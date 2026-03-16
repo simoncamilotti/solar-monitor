@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* You can add global styles to this file, and also import other style files */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+    --primary: 245 58% 51%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 245 58% 51%;
+    --radius: 0.5rem;
+
+    --sidebar-background: 240 5% 98%;
+    --sidebar-foreground: 240 4% 25%;
+    --sidebar-primary: 245 58% 51%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 94%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-ring: 245 58% 51%;
+
+    --surface: 240 5% 98%;
+    --surface-hover: 240 5% 94%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 240 15% 4%;
+    --foreground: 240 10% 93%;
+    --card: 240 14% 6%;
+    --card-foreground: 240 10% 93%;
+    --popover: 240 14% 7%;
+    --popover-foreground: 240 10% 93%;
+    --primary: 245 58% 61%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 12% 10%;
+    --secondary-foreground: 240 10% 93%;
+    --muted: 240 12% 10%;
+    --muted-foreground: 240 5% 50%;
+    --accent: 240 12% 10%;
+    --accent-foreground: 240 10% 93%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 10% 13%;
+    --input: 240 10% 13%;
+    --ring: 245 58% 61%;
+
+    --sidebar-background: 240 15% 5%;
+    --sidebar-foreground: 240 5% 55%;
+    --sidebar-primary: 245 58% 61%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 12% 9%;
+    --sidebar-accent-foreground: 240 10% 93%;
+    --sidebar-border: 240 10% 11%;
+    --sidebar-ring: 245 58% 61%;
+
+    --surface: 240 14% 7%;
+    --surface-hover: 240 12% 10%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family:
+      'Inter',
+      system-ui,
+      -apple-system,
+      sans-serif;
+  }
+}

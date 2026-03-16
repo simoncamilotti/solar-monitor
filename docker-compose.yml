@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: solar-monitor_postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - solar-monitor_network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: solar-monitor_keycloak
+    ports:
+      - '8080:8080'
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    command: start-dev
+    volumes:
+      - ./config/keycloak/data:/opt/keycloak/data/h2
+    networks:
+      - solar-monitor_network
+
+volumes:
+  postgres_data:
+
+networks:
+  solar-monitor_network:
+    driver: bridge

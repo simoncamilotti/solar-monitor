@@ -1,0 +1,22 @@
+{
+  "nav": {
+    "home": "Home",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "featureFlags": {
+    "title": "Feature Flags",
+    "description": "Enable or disable sections of the public site.",
+    "placeholder": "Flag name (e.g. my-feature)",
+    "keyHint": "Lowercase only, words separated by hyphens.",
+    "add": "Add",
+    "empty": "No feature flags configured.",
+    "enabled": "enabled",
+    "disabled": "disabled",
+    "toggled": "Flag \"{{key}}\" {{state}}",
+    "toggleError": "Error updating flag",
+    "created": "Flag \"{{key}}\" created",
+    "createError": "Error creating flag",
+    "alreadyExists": "This flag already exists"
+  }
+}

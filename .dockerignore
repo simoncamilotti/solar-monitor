@@ -1,0 +1,41 @@
+node_modules
+dist
+.nx
+.git
+.gitignore
+.github
+coverage
+tmp
+
+# Environment files
+.env
+.env.*
+
+# Documentation
+*.md
+LICENSE
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Config
+config/keycloak/data
+setup.sh
+
+# Tests
+apps/*/playwright
+apps/*-e2e
+**/*.spec.ts
+**/*.spec.tsx
+**/*.test.ts
+**/*.test.tsx
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.yml

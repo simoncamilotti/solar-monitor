@@ -1,0 +1,22 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "settings": "Paramétrage",
+    "logout": "Déconnexion"
+  },
+  "featureFlags": {
+    "title": "Feature Flags",
+    "description": "Activez ou désactivez des sections du site public.",
+    "placeholder": "Nom du flag (ex: my-feature)",
+    "keyHint": "Minuscules uniquement, mots séparés par des tirets.",
+    "add": "Ajouter",
+    "empty": "Aucun feature flag configuré.",
+    "enabled": "activé",
+    "disabled": "désactivé",
+    "toggled": "Flag \"{{key}}\" {{state}}",
+    "toggleError": "Erreur lors de la mise à jour du flag",
+    "created": "Flag \"{{key}}\" créé",
+    "createError": "Erreur lors de la création du flag",
+    "alreadyExists": "Ce flag existe déjà"
+  }
+}
