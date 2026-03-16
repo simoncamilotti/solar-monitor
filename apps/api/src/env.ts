@@ -8,6 +8,10 @@ const envSchema = z.object({
   PORT: z.coerce.number().optional().default(3000),
   NODE_ENV: z.enum(['development', 'production', 'test']).optional().default('development'),
   TZ: z.string().optional().default('Etc/UTC'),
+  ENPHASE_CLIENT_ID: z.string().min(1),
+  ENPHASE_CLIENT_SECRET: z.string().min(1),
+  ENPHASE_API_KEY: z.string().min(1),
+  ENPHASE_REDIRECT_URI: z.url(),
 });
 
 export type Env = z.infer<typeof envSchema>;

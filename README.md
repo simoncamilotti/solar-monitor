@@ -108,6 +108,30 @@ npm run prisma:migrate:deploy  # Apply migrations (prod)
 npm run prisma:studio          # Prisma Studio (DB GUI)
 ```
 
+## Enphase Solar Monitoring
+
+Integration with the [Enphase Developer API v4](https://developer-v4.enphase.com) to collect daily solar production, consumption, import, and export data.
+
+### Setup
+
+1. Create an application on the [Enphase Developer Portal](https://developer-v4.enphase.com/signup)
+2. Add the following variables to your `.env`:
+
+```env
+ENPHASE_CLIENT_ID=your_client_id
+ENPHASE_CLIENT_SECRET=your_client_secret
+ENPHASE_API_KEY=your_api_key
+ENPHASE_REDIRECT_URI=http://localhost:3000/api/enphase/callback
+```
+
+3. Apply the database migration:
+
+```bash
+npm run prisma:migrate:deploy
+```
+
+4. Start the API and navigate to `http://localhost:3000/api/enphase/authorize` to link your Enphase account via OAuth2.
+
 ### API Endpoints
 
 | Endpoint                     | Auth     | Description                                                     |
@@ -117,6 +141,12 @@ npm run prisma:studio          # Prisma Studio (DB GUI)
 | `GET /api/enphase/sync`      | Required | Triggers manual sync (`?system_id=`)                            |
 | `GET /api/enphase/backfill`  | Required | Backfills historical data (`?system_id=&start_date=&end_date=`) |
 
+### Automated Tasks
+
+| Schedule       | Task                                                      |
+| :------------- | :-------------------------------------------------------- |
+| Every day 2 AM | Fetch previous day's lifetime data for all linked systems |
+| Every 6 hours  | Proactively refresh tokens expiring within 12 hours       |
 
 ## Docker Infrastructure
 
