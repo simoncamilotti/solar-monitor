@@ -117,10 +117,7 @@ describe('EnphaseSyncService', () => {
 
   describe('syncAllSystems', () => {
     it('should sync all registered systems', async () => {
-      mockPrismaService.enphaseToken.findMany.mockResolvedValue([
-        { systemId: 1 },
-        { systemId: 2 },
-      ]);
+      mockPrismaService.enphaseToken.findMany.mockResolvedValue([{ systemId: 1 }, { systemId: 2 }]);
       mockApiService.getLifetimeData.mockResolvedValue(LIFETIME_DATA);
       mockPrismaService.enphaseToken.findUniqueOrThrow.mockResolvedValue(TOKEN_RECORD);
       mockMapper.toLifetimeDataRecords.mockReturnValue([]);
@@ -132,13 +129,8 @@ describe('EnphaseSyncService', () => {
     });
 
     it('should continue syncing other systems if one fails', async () => {
-      mockPrismaService.enphaseToken.findMany.mockResolvedValue([
-        { systemId: 1 },
-        { systemId: 2 },
-      ]);
-      mockApiService.getLifetimeData
-        .mockRejectedValueOnce(new Error('API error'))
-        .mockResolvedValueOnce(LIFETIME_DATA);
+      mockPrismaService.enphaseToken.findMany.mockResolvedValue([{ systemId: 1 }, { systemId: 2 }]);
+      mockApiService.getLifetimeData.mockRejectedValueOnce(new Error('API error')).mockResolvedValueOnce(LIFETIME_DATA);
       mockPrismaService.enphaseToken.findUniqueOrThrow.mockResolvedValue(TOKEN_RECORD);
       mockMapper.toLifetimeDataRecords.mockReturnValue([]);
 
@@ -158,10 +150,7 @@ describe('EnphaseSyncService', () => {
 
   describe('refreshExpiringTokens', () => {
     it('should refresh tokens expiring within 12 hours', async () => {
-      mockPrismaService.enphaseToken.findMany.mockResolvedValue([
-        { systemId: 1 },
-        { systemId: 2 },
-      ]);
+      mockPrismaService.enphaseToken.findMany.mockResolvedValue([{ systemId: 1 }, { systemId: 2 }]);
       mockAuthService.refreshAccessToken.mockResolvedValue('new-token');
 
       await service.refreshExpiringTokens();
@@ -175,10 +164,7 @@ describe('EnphaseSyncService', () => {
     });
 
     it('should continue refreshing other tokens if one fails', async () => {
-      mockPrismaService.enphaseToken.findMany.mockResolvedValue([
-        { systemId: 1 },
-        { systemId: 2 },
-      ]);
+      mockPrismaService.enphaseToken.findMany.mockResolvedValue([{ systemId: 1 }, { systemId: 2 }]);
       mockAuthService.refreshAccessToken
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce('new-token');

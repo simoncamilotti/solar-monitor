@@ -116,7 +116,15 @@ describe('EnphaseApiService', () => {
     it('should omit date params when not provided', async () => {
       mockAuthService.getValidAccessToken.mockResolvedValue('token');
       mockHttpService.get.mockReturnValue(
-        of({ data: { system_id: 1, start_date: '2025-01-01', meta: LIFETIME_META, production: [], meter_start_date: '2025-01-01' } }),
+        of({
+          data: {
+            system_id: 1,
+            start_date: '2025-01-01',
+            meta: LIFETIME_META,
+            production: [],
+            meter_start_date: '2025-01-01',
+          },
+        }),
       );
 
       await service.getEnergyLifetime(1);

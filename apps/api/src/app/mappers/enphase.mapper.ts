@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import type { EnphaseSystemRaw, LifetimeData } from '../types/enphase.types';
 import { EnphaseSystemDto } from '@/shared-models/server';
+
+import type { EnphaseSystemRaw, LifetimeData } from '../types/enphase.types';
 
 type LifetimeDataRecord = {
   date: Date;

@@ -9,8 +9,7 @@ import { EnphaseMapper } from '../mappers/enphase.mapper';
 import { EnphaseApiService } from '../services/enphase-api.service';
 import { EnphaseAuthService } from '../services/enphase-auth.service';
 import { EnphaseSyncService } from '../services/enphase-sync.service';
-import type {
-} from '../types/enphase.types';
+import type {} from '../types/enphase.types';
 
 @ApiTags('Enphase')
 @Controller('enphase')

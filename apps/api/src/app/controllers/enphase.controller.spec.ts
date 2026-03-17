@@ -84,9 +84,7 @@ describe('EnphaseController', () => {
 
     it('should store tokens and return mapped systems', async () => {
       const tokens = { accessToken: 'token', refreshToken: 'refresh', expiresAt: new Date() };
-      const rawSystems = [
-        { system_id: 1, name: 'Solar A', timezone: 'Europe/Paris', status: 'normal' },
-      ];
+      const rawSystems = [{ system_id: 1, name: 'Solar A', timezone: 'Europe/Paris', status: 'normal' }];
       const mappedSystems = [{ id: 1, name: 'Solar A', timezone: 'Europe/Paris' }];
 
       mockAuthService.exchangeCodeForTokens.mockResolvedValue(tokens);

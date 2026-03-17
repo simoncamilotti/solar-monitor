@@ -75,11 +75,7 @@ export class EnphaseSyncService {
     }
   }
 
-  private async _upsertLifetimeData(
-    systemId: number,
-    lifetimeData: LifetimeData,
-    startDate: string,
-  ): Promise<number> {
+  private async _upsertLifetimeData(systemId: number, lifetimeData: LifetimeData, startDate: string): Promise<number> {
     const token = await this._prismaService.enphaseToken.findUniqueOrThrow({
       where: { systemId },
     });
