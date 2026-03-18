@@ -58,3 +58,11 @@ export type LifetimeData = {
   whImported: number[];
   whExported: number[];
 };
+
+export type LifetimeDataRecord = {
+  date: Date;
+  whProduced: number;
+  whConsumed: number;
+  whImported: number;
+  whExported: number;
+};

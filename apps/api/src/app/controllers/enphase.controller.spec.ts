@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { EnphaseMapper } from '../mappers/enphase.mapper';
+import { EnphaseService } from '../services/enphase.service';
 import { EnphaseApiService } from '../services/enphase-api.service';
 import { EnphaseAuthService } from '../services/enphase-auth.service';
 import { EnphaseSyncService } from '../services/enphase-sync.service';
@@ -20,6 +21,10 @@ const mockApiService = {
 const mockSyncService = {
   syncLifetimeData: jest.fn(),
   backfillLifetimeData: jest.fn(),
+};
+
+const mockEnphaseService = {
+  getAllLifetimeData: jest.fn(),
 };
 
 const mockMapper = {
@@ -43,6 +48,7 @@ describe('EnphaseController', () => {
         { provide: EnphaseAuthService, useValue: mockAuthService },
         { provide: EnphaseApiService, useValue: mockApiService },
         { provide: EnphaseSyncService, useValue: mockSyncService },
+        { provide: EnphaseService, useValue: mockEnphaseService },
         { provide: EnphaseMapper, useValue: mockMapper },
       ],
     }).compile();
@@ -103,6 +109,28 @@ describe('EnphaseController', () => {
         message: 'Enphase account linked successfully',
         systems: mappedSystems,
       });
+    });
+  });
+
+  describe('getAll', () => {
+    it('should return all lifetime data', async () => {
+      const data = [
+        { date: new Date('2026-03-10'), whProduced: 1000, whConsumed: 500, whImported: 100, whExported: 400 },
+      ];
+      mockEnphaseService.getAllLifetimeData.mockResolvedValue(data);
+
+      const result = await controller.getAll();
+
+      expect(result).toEqual(data);
+      expect(mockEnphaseService.getAllLifetimeData).toHaveBeenCalled();
+    });
+
+    it('should return empty array when no data exists', async () => {
+      mockEnphaseService.getAllLifetimeData.mockResolvedValue([]);
+
+      const result = await controller.getAll();
+
+      expect(result).toEqual([]);
     });
   });
 

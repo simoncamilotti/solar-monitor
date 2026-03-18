@@ -1,23 +1,22 @@
-/** Mapped system info for API responses */
-export type EnphaseSystemDto = {
-  id: number;
-  name: string;
-  timezone: string;
-};
+import { createZodDto } from 'nestjs-zod';
 
-/** Response returned after a successful OAuth callback */
-export type EnphaseCallbackResponseDto = {
-  message: string;
-  systems: EnphaseSystemDto[];
-};
+import {
+  enphaseBackfillResponseDtoSchema,
+  enphaseCallbackResponseDtoSchema,
+  enphaseSyncResponseDtoSchema,
+  enphaseSystemDtoSchema,
+  lifetimeDataDtoSchema,
+  lifetimeDataResponseDtoSchema,
+} from '../schemas/enphase.schema';
 
-/** Response returned after a sync operation */
-export type EnphaseSyncResponseDto = {
-  message: string;
-};
+export class EnphaseSystemDto extends createZodDto(enphaseSystemDtoSchema) {}
 
-/** Response returned after a backfill operation */
-export type EnphaseBackfillResponseDto = {
-  message: string;
-  daysBackfilled: number;
-};
+export class EnphaseCallbackResponseDto extends createZodDto(enphaseCallbackResponseDtoSchema) {}
+
+export class EnphaseSyncResponseDto extends createZodDto(enphaseSyncResponseDtoSchema) {}
+
+export class EnphaseBackfillResponseDto extends createZodDto(enphaseBackfillResponseDtoSchema) {}
+
+export class LifetimeDataDto extends createZodDto(lifetimeDataDtoSchema) {}
+
+export class LifetimeDataResponseDto extends createZodDto(lifetimeDataResponseDtoSchema) {}
