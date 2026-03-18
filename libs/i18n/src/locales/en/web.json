@@ -1,8 +1,18 @@
 {
-  "nav": {
-    "home": "Home",
-    "settings": "Settings",
-    "logout": "Logout"
+  "sidebar": {
+    "title": "Solar monitoring",
+    "nav": {
+      "home": "Home",
+      "settings": "Settings",
+      "logout": "Logout"
+    }
+  },
+  "language": {
+    "fr": "Fr"
+  },
+  "theme": {
+    "dark": "Dark mode",
+    "light": "Light mode"
   },
   "featureFlags": {
     "title": "Feature Flags",

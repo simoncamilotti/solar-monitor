@@ -1,8 +1,18 @@
 {
-  "nav": {
-    "home": "Accueil",
-    "settings": "Paramétrage",
-    "logout": "Déconnexion"
+  "sidebar": {
+    "title": "Monitoring solaire",
+    "nav": {
+      "home": "Accueil",
+      "settings": "Paramétrage",
+      "logout": "Déconnexion"
+    }
+  },
+  "language": {
+    "en": "En"
+  },
+  "theme": {
+    "dark": "Mode sombre",
+    "light": "Mode clair"
   },
   "featureFlags": {
     "title": "Feature Flags",

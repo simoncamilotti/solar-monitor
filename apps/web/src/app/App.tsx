@@ -6,14 +6,18 @@ import { Toaster } from 'sonner';
 
 import { ReactQueryProvider } from '@/shared-web';
 
+import { ThemeProvider } from './modules/layout/providers/ThemeProvider';
+
 export const App: FunctionComponent<{
   router: ReturnType<typeof createBrowserRouter>;
 }> = ({ router }) => {
   return (
     <React.StrictMode>
       <ReactQueryProvider>
-        <RouterProvider router={router} />
-        <Toaster richColors position="bottom-right" />
+        <ThemeProvider>
+          <RouterProvider router={router} />
+          <Toaster richColors position="bottom-right" />
+        </ThemeProvider>
       </ReactQueryProvider>
     </React.StrictMode>
   );
