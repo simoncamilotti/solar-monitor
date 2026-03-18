@@ -1,16 +1,48 @@
 import type { Page } from '@playwright/test';
 
+const featureFlags = [
+  { key: 'dark-mode', enabled: true },
+  { key: 'blog', enabled: false },
+];
+
 /**
  * Intercepts all API requests and returns mock data.
  * Must be called before any page navigation.
  */
 export async function mockApi(page: Page): Promise<void> {
   await page.route('**/api/feature-flags', route => {
-    if (route.request().method() === 'GET') {
+    const method = route.request().method();
+
+    if (method === 'GET') {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({}),
+        body: JSON.stringify(featureFlags),
+      });
+    }
+
+    if (method === 'POST') {
+      const body = route.request().postDataJSON();
+      const created = { key: body.key, enabled: body.enabled ?? false };
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(created),
+      });
+    }
+
+    return route.continue();
+  });
+
+  await page.route('**/api/feature-flags/*', route => {
+    if (route.request().method() === 'PATCH') {
+      const body = route.request().postDataJSON();
+      const url = route.request().url();
+      const key = url.split('/').pop();
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ key, enabled: body.enabled }),
       });
     }
 

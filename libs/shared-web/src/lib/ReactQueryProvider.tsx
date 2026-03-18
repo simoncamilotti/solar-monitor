@@ -16,13 +16,6 @@ export const queryClient = new QueryClient({
   },
 });
 
-export const neverRefetchQueryOptions = {
-  refetchOnReconnect: false,
-  refetchIntervalInBackground: false,
-  refetchOnWindowFocus: false,
-  refetchOnMount: false,
-} as const;
-
 export const ReactQueryProvider: FunctionComponent<PropsWithChildren> = ({ children }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );

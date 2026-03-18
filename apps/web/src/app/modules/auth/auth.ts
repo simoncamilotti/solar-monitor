@@ -89,3 +89,7 @@ const updateTokenInStorage = (token?: string) => {
     setStoredToken(token);
   }
 };
+
+export const getAuthenticatedUsername = () => {
+  return `${keycloak.idTokenParsed?.given_name ?? ''} ${keycloak.idTokenParsed?.family_name ?? ''}`;
+};
