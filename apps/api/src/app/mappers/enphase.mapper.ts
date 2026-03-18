@@ -1,16 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { EnphaseLifetimeData } from '@prisma/client';
 
-import { EnphaseSystemDto } from '@/shared-models/server';
+import { EnphaseSystemDto, LifetimeDataResponseDto } from '@/shared-models/server';
 
-import type { EnphaseSystemRaw, LifetimeData } from '../types/enphase.types';
-
-type LifetimeDataRecord = {
-  date: Date;
-  whProduced: number;
-  whConsumed: number;
-  whImported: number;
-  whExported: number;
-};
+import type { EnphaseSystemRaw, LifetimeData, LifetimeDataRecord } from '../types/enphase.types';
 
 @Injectable()
 export class EnphaseMapper {
@@ -39,5 +32,15 @@ export class EnphaseMapper {
         whExported: lifetimeData.whExported[index],
       };
     });
+  }
+
+  toLifetimeDataResponseDto(lifetimeData: EnphaseLifetimeData[]): LifetimeDataResponseDto {
+    return lifetimeData.map(x => ({
+      date: x.date,
+      whProduced: x.whProduced,
+      whConsumed: x.whConsumed,
+      whImported: x.whImported,
+      whExported: x.whExported,
+    }));
   }
 }

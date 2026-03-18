@@ -3,14 +3,18 @@ import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 
 import { Public } from '@/core';
-import { EnphaseBackfillResponseDto, EnphaseCallbackResponseDto, EnphaseSyncResponseDto } from '@/shared-models/server';
+import {
+  EnphaseBackfillResponseDto,
+  EnphaseCallbackResponseDto,
+  EnphaseSyncResponseDto,
+  LifetimeDataResponseDto,
+} from '@/shared-models/server';
 
 import { EnphaseMapper } from '../mappers/enphase.mapper';
+import { EnphaseService } from '../services/enphase.service';
 import { EnphaseApiService } from '../services/enphase-api.service';
 import { EnphaseAuthService } from '../services/enphase-auth.service';
 import { EnphaseSyncService } from '../services/enphase-sync.service';
-import type {} from '../types/enphase.types';
-
 @ApiTags('Enphase')
 @Controller('enphase')
 export class EnphaseController {
@@ -20,6 +24,7 @@ export class EnphaseController {
     private readonly _enphaseAuthService: EnphaseAuthService,
     private readonly _enphaseApiService: EnphaseApiService,
     private readonly _enphaseSyncService: EnphaseSyncService,
+    private readonly _enphaseService: EnphaseService,
     private readonly _enphaseMapper: EnphaseMapper,
   ) {}
 
@@ -60,6 +65,12 @@ export class EnphaseController {
     };
 
     res.json(response);
+  }
+
+  @Get('all')
+  @ApiOperation({ summary: 'expose all lifetime data' })
+  async getAll(): Promise<LifetimeDataResponseDto> {
+    return this._enphaseService.getAllLifetimeData();
   }
 
   @Get('sync')

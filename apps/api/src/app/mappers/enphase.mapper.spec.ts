@@ -1,3 +1,5 @@
+import type { EnphaseLifetimeData } from '@prisma/client';
+
 import type { EnphaseSystemRaw, LifetimeData } from '../types/enphase.types';
 import { EnphaseMapper } from './enphase.mapper';
 
@@ -142,6 +144,67 @@ describe('EnphaseMapper', () => {
 
       expect(records[0].date).toEqual(new Date('2026-01-31'));
       expect(records[1].date).toEqual(new Date('2026-02-01'));
+    });
+  });
+
+  describe('toLifetimeDataResponseDto', () => {
+    it('should map Prisma entities to response DTOs', () => {
+      const data: EnphaseLifetimeData[] = [
+        {
+          id: '1',
+          date: new Date('2026-03-10'),
+          whProduced: 1000,
+          whConsumed: 500,
+          whImported: 100,
+          whExported: 400,
+          createdAt: new Date(),
+          enphaseTokenId: '1',
+        },
+        {
+          id: '2',
+          date: new Date('2026-03-11'),
+          whProduced: 2000,
+          whConsumed: 600,
+          whImported: 200,
+          whExported: 500,
+          createdAt: new Date(),
+          enphaseTokenId: '1',
+        },
+      ];
+
+      const result = mapper.toLifetimeDataResponseDto(data);
+
+      expect(result).toEqual([
+        { date: new Date('2026-03-10'), whProduced: 1000, whConsumed: 500, whImported: 100, whExported: 400 },
+        { date: new Date('2026-03-11'), whProduced: 2000, whConsumed: 600, whImported: 200, whExported: 500 },
+      ]);
+    });
+
+    it('should not include Prisma-specific fields', () => {
+      const data: EnphaseLifetimeData[] = [
+        {
+          id: '99',
+          date: new Date('2026-01-01'),
+          whProduced: 100,
+          whConsumed: 50,
+          whImported: 10,
+          whExported: 40,
+          createdAt: new Date(),
+          enphaseTokenId: '5',
+        },
+      ];
+
+      const result = mapper.toLifetimeDataResponseDto(data);
+
+      expect(result[0]).not.toHaveProperty('id');
+      expect(result[0]).not.toHaveProperty('createdAt');
+      expect(result[0]).not.toHaveProperty('enphaseTokenId');
+    });
+
+    it('should return empty array for empty input', () => {
+      const result = mapper.toLifetimeDataResponseDto([]);
+
+      expect(result).toEqual([]);
     });
   });
 });
