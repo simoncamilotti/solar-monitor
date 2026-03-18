@@ -44,7 +44,7 @@ describe('ThemeProvider', () => {
   });
 
   it('should read theme from localStorage', () => {
-    localStorage.setItem('helios-theme', 'light');
+    localStorage.setItem('theme', 'light');
 
     render(
       <ThemeProvider>
@@ -66,7 +66,7 @@ describe('ThemeProvider', () => {
   });
 
   it('should remove dark class when theme is light', () => {
-    localStorage.setItem('helios-theme', 'light');
+    localStorage.setItem('theme', 'light');
 
     render(
       <ThemeProvider>
@@ -100,12 +100,12 @@ describe('ThemeProvider', () => {
       </ThemeProvider>,
     );
 
-    expect(localStorage.getItem('helios-theme')).toBe('dark');
+    expect(localStorage.getItem('theme')).toBe('dark');
 
     act(() => {
       fireEvent.click(screen.getByTestId('toggle'));
     });
 
-    expect(localStorage.getItem('helios-theme')).toBe('light');
+    expect(localStorage.getItem('theme')).toBe('light');
   });
 });

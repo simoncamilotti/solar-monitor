@@ -33,7 +33,7 @@ test.describe('Theme toggle', () => {
     const themeButton = page.locator('aside button').filter({ hasText: /mode/i });
     await themeButton.click();
 
-    const theme = await page.evaluate(() => localStorage.getItem('helios-theme'));
+    const theme = await page.evaluate(() => localStorage.getItem('theme'));
     expect(theme).toBe('light');
   });
 });

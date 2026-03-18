@@ -72,9 +72,7 @@ describe('Feature Flags API', () => {
 
   describe('PATCH /api/feature-flags/:key', () => {
     it('should return 401 without a token', async () => {
-      const error = await axios
-        .patch('/api/feature-flags/some-key', { enabled: true })
-        .catch((e: AxiosError) => e);
+      const error = await axios.patch('/api/feature-flags/some-key', { enabled: true }).catch((e: AxiosError) => e);
 
       expect(axios.isAxiosError(error)).toBe(true);
       expect((error as AxiosError).response?.status).toBe(401);
