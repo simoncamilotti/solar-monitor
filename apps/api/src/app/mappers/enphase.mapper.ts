@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EnphaseLifetimeData } from '@prisma/client';
+import { Decimal } from 'decimal.js';
 
 import { EnphaseSystemDto, LifetimeDataResponseDto } from '@/shared-models/server';
 
@@ -20,16 +21,23 @@ export class EnphaseMapper {
   }
 
   toLifetimeDataRecords(lifetimeData: LifetimeData, startDate: string): LifetimeDataRecord[] {
-    return lifetimeData.whConsumed.map((_, index) => {
+    const length = Math.min(
+      lifetimeData.whProduced.length,
+      lifetimeData.whConsumed.length,
+      lifetimeData.whImported.length,
+      lifetimeData.whExported.length,
+    );
+
+    return Array.from({ length }, (_, index) => {
       const date = new Date(startDate);
       date.setUTCDate(date.getUTCDate() + index);
 
       return {
         date,
-        whProduced: lifetimeData.whProduced[index],
-        whConsumed: lifetimeData.whConsumed[index],
-        whImported: lifetimeData.whImported[index],
-        whExported: lifetimeData.whExported[index],
+        whProduced: lifetimeData.whProduced[index] ?? 0,
+        whConsumed: lifetimeData.whConsumed[index] ?? 0,
+        whImported: lifetimeData.whImported[index] ?? 0,
+        whExported: lifetimeData.whExported[index] ?? 0,
       };
     });
   }
@@ -37,10 +45,11 @@ export class EnphaseMapper {
   toLifetimeDataResponseDto(lifetimeData: EnphaseLifetimeData[]): LifetimeDataResponseDto {
     return lifetimeData.map(x => ({
       date: x.date,
-      whProduced: x.whProduced,
-      whConsumed: x.whConsumed,
-      whImported: x.whImported,
-      whExported: x.whExported,
+      kwhProduced: new Decimal(x.whProduced).div(1000).toNumber(),
+      kwhConsumed: new Decimal(x.whConsumed).div(1000).toNumber(),
+      kwhImported: new Decimal(x.whImported).div(1000).toNumber(),
+      kwhExported: new Decimal(x.whExported).div(1000).toNumber(),
+      gridDependency: x.whConsumed === 0 ? 0 : new Decimal(x.whImported).div(x.whConsumed).mul(100).toNumber(),
     }));
   }
 }

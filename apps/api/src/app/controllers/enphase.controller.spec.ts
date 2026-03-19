@@ -12,6 +12,7 @@ const mockAuthService = {
   getAuthorizationUrl: jest.fn(),
   exchangeCodeForTokens: jest.fn(),
   storeTokens: jest.fn(),
+  validateState: jest.fn(),
 };
 
 const mockApiService = {
@@ -40,7 +41,7 @@ describe('EnphaseController', () => {
   let controller: EnphaseController;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [EnphaseController],
@@ -71,9 +72,21 @@ describe('EnphaseController', () => {
     it('should throw BadRequestException when code is missing', async () => {
       const res = createMockResponse();
 
-      await expect(controller.callback(undefined as unknown as string, res as any)).rejects.toThrow(
+      await expect(controller.callback(undefined as unknown as string, 'valid-state', res as any)).rejects.toThrow(
         BadRequestException,
       );
+    });
+
+    it('should validate state parameter', async () => {
+      mockAuthService.validateState.mockImplementation(() => {
+        throw new BadRequestException('Invalid or missing OAuth state parameter');
+      });
+      const res = createMockResponse();
+
+      await expect(controller.callback('code-123', undefined as unknown as string, res as any)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(mockAuthService.validateState).toHaveBeenCalled();
     });
 
     it('should return empty message when no systems found', async () => {
@@ -82,7 +95,7 @@ describe('EnphaseController', () => {
       mockApiService.getSystems.mockResolvedValue({ systems: [] });
       const res = createMockResponse();
 
-      await controller.callback('code-123', res as any);
+      await controller.callback('code-123', 'valid-state', res as any);
 
       expect(res.json).toHaveBeenCalledWith({ message: 'No systems found on this Enphase account' });
       expect(mockAuthService.storeTokens).not.toHaveBeenCalled();
@@ -99,8 +112,9 @@ describe('EnphaseController', () => {
       mockAuthService.storeTokens.mockResolvedValue(undefined);
       const res = createMockResponse();
 
-      await controller.callback('code-123', res as any);
+      await controller.callback('code-123', 'valid-state', res as any);
 
+      expect(mockAuthService.validateState).toHaveBeenCalledWith('valid-state');
       expect(mockAuthService.exchangeCodeForTokens).toHaveBeenCalledWith('code-123');
       expect(mockApiService.getSystems).toHaveBeenCalledWith('token');
       expect(mockAuthService.storeTokens).toHaveBeenCalledWith(1, tokens);
@@ -138,7 +152,7 @@ describe('EnphaseController', () => {
     it('should delegate to sync service and return message', async () => {
       mockSyncService.syncLifetimeData.mockResolvedValue(undefined);
 
-      const result = await controller.triggerSync('42');
+      const result = await controller.triggerSync(42);
 
       expect(result).toEqual({ message: 'Sync completed for system 42' });
       expect(mockSyncService.syncLifetimeData).toHaveBeenCalledWith(42);
@@ -147,7 +161,7 @@ describe('EnphaseController', () => {
     it('should propagate errors from sync service', async () => {
       mockSyncService.syncLifetimeData.mockRejectedValue(new Error('Sync failed'));
 
-      await expect(controller.triggerSync('42')).rejects.toThrow('Sync failed');
+      await expect(controller.triggerSync(42)).rejects.toThrow('Sync failed');
     });
   });
 
@@ -155,7 +169,7 @@ describe('EnphaseController', () => {
     it('should delegate to sync service and return count', async () => {
       mockSyncService.backfillLifetimeData.mockResolvedValue(30);
 
-      const result = await controller.backfill('42', '2026-01-01', '2026-01-31');
+      const result = await controller.backfill(42, '2026-01-01', '2026-01-31');
 
       expect(result).toEqual({ message: 'Backfill completed', daysBackfilled: 30 });
       expect(mockSyncService.backfillLifetimeData).toHaveBeenCalledWith(42, '2026-01-01', '2026-01-31');
@@ -164,7 +178,15 @@ describe('EnphaseController', () => {
     it('should propagate errors from sync service', async () => {
       mockSyncService.backfillLifetimeData.mockRejectedValue(new Error('API error'));
 
-      await expect(controller.backfill('42', '2026-01-01', '2026-01-31')).rejects.toThrow('API error');
+      await expect(controller.backfill(42, '2026-01-01', '2026-01-31')).rejects.toThrow('API error');
+    });
+
+    it('should throw when start_date format is invalid', async () => {
+      await expect(controller.backfill(42, 'not-a-date', '2026-01-31')).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw when start_date is after end_date', async () => {
+      await expect(controller.backfill(42, '2026-02-01', '2026-01-01')).rejects.toThrow(BadRequestException);
     });
   });
 });

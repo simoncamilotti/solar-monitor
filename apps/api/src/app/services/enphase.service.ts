@@ -13,7 +13,9 @@ export class EnphaseService {
   ) {}
 
   async getAllLifetimeData(): Promise<LifetimeDataResponseDto> {
-    const data = await this._prismaService.enphaseLifetimeData.findMany();
+    const data = await this._prismaService.enphaseLifetimeData.findMany({
+      orderBy: { date: 'asc' },
+    });
 
     return this._enphaseMapper.toLifetimeDataResponseDto(data);
   }

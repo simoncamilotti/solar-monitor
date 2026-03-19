@@ -96,4 +96,14 @@
       -apple-system,
       sans-serif;
   }
+
+  .solar-numeric-header .ag-header-cell-label {
+    flex-direction: row-reverse;
+  }
+
+  .solar-numeric-cell {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
 }

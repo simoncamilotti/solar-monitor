@@ -3,6 +3,7 @@
     "title": "Monitoring solaire",
     "nav": {
       "home": "Accueil",
+      "history": "Historique",
       "settings": "Paramétrage",
       "logout": "Déconnexion"
     }
@@ -13,6 +14,22 @@
   "theme": {
     "dark": "Mode sombre",
     "light": "Mode clair"
+  },
+  "history": {
+    "title": "Historique",
+    "description": "Explorez et filtrez l'ensemble de vos données de production",
+    "error": "Une erreur est survenue lors du chargement des données.",
+    "columns": {
+      "date": "Date",
+      "year": "Année",
+      "month": "Mois",
+      "day": "Jour",
+      "produced": "Production (Wh)",
+      "consumed": "Consommation (Wh)",
+      "imported": "Import (Wh)",
+      "exported": "Export (Wh)",
+      "gridDependency": "Dépendence (%)"
+    }
   },
   "featureFlags": {
     "title": "Feature Flags",

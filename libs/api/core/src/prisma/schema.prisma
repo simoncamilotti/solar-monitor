@@ -45,9 +45,9 @@ model EnphaseLifetimeData {
 
   createdAt DateTime @default(now())
 
-  EnphaseToken   EnphaseToken? @relation(fields: [enphaseTokenId], references: [id])
-  enphaseTokenId String?
+  EnphaseToken   EnphaseToken @relation(fields: [enphaseTokenId], references: [id])
+  enphaseTokenId String
 
-  @@unique([date])
+  @@unique([date, enphaseTokenId])
   @@index([date])
 }

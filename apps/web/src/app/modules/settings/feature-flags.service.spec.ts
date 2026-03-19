@@ -9,7 +9,7 @@ vi.mock('../api/axiosInstance', () => ({
 import { axiosInstance } from '../api/axiosInstance';
 import { FeatureFlagsService } from './feature-flags.service';
 
-const mockedAxios = vi.mocked(axiosInstance);
+const mockedAxios = vi.mocked(axiosInstance, true);
 
 describe('FeatureFlagsService', () => {
   beforeEach(() => {

@@ -20,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         jwksUri: `${process.env['KEYCLOAK_ISSUER_URL']}/protocol/openid-connect/certs`,
       }),
       issuer: process.env['KEYCLOAK_ISSUER_URL'],
+      audience: process.env['KEYCLOAK_CLIENT_ID'],
       algorithms: ['RS256'],
     });
   }
@@ -34,7 +35,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       username: payload.preferred_username,
       firstName: payload.given_name,
       lastName: payload.family_name,
-      roles: payload.resource_access?.roles || [],
+      roles: payload.realm_access?.roles || [],
     };
   }
 }

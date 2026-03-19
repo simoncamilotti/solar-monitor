@@ -82,13 +82,20 @@ export class EnphaseSyncService {
 
     const records = this._mapper.toLifetimeDataRecords(lifetimeData, startDate);
 
-    for (const record of records) {
-      await this._prismaService.enphaseLifetimeData.upsert({
-        where: { date: record.date },
-        create: { ...record, enphaseTokenId: token.id },
-        update: { ...record, enphaseTokenId: token.id },
-      });
-    }
+    await this._prismaService.$transaction(
+      records.map(record =>
+        this._prismaService.enphaseLifetimeData.upsert({
+          where: {
+            date_enphaseTokenId: {
+              date: record.date,
+              enphaseTokenId: token.id,
+            },
+          },
+          create: { ...record, enphaseTokenId: token.id },
+          update: { ...record, enphaseTokenId: token.id },
+        }),
+      ),
+    );
 
     return records.length;
   }

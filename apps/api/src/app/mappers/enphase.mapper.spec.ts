@@ -175,8 +175,22 @@ describe('EnphaseMapper', () => {
       const result = mapper.toLifetimeDataResponseDto(data);
 
       expect(result).toEqual([
-        { date: new Date('2026-03-10'), whProduced: 1000, whConsumed: 500, whImported: 100, whExported: 400 },
-        { date: new Date('2026-03-11'), whProduced: 2000, whConsumed: 600, whImported: 200, whExported: 500 },
+        {
+          date: new Date('2026-03-10'),
+          kwhProduced: 1,
+          kwhConsumed: 0.5,
+          kwhImported: 0.1,
+          kwhExported: 0.4,
+          gridDependency: 20,
+        },
+        {
+          date: new Date('2026-03-11'),
+          kwhProduced: 2,
+          kwhConsumed: 0.6,
+          kwhImported: 0.2,
+          kwhExported: 0.5,
+          gridDependency: expect.closeTo(33.33, 1),
+        },
       ]);
     });
 
@@ -199,6 +213,8 @@ describe('EnphaseMapper', () => {
       expect(result[0]).not.toHaveProperty('id');
       expect(result[0]).not.toHaveProperty('createdAt');
       expect(result[0]).not.toHaveProperty('enphaseTokenId');
+      expect(result[0]).toHaveProperty('kwhProduced');
+      expect(result[0]).toHaveProperty('gridDependency');
     });
 
     it('should return empty array for empty input', () => {
