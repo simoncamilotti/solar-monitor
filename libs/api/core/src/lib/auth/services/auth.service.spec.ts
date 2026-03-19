@@ -26,7 +26,7 @@ const jwtPayload: JWTPayload = {
   typ: '',
   azp: '',
   'allowed-origins': [],
-  resource_access: { roles: ['user'] },
+  realm_access: { roles: ['USER'] },
   scope: '',
   sid: '',
 };
