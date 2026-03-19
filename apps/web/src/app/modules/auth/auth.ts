@@ -51,7 +51,10 @@ export const initAuth: (options: InitAuthOptions) => Promise<boolean> = ({ realm
   keycloak = new Keycloak({ realm, clientId, url });
 
   keycloak.onTokenExpired = () => {
-    keycloak.updateToken(30);
+    keycloak.updateToken(30).catch(() => {
+      removeStoredToken();
+      keycloak.login();
+    });
   };
 
   keycloak.onAuthSuccess = () => {

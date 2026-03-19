@@ -17,12 +17,18 @@ const ENPHASE_API_BASE = 'https://api.enphaseenergy.com/api/v4';
 @Injectable()
 export class EnphaseApiService {
   private readonly _logger = new Logger(EnphaseApiService.name);
-  private readonly _apiKey = process.env['ENPHASE_API_KEY']!;
+  private readonly _apiKey: string;
 
   constructor(
     private readonly _httpService: HttpService,
     private readonly _authService: EnphaseAuthService,
-  ) {}
+  ) {
+    const apiKey = process.env['ENPHASE_API_KEY'];
+    if (!apiKey) {
+      throw new Error('Missing required environment variable: ENPHASE_API_KEY');
+    }
+    this._apiKey = apiKey;
+  }
 
   async getSystems(accessToken: string): Promise<EnphaseSystemsResponse> {
     const params = new URLSearchParams({ key: this._apiKey });

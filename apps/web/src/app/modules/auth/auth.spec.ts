@@ -4,7 +4,7 @@ const mockKeycloakInstance = {
   logout: vi.fn().mockResolvedValue(undefined),
   updateToken: vi.fn().mockResolvedValue(true),
   authenticated: false,
-  token: 'mock-token',
+  token: 'mock-token' as string | undefined,
   onTokenExpired: null as (() => void) | null,
   onAuthSuccess: null as (() => void) | null,
   onAuthRefreshSuccess: null as (() => void) | null,

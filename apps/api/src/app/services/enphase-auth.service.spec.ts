@@ -48,13 +48,41 @@ describe('EnphaseAuthService', () => {
   });
 
   describe('getAuthorizationUrl', () => {
-    it('should return a valid authorization URL with required params', () => {
+    it('should return a valid authorization URL with required params including state', () => {
       const url = service.getAuthorizationUrl();
 
       expect(url).toContain('https://api.enphaseenergy.com/oauth/authorize');
       expect(url).toContain('response_type=code');
       expect(url).toContain('client_id=test-client-id');
       expect(url).toContain(`redirect_uri=${encodeURIComponent('http://localhost:3000/enphase/callback')}`);
+      expect(url).toContain('state=');
+    });
+  });
+
+  describe('validateState', () => {
+    it('should accept a valid state that was generated', () => {
+      const url = service.getAuthorizationUrl();
+      const state = new URL(url).searchParams.get('state')!;
+
+      expect(() => service.validateState(state)).not.toThrow();
+    });
+
+    it('should reject an unknown state', () => {
+      expect(() => service.validateState('unknown-state')).toThrow('Invalid or missing OAuth state parameter');
+    });
+
+    it('should reject undefined state', () => {
+      expect(() => service.validateState(undefined as unknown as string)).toThrow(
+        'Invalid or missing OAuth state parameter',
+      );
+    });
+
+    it('should reject a state used twice', () => {
+      const url = service.getAuthorizationUrl();
+      const state = new URL(url).searchParams.get('state')!;
+
+      service.validateState(state);
+      expect(() => service.validateState(state)).toThrow('Invalid or missing OAuth state parameter');
     });
   });
 

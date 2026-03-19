@@ -28,8 +28,6 @@ node_modules
 .env
 /apps/web/public/config.js
 
-/config/keycloak/data/
-
 # playwright
 playwright/.auth/
 

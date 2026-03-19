@@ -16,6 +16,7 @@ const mockPrismaService = {
   enphaseLifetimeData: {
     upsert: jest.fn(),
   },
+  $transaction: jest.fn((promises: Array<Promise<unknown>>) => Promise.all(promises)),
 };
 
 const mockApiService = {
@@ -73,7 +74,12 @@ describe('EnphaseSyncService', () => {
       expect(mockApiService.getLifetimeData).toHaveBeenCalledWith(42, expect.any(String));
       expect(mockPrismaService.enphaseToken.findUniqueOrThrow).toHaveBeenCalledWith({ where: { systemId: 42 } });
       expect(mockPrismaService.enphaseLifetimeData.upsert).toHaveBeenCalledWith({
-        where: { date: mappedRecords[0].date },
+        where: {
+          date_enphaseTokenId: {
+            date: mappedRecords[0].date,
+            enphaseTokenId: 'token-uuid',
+          },
+        },
         create: { ...mappedRecords[0], enphaseTokenId: 'token-uuid' },
         update: { ...mappedRecords[0], enphaseTokenId: 'token-uuid' },
       });

@@ -3,6 +3,7 @@ import { redirect } from 'react-router';
 
 import { isAuthenticated, login } from '../modules/auth/auth';
 import { Layout } from '../modules/layout/components/Layout';
+import { HistoryPage } from '../pages/HistoryPage';
 import { HomePage } from '../pages/HomePage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { RoutePaths } from './paths.const';
@@ -22,6 +23,10 @@ export const routes: RouteObject[] = [
       {
         path: RoutePaths.HOME,
         element: <HomePage />,
+      },
+      {
+        path: RoutePaths.HISTORY,
+        element: <HistoryPage />,
       },
       {
         path: RoutePaths.SETTINGS,

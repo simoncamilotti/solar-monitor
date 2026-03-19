@@ -1,5 +1,5 @@
-import { BadRequestException, Controller, Get, Logger, Query, Res } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Controller, Get, Logger, ParseIntPipe, Query, Res } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 
 import { Public } from '@/core';
@@ -15,6 +15,19 @@ import { EnphaseService } from '../services/enphase.service';
 import { EnphaseApiService } from '../services/enphase-api.service';
 import { EnphaseAuthService } from '../services/enphase-auth.service';
 import { EnphaseSyncService } from '../services/enphase-sync.service';
+
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+const validateDateParam = (value: string, name: string): void => {
+  if (!DATE_REGEX.test(value)) {
+    throw new BadRequestException(`${name} must be in YYYY-MM-DD format`);
+  }
+  const parsed = new Date(value);
+  if (isNaN(parsed.getTime())) {
+    throw new BadRequestException(`${name} is not a valid date`);
+  }
+};
+
 @ApiTags('Enphase')
 @Controller('enphase')
 export class EnphaseController {
@@ -31,6 +44,7 @@ export class EnphaseController {
   @Public()
   @Get('authorize')
   @ApiOperation({ summary: 'Redirect to Enphase OAuth2 authorization page' })
+  @ApiResponse({ status: 302, description: 'Redirects to Enphase authorization page' })
   authorize(@Res() res: Response): void {
     const url = this._enphaseAuthService.getAuthorizationUrl();
     this._logger.log('Redirecting to Enphase authorization page');
@@ -40,7 +54,11 @@ export class EnphaseController {
   @Public()
   @Get('callback')
   @ApiOperation({ summary: 'Handle Enphase OAuth2 callback' })
-  async callback(@Query('code') code: string, @Res() res: Response): Promise<void> {
+  @ApiResponse({ status: 200, description: 'Enphase account linked successfully' })
+  @ApiResponse({ status: 400, description: 'Missing code or invalid state' })
+  async callback(@Query('code') code: string, @Query('state') state: string, @Res() res: Response): Promise<void> {
+    this._enphaseAuthService.validateState(state);
+
     if (!code) {
       throw new BadRequestException('Missing authorization code');
     }
@@ -68,30 +86,42 @@ export class EnphaseController {
   }
 
   @Get('all')
-  @ApiOperation({ summary: 'expose all lifetime data' })
+  @ApiOperation({ summary: 'Expose all lifetime data' })
+  @ApiResponse({ status: 200, description: 'Returns all lifetime data' })
   async getAll(): Promise<LifetimeDataResponseDto> {
     return this._enphaseService.getAllLifetimeData();
   }
 
   @Get('sync')
   @ApiOperation({ summary: 'Trigger manual sync for a system' })
-  @ApiQuery({ name: 'system_id', required: true })
-  async triggerSync(@Query('system_id') systemId: string): Promise<EnphaseSyncResponseDto> {
-    await this._enphaseSyncService.syncLifetimeData(Number(systemId));
+  @ApiQuery({ name: 'system_id', required: true, type: Number })
+  @ApiResponse({ status: 200, description: 'Sync completed' })
+  @ApiResponse({ status: 400, description: 'Invalid system_id' })
+  async triggerSync(@Query('system_id', ParseIntPipe) systemId: number): Promise<EnphaseSyncResponseDto> {
+    await this._enphaseSyncService.syncLifetimeData(systemId);
     return { message: `Sync completed for system ${systemId}` };
   }
 
   @Get('backfill')
   @ApiOperation({ summary: 'Backfill historical production data' })
-  @ApiQuery({ name: 'system_id', required: true })
+  @ApiQuery({ name: 'system_id', required: true, type: Number })
   @ApiQuery({ name: 'start_date', required: true, description: 'YYYY-MM-DD' })
   @ApiQuery({ name: 'end_date', required: true, description: 'YYYY-MM-DD' })
+  @ApiResponse({ status: 200, description: 'Backfill completed' })
+  @ApiResponse({ status: 400, description: 'Invalid parameters' })
   async backfill(
-    @Query('system_id') systemId: string,
+    @Query('system_id', ParseIntPipe) systemId: number,
     @Query('start_date') startDate: string,
     @Query('end_date') endDate: string,
   ): Promise<EnphaseBackfillResponseDto> {
-    const count = await this._enphaseSyncService.backfillLifetimeData(Number(systemId), startDate, endDate);
+    validateDateParam(startDate, 'start_date');
+    validateDateParam(endDate, 'end_date');
+
+    if (new Date(startDate) > new Date(endDate)) {
+      throw new BadRequestException('start_date must be before end_date');
+    }
+
+    const count = await this._enphaseSyncService.backfillLifetimeData(systemId, startDate, endDate);
     return { message: 'Backfill completed', daysBackfilled: count };
   }
 }

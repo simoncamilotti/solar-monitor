@@ -1,11 +1,14 @@
-import { Sun } from 'lucide-react';
+import { Calendar, Sun } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router';
 
 export const SidebarNav: FunctionComponent = () => {
   const { t } = useTranslation('web');
-  const navItems = [{ icon: Sun, label: t('sidebar.nav.home'), to: '/' }];
+  const navItems = [
+    { icon: Sun, label: t('sidebar.nav.home'), to: '/' },
+    { icon: Calendar, label: t('sidebar.nav.history'), to: '/history' },
+  ];
 
   return (
     <nav className="flex-1 px-3 mt-4 space-y-1">

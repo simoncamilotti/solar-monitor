@@ -8,15 +8,16 @@ import { FeatureFlagService } from './feature-flag.service';
 
 const mockPrismaService = {
   featureFlag: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
+    findMany: jest.fn() as jest.Mock,
+    findUnique: jest.fn() as jest.Mock,
+    create: jest.fn() as jest.Mock,
+    update: jest.fn() as jest.Mock,
   },
 };
 
 const mockFeatureFlagMapper = {
-  toFeatureFlagDto: jest.fn(),
-  toFeatureFlagDtoList: jest.fn(),
+  toFeatureFlagDto: jest.fn() as jest.Mock,
+  toFeatureFlagDtoList: jest.fn() as jest.Mock,
 };
 
 describe('FeatureFlagService', () => {

@@ -22,10 +22,11 @@ export const enphaseBackfillResponseDtoSchema = z.object({
 
 export const lifetimeDataDtoSchema = z.object({
   date: z.date(),
-  whProduced: z.int(),
-  whConsumed: z.int(),
-  whImported: z.int(),
-  whExported: z.int(),
+  kwhProduced: z.number(),
+  kwhConsumed: z.number(),
+  kwhImported: z.number(),
+  kwhExported: z.number(),
+  gridDependency: z.number(),
 });
 
 export const lifetimeDataResponseDtoSchema = z.array(lifetimeDataDtoSchema);

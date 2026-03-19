@@ -8,7 +8,7 @@ export type JWTPayload = {
   typ: string;
   azp: string;
   'allowed-origins': string[];
-  resource_access: { roles: string[] };
+  realm_access: { roles: string[] };
   scope: string;
   sid: string;
   name: string;

@@ -3,6 +3,7 @@
     "title": "Solar monitoring",
     "nav": {
       "home": "Home",
+      "history": "History",
       "settings": "Settings",
       "logout": "Logout"
     }
@@ -13,6 +14,22 @@
   "theme": {
     "dark": "Dark mode",
     "light": "Light mode"
+  },
+  "history": {
+    "title": "History",
+    "description": "Explore and filter all your production data",
+    "error": "An error occurred while loading data.",
+    "columns": {
+      "date": "Date",
+      "year": "Year",
+      "month": "Month",
+      "day": "Day",
+      "produced": "Production (Wh)",
+      "consumed": "Consumption (Wh)",
+      "imported": "Importation (Wh)",
+      "exported": "Exportation (Wh)",
+      "gridDependency": "Dependency (%)"
+    }
   },
   "featureFlags": {
     "title": "Feature Flags",
