@@ -21,11 +21,12 @@ export const agThemeDark = themeQuartz.withParams({
 });
 
 export const agThemeLight = themeQuartz.withParams({
-  backgroundColor: 'hsl(270 20% 98%)',
-  foregroundColor: 'hsl(270 50% 10%)',
+  backgroundColor: 'hsl(270, 20%, 100%)',
+  foregroundColor: 'hsl(270, 50%, 10%)',
+  headerBackgroundColor: 'hsl(270, 15%, 94%)',
   headerTextColor: 'hsl(270 5% 50%)',
   borderColor: 'hsl(270 50% 90%)',
-  rowHoverColor: 'hsl(270 50% 90%)',
+  rowHoverColor: 'hsl(280, 80%, 60%, 0.08)',
   selectedRowBackgroundColor: 'hsl(275 58% 61% / 0.1)',
   ...defaultTheme,
 });

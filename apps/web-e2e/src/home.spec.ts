@@ -12,7 +12,7 @@ test.describe('Home page', () => {
   test('should display the home page', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('main')).toBeVisible();
-    await expect(page.locator('main')).toContainText('Homepage');
+    await expect(page.locator('main')).toContainText('Tableau de bord');
   });
 
   test('should display the sidebar', async ({ page }) => {

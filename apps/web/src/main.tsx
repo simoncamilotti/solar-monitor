@@ -1,4 +1,5 @@
 import '@/i18n';
+import './app/modules/charts/init-echarts';
 
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter } from 'react-router';
