@@ -15,6 +15,20 @@
     "dark": "Mode sombre",
     "light": "Mode clair"
   },
+  "months": {
+    "0": "Janvier",
+    "1": "Février",
+    "2": "Mars",
+    "3": "Avril",
+    "4": "Mai",
+    "5": "Juin",
+    "6": "Juillet",
+    "7": "Août",
+    "8": "Septembre",
+    "9": "Octobre",
+    "10": "Novembre",
+    "11": "Décembre"
+  },
   "history": {
     "title": "Historique",
     "description": "Explorez et filtrez l'ensemble de vos données de production",
@@ -29,6 +43,30 @@
       "imported": "Import (Wh)",
       "exported": "Export (Wh)",
       "gridDependency": "Dépendence (%)"
+    }
+  },
+  "home": {
+    "title": "Tableau de bord",
+    "description": "Vue d'ensemble de votre installation solaire",
+    "error": "Une erreur est survenue lors du chargement des données.",
+    "viewModes": {
+      "yearly": "Annuel",
+      "monthly": "Mensuel",
+      "weekly": "Hebdo",
+      "daily": "Jour"
+    },
+    "kpi": {
+      "production": "Production",
+      "consumption": "Consommation",
+      "autonomy": "Autonomie",
+      "selfConsumption": "Autoconsommation",
+      "vsPrevious": "vs période préc."
+    },
+    "chart": {
+      "production": "Production",
+      "consumption": "Consommation",
+      "import": "Import",
+      "export": "Export"
     }
   },
   "featureFlags": {

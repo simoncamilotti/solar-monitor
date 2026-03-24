@@ -3,82 +3,109 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* You can add global styles to this file, and also import other style files */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    --primary: 245 58% 51%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 240 5% 96%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 245 58% 51%;
-    --radius: 0.5rem;
+    --background: 270 20% 98%;
+    --foreground: 270 50% 10%;
 
-    --sidebar-background: 240 5% 98%;
-    --sidebar-foreground: 240 4% 25%;
-    --sidebar-primary: 245 58% 51%;
+    --card: 270 20% 100%;
+    --card-foreground: 270 50% 10%;
+
+    --popover: 270 20% 100%;
+    --popover-foreground: 270 50% 10%;
+
+    --primary: 280 80% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 310 40% 70%;
+    --secondary-foreground: 270 50% 10%;
+
+    --muted: 270 15% 94%;
+    --muted-foreground: 270 10% 45%;
+
+    --accent: 270 15% 94%;
+    --accent-foreground: 270 50% 10%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 270 15% 88%;
+    --input: 270 15% 88%;
+    --ring: 280 80% 55%;
+
+    --radius: 0.75rem;
+
+    --card-shadow:
+      0 0 0 1px rgba(120, 0, 200, 0.04), 0 2px 4px rgba(120, 0, 200, 0.03), 0 8px 16px rgba(120, 0, 200, 0.03);
+
+    --sidebar-background: 270 50% 8%;
+    --sidebar-foreground: 270 15% 92%;
+    --sidebar-primary: 280 80% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 94%;
-    --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 245 58% 51%;
+    --sidebar-accent: 270 40% 14%;
+    --sidebar-accent-foreground: 270 15% 92%;
+    --sidebar-border: 270 35% 16%;
+    --sidebar-ring: 280 80% 55%;
+    --sidebar-muted: 270 10% 50%;
 
     --surface: 240 5% 98%;
     --surface-hover: 240 5% 94%;
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
+
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
   }
 
   .dark {
-    --background: 240 15% 4%;
-    --foreground: 240 10% 93%;
-    --card: 240 14% 6%;
-    --card-foreground: 240 10% 93%;
-    --popover: 240 14% 7%;
-    --popover-foreground: 240 10% 93%;
-    --primary: 245 58% 61%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 12% 10%;
-    --secondary-foreground: 240 10% 93%;
-    --muted: 240 12% 10%;
-    --muted-foreground: 240 5% 50%;
-    --accent: 240 12% 10%;
-    --accent-foreground: 240 10% 93%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 240 10% 13%;
-    --input: 240 10% 13%;
-    --ring: 245 58% 61%;
+    --background: 270 50% 4%;
+    --foreground: 270 15% 92%;
 
-    --sidebar-background: 240 15% 5%;
-    --sidebar-foreground: 240 5% 55%;
-    --sidebar-primary: 245 58% 61%;
+    --card: 270 40% 8%;
+    --card-foreground: 270 15% 92%;
+
+    --popover: 270 40% 8%;
+    --popover-foreground: 270 15% 92%;
+
+    --primary: 280 80% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 310 40% 40%;
+    --secondary-foreground: 270 15% 92%;
+
+    --muted: 270 35% 12%;
+    --muted-foreground: 270 10% 55%;
+
+    --accent: 270 35% 12%;
+    --accent-foreground: 270 15% 92%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 270 35% 14%;
+    --input: 270 35% 14%;
+    --ring: 280 80% 60%;
+
+    --card-shadow: 0 0 0 1px rgba(160, 0, 255, 0.06), 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+
+    --sidebar-background: 270 50% 4%;
+    --sidebar-foreground: 270 15% 92%;
+    --sidebar-primary: 280 80% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 12% 9%;
-    --sidebar-accent-foreground: 240 10% 93%;
-    --sidebar-border: 240 10% 11%;
-    --sidebar-ring: 245 58% 61%;
+    --sidebar-accent: 270 40% 10%;
+    --sidebar-accent-foreground: 270 15% 92%;
+    --sidebar-border: 270 35% 14%;
+    --sidebar-ring: 280 80% 60%;
+    --sidebar-muted: 270 10% 50%;
 
     --surface: 240 14% 7%;
     --surface-hover: 240 12% 10%;
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
+
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
   }
@@ -89,12 +116,28 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
     font-family:
       'Inter',
       system-ui,
       -apple-system,
       sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .display-heading {
+    font-size: 2.5rem;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+  }
+
+  .data-text {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-variant-numeric: tabular-nums;
   }
 
   .solar-numeric-header .ag-header-cell-label {
@@ -105,5 +148,15 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
+  }
+}
+
+@layer utilities {
+  .card-elevated {
+    box-shadow: var(--card-shadow);
+    @apply bg-card rounded-xl;
+  }
+  .transition-smooth {
+    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
   }
 }
