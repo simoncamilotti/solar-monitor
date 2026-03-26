@@ -50,10 +50,10 @@
     "description": "Overview of your solar installation",
     "error": "An error occurred while loading data.",
     "viewModes": {
+      "full": "Operating life",
       "yearly": "Yearly",
       "monthly": "Monthly",
-      "weekly": "Weekly",
-      "daily": "Daily"
+      "custom": "Custom"
     },
     "kpi": {
       "production": "Production",

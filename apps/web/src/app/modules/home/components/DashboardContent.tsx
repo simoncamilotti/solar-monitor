@@ -14,18 +14,16 @@ export const DashboardContent: FunctionComponent<{ data: LifetimeDataResponseDto
     filters,
     availableYears,
     availableMonths,
-    availableWeeks,
-    availableDays,
+    dateRange,
     setViewMode,
     setYear,
     setMonth,
-    setWeek,
-    setDay,
     setMetric,
+    setCustomRange,
   } = useDashboardFilters(data);
 
-  const kpis = useDashboardKpis(data, filters, availableWeeks);
-  const chartOptions = useDashboardChart(data, filters, availableWeeks);
+  const kpis = useDashboardKpis(data, filters);
+  const chartOptions = useDashboardChart(data, filters);
 
   return (
     <div className="flex flex-col gap-4 flex-1">
@@ -33,13 +31,11 @@ export const DashboardContent: FunctionComponent<{ data: LifetimeDataResponseDto
         filters={filters}
         availableYears={availableYears}
         availableMonths={availableMonths}
-        availableWeeks={availableWeeks}
-        availableDays={availableDays}
+        dateRange={dateRange}
         onViewModeChange={setViewMode}
         onYearChange={setYear}
         onMonthChange={setMonth}
-        onWeekChange={setWeek}
-        onDayChange={setDay}
+        onCustomRangeChange={setCustomRange}
       />
       <DashboardKPIGrid kpis={kpis} />
       <DashboardChart chartOptions={chartOptions} selectedMetric={filters.selectedMetric} onMetricChange={setMetric} />

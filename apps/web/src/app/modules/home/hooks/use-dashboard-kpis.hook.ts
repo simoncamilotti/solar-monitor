@@ -1,9 +1,9 @@
-import { subDays, subMonths } from 'date-fns';
+import { differenceInCalendarDays, isAfter, isBefore, parse, parseISO, subDays, subMonths } from 'date-fns';
 import { useMemo } from 'react';
 
 import type { LifetimeDataDto, LifetimeDataResponseDto } from '@/shared-models';
 
-import type { DashboardFilterState, WeekRange } from '../dashboard.type';
+import type { DashboardFilterState } from '../dashboard.type';
 
 export type DashboardKpis = {
   production: number;
@@ -39,64 +39,50 @@ const filterByMonth = (data: LifetimeDataResponseDto, year: number, month: numbe
   });
 };
 
-const filterByWeek = (data: LifetimeDataResponseDto, week: WeekRange) => {
-  return data.filter(d => {
-    const date = new Date(d.date);
-    return date >= week.start && date <= week.end;
-  });
-};
-
-const filterByDay = (data: LifetimeDataResponseDto, day: string) => {
-  return data.filter(d => {
-    const date = new Date(d.date);
-    const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    return iso === day;
-  });
-};
-
-const filterCurrentPeriod = (
-  data: LifetimeDataResponseDto,
-  filters: DashboardFilterState,
-  availableWeeks: WeekRange[],
-): LifetimeDataDto[] => {
+const filterCurrentPeriod = (data: LifetimeDataResponseDto, filters: DashboardFilterState): LifetimeDataDto[] => {
   switch (filters.viewMode) {
+    case 'full':
+      return data;
     case 'yearly':
       return filterByYear(data, filters.selectedYear);
     case 'monthly':
       return filterByMonth(data, filters.selectedYear, filters.selectedMonth);
-    case 'weekly': {
-      const week = availableWeeks[filters.selectedWeekIndex];
-      return week ? filterByWeek(data, week) : [];
+    case 'custom': {
+      const { customStartDate, customEndDate } = filters;
+      if (!customStartDate || !customEndDate) {
+        return [];
+      }
+
+      const startDate = parse(customStartDate, 'yyyy-MM-dd', new Date());
+      const endDate = parse(customEndDate, 'yyyy-MM-dd', new Date());
+      return data.filter(d => isAfter(d.date, startDate) && isBefore(d.date, endDate));
     }
-    case 'daily':
-      return filters.selectedDay ? filterByDay(data, filters.selectedDay) : [];
   }
 };
 
-const filterPreviousPeriod = (
-  data: LifetimeDataResponseDto,
-  filters: DashboardFilterState,
-  availableWeeks: WeekRange[],
-): LifetimeDataDto[] => {
+const filterPreviousPeriod = (data: LifetimeDataResponseDto, filters: DashboardFilterState): LifetimeDataDto[] => {
   switch (filters.viewMode) {
+    case 'full':
+      return data;
     case 'yearly':
       return filterByYear(data, filters.selectedYear - 1);
     case 'monthly': {
       const prev = subMonths(new Date(filters.selectedYear, filters.selectedMonth, 1), 1);
       return filterByMonth(data, prev.getFullYear(), prev.getMonth());
     }
-    case 'weekly': {
-      const week = availableWeeks[filters.selectedWeekIndex];
-      if (!week) return [];
-      const prevStart = subDays(week.start, 7);
-      const prevEnd = subDays(week.end, 7);
-      return filterByWeek(data, { start: prevStart, end: prevEnd, label: '' });
-    }
-    case 'daily': {
-      if (!filters.selectedDay) return [];
-      const prev = subDays(new Date(filters.selectedDay), 1);
-      const iso = `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}-${String(prev.getDate()).padStart(2, '0')}`;
-      return filterByDay(data, iso);
+    case 'custom': {
+      const { customStartDate, customEndDate } = filters;
+      if (!customStartDate || !customEndDate) {
+        return [];
+      }
+      const start = new Date(customStartDate);
+      const end = new Date(customEndDate);
+      const rangeDays = differenceInCalendarDays(end, start) + 1;
+      const prevEnd = subDays(start, 1);
+      const prevStart = subDays(prevEnd, rangeDays - 1);
+      const prevStartIso = `${prevStart.getFullYear()}-${String(prevStart.getMonth() + 1).padStart(2, '0')}-${String(prevStart.getDate()).padStart(2, '0')}`;
+      const prevEndIso = `${prevEnd.getFullYear()}-${String(prevEnd.getMonth() + 1).padStart(2, '0')}-${String(prevEnd.getDate()).padStart(2, '0')}`;
+      return data.filter(d => isAfter(d.date, parseISO(prevStartIso)) && isBefore(d.date, parseISO(prevEndIso)));
     }
   }
 };
@@ -106,14 +92,10 @@ const computeDelta = (current: number, previous: number): number | null => {
   return ((current - previous) / previous) * 100;
 };
 
-export const useDashboardKpis = (
-  data: LifetimeDataResponseDto,
-  filters: DashboardFilterState,
-  availableWeeks: WeekRange[],
-): DashboardKpis => {
+export const useDashboardKpis = (data: LifetimeDataResponseDto, filters: DashboardFilterState): DashboardKpis => {
   return useMemo(() => {
-    const currentData = filterCurrentPeriod(data, filters, availableWeeks);
-    const previousData = filterPreviousPeriod(data, filters, availableWeeks);
+    const currentData = filterCurrentPeriod(data, filters);
+    const previousData = filterPreviousPeriod(data, filters);
 
     const current = aggregate(currentData);
     const previous = aggregate(previousData);
@@ -128,5 +110,5 @@ export const useDashboardKpis = (
       autonomyDelta: previousData.length > 0 ? current.autonomy - previous.autonomy : null,
       selfConsumptionDelta: previousData.length > 0 ? current.selfConsumption - previous.selfConsumption : null,
     };
-  }, [data, filters, availableWeeks]);
+  }, [data, filters]);
 };

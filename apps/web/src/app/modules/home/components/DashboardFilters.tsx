@@ -1,51 +1,41 @@
-import { format } from 'date-fns';
-import { fr as frLocale } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { DashboardFilterState, DashboardViewMode, WeekRange } from '../dashboard.type';
+import type { DashboardFilterState, DashboardViewMode, DateRange } from '../dashboard.type';
+import { DateRangePicker } from './DateRangePicker';
+import { MonthPicker } from './MonthPicker';
+import { YearPicker } from './YearPicker';
 
 type DashboardFiltersProps = {
   filters: DashboardFilterState;
   availableYears: number[];
   availableMonths: number[];
-  availableWeeks: WeekRange[];
-  availableDays: string[];
+  dateRange: DateRange;
   onViewModeChange: (mode: DashboardViewMode) => void;
-  onYearChange: (year: number) => void;
-  onMonthChange: (month: number) => void;
-  onWeekChange: (weekIndex: number) => void;
-  onDayChange: (day: string) => void;
+  onYearChange: (year: number | null) => void;
+  onMonthChange: (month: string | null) => void;
+  onCustomRangeChange: (startDate: string | null, endDate: string | null) => void;
 };
 
-const VIEW_MODES: DashboardViewMode[] = ['yearly', 'monthly', 'weekly', 'daily'];
-
-const selectClasses =
-  'text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring/20';
+const VIEW_MODES: DashboardViewMode[] = ['full', 'yearly', 'monthly', 'custom'];
 
 export const DashboardFilters: FunctionComponent<DashboardFiltersProps> = ({
   filters,
   availableYears,
   availableMonths,
-  availableWeeks,
-  availableDays,
+  dateRange,
   onViewModeChange,
   onYearChange,
   onMonthChange,
-  onWeekChange,
-  onDayChange,
+  onCustomRangeChange,
 }) => {
   const { t } = useTranslation('web');
-  const { viewMode, selectedYear, selectedMonth, selectedWeekIndex, selectedDay } = filters;
+  const { viewMode, selectedYear, selectedMonth } = filters;
 
-  const showMonth = viewMode !== 'yearly';
-  const showWeek = viewMode === 'weekly';
-  const showDay = viewMode === 'daily';
-
-  const canPrevWeek = selectedWeekIndex > 0;
-  const canNextWeek = selectedWeekIndex < availableWeeks.length - 1;
+  const showYear = viewMode === 'yearly';
+  const showMonth = viewMode === 'monthly';
+  const showCustom = viewMode === 'custom';
 
   return (
     <motion.div
@@ -70,57 +60,28 @@ export const DashboardFilters: FunctionComponent<DashboardFiltersProps> = ({
       </div>
 
       {/* Year */}
-      <select value={selectedYear} onChange={e => onYearChange(Number(e.target.value))} className={selectClasses}>
-        {availableYears.map(y => (
-          <option key={y} value={y}>
-            {y}
-          </option>
-        ))}
-      </select>
+      {showYear && <YearPicker inputYear={selectedYear} availableYears={availableYears} onChange={onYearChange} />}
 
       {/* Month */}
       {showMonth && (
-        <select value={selectedMonth} onChange={e => onMonthChange(Number(e.target.value))} className={selectClasses}>
-          {availableMonths.map(m => (
-            <option key={m} value={m}>
-              {t(`months.${m}`)}
-            </option>
-          ))}
-        </select>
+        <MonthPicker
+          inputYear={selectedYear}
+          inputMonth={selectedMonth}
+          availableYears={availableYears}
+          availableMonths={availableMonths}
+          onChange={onMonthChange}
+        />
       )}
 
-      {/* Week */}
-      {showWeek && availableWeeks.length > 0 && (
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => onWeekChange(selectedWeekIndex - 1)}
-            disabled={!canPrevWeek}
-            className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-smooth"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-sm font-medium px-2 min-w-[140px] text-center">
-            {availableWeeks[selectedWeekIndex]?.label}
-          </span>
-          <button
-            onClick={() => onWeekChange(selectedWeekIndex + 1)}
-            disabled={!canNextWeek}
-            className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-smooth"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
-      {/* Day */}
-      {showDay && (
-        <select value={selectedDay ?? ''} onChange={e => onDayChange(e.target.value)} className={selectClasses}>
-          {availableDays.map(d => (
-            <option key={d} value={d}>
-              {format(new Date(d), 'd MMM', { locale: frLocale })}
-            </option>
-          ))}
-        </select>
+      {/* Custom date range */}
+      {showCustom && (
+        <DateRangePicker
+          startDate={filters.customStartDate}
+          endDate={filters.customEndDate}
+          minDate={dateRange.min}
+          maxDate={dateRange.max}
+          onChange={onCustomRangeChange}
+        />
       )}
     </motion.div>
   );
