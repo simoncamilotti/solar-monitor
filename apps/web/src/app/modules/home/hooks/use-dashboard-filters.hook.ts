@@ -1,16 +1,14 @@
-import { fr } from 'date-fns/locale';
+import { format, parse } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { LifetimeDataResponseDto } from '@/shared-models';
 
 import type { DashboardFilterState, DashboardMetricKey, DashboardViewMode } from '../dashboard.type';
-import { getDaysForMonth } from './get-days-for-month';
 import { getMonthsForYear } from './get-months-for-year';
-import { getWeeksForMonth } from './get-weeks-for-month';
 
 const STORAGE_KEY = 'dashboard-filters';
 
-const VALID_VIEW_MODES: DashboardViewMode[] = ['yearly', 'monthly', 'weekly', 'daily'];
+const VALID_VIEW_MODES: DashboardViewMode[] = ['full', 'yearly', 'monthly', 'custom'];
 const VALID_METRICS: DashboardMetricKey[] = ['kwhProduced', 'kwhConsumed', 'kwhImported', 'kwhExported'];
 
 const readFromStorage = (): Partial<DashboardFilterState> | null => {
@@ -41,25 +39,34 @@ const buildInitialState = (data: LifetimeDataResponseDto): DashboardFilterState 
       ? stored.selectedMonth
       : latestMonth;
 
-  const availableWeeks = getWeeksForMonth(data, selectedYear, selectedMonth, fr);
-
-  const selectedWeekIndex =
-    stored?.selectedWeekIndex !== undefined &&
-    stored.selectedWeekIndex >= 0 &&
-    stored.selectedWeekIndex < availableWeeks.length
-      ? stored.selectedWeekIndex
-      : Math.max(0, availableWeeks.length - 1);
-
-  const availableDays = getDaysForMonth(data, selectedYear, selectedMonth);
-  const latestDay = availableDays[availableDays.length - 1] ?? null;
-
-  const selectedDay =
-    stored?.selectedDay && availableDays.includes(stored.selectedDay) ? stored.selectedDay : latestDay;
-
   const selectedMetric =
     stored?.selectedMetric && VALID_METRICS.includes(stored.selectedMetric) ? stored.selectedMetric : 'kwhConsumed';
 
-  return { viewMode, selectedYear, selectedMonth, selectedWeekIndex, selectedDay, selectedMetric };
+  const getCustomDate = (key: 'customStartDate' | 'customEndDate'): string | null => {
+    const index = key === 'customStartDate' ? 0 : data.length - 1;
+
+    if (stored != null && stored[key] != null) {
+      const formatedDate = format(stored[key]!, 'yyyy-MM-dd');
+
+      const isInData = data.some(d => format(d.date, 'yyyy-MM-dd') === formatedDate);
+
+      return isInData ? formatedDate : (format(data[index]?.date, 'yyyy-MM-dd') ?? null);
+    }
+
+    return format(data[index]?.date, 'yyyy-MM-dd') ?? null;
+  };
+
+  const customStartDate = getCustomDate('customStartDate');
+  const customEndDate = getCustomDate('customEndDate');
+
+  return {
+    viewMode,
+    selectedYear,
+    selectedMonth,
+    selectedMetric,
+    customStartDate,
+    customEndDate,
+  };
 };
 
 export const useDashboardFilters = (data: LifetimeDataResponseDto) => {
@@ -76,78 +83,69 @@ export const useDashboardFilters = (data: LifetimeDataResponseDto) => {
 
   const availableMonths = useMemo(() => getMonthsForYear(data, filters.selectedYear), [data, filters.selectedYear]);
 
-  const availableWeeks = useMemo(
-    () => getWeeksForMonth(data, filters.selectedYear, filters.selectedMonth, fr),
-    [data, filters.selectedYear, filters.selectedMonth],
-  );
-
-  const availableDays = useMemo(
-    () => getDaysForMonth(data, filters.selectedYear, filters.selectedMonth),
-    [data, filters.selectedYear, filters.selectedMonth],
-  );
-
   const setViewMode = useCallback((viewMode: DashboardViewMode) => {
     setFilters(prev => ({ ...prev, viewMode }));
   }, []);
 
   const setYear = useCallback(
-    (year: number) => {
+    (year: number | null) => {
+      if (year == null) {
+        return;
+      }
       const months = getMonthsForYear(data, year);
       const monthValid = months.includes(filters.selectedMonth);
       const newMonth = monthValid ? filters.selectedMonth : (months[months.length - 1] ?? 0);
-
-      const weeks = getWeeksForMonth(data, year, newMonth, fr);
-      const days = getDaysForMonth(data, year, newMonth);
 
       setFilters(prev => ({
         ...prev,
         selectedYear: year,
         selectedMonth: newMonth,
-        selectedWeekIndex: Math.max(0, weeks.length - 1),
-        selectedDay: days[days.length - 1] ?? null,
       }));
     },
     [data, filters.selectedMonth],
   );
 
   const setMonth = useCallback(
-    (month: number) => {
-      const weeks = getWeeksForMonth(data, filters.selectedYear, month, fr);
-      const days = getDaysForMonth(data, filters.selectedYear, month);
+    (month: string | null) => {
+      if (month == null) {
+        return;
+      }
+
+      const parsed = parse(month, 'yyyy-MM', new Date());
+      const year = parsed.getFullYear();
+      const selectedMonth = parsed.getMonth();
 
       setFilters(prev => ({
         ...prev,
-        selectedMonth: month,
-        selectedWeekIndex: Math.max(0, weeks.length - 1),
-        selectedDay: days[days.length - 1] ?? null,
+        selectedYear: year,
+        selectedMonth: selectedMonth,
       }));
     },
     [data, filters.selectedYear],
   );
 
-  const setWeek = useCallback((weekIndex: number) => {
-    setFilters(prev => ({ ...prev, selectedWeekIndex: weekIndex }));
-  }, []);
-
-  const setDay = useCallback((day: string) => {
-    setFilters(prev => ({ ...prev, selectedDay: day }));
-  }, []);
-
   const setMetric = useCallback((metric: DashboardMetricKey) => {
     setFilters(prev => ({ ...prev, selectedMetric: metric }));
   }, []);
+
+  const setCustomRange = useCallback((startDate: string | null, endDate: string | null) => {
+    setFilters(prev => ({ ...prev, customStartDate: startDate, customEndDate: endDate }));
+  }, []);
+
+  const dateRange: { min: Date | null; max: Date | null } = useMemo(() => {
+    const dates = data.map(d => d.date).sort();
+    return { min: dates[0] ?? null, max: dates[dates.length - 1] ?? null };
+  }, [data]);
 
   return {
     filters,
     availableYears,
     availableMonths,
-    availableWeeks,
-    availableDays,
+    dateRange,
     setViewMode,
     setYear,
     setMonth,
-    setWeek,
-    setDay,
     setMetric,
+    setCustomRange,
   };
 };

@@ -1,3 +1,5 @@
+import { format, isAfter, isBefore, isEqual, parse } from 'date-fns';
+import { fr as frLocale } from 'date-fns/locale';
 import type { EChartsOption } from 'echarts';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { useMemo } from 'react';
@@ -7,13 +9,9 @@ import type { LifetimeDataResponseDto } from '@/shared-models';
 
 import { METRICS_MAPPING } from '../components/DashboardChart';
 import { dashboardMetricColors } from '../constants/dashboard-colors';
-import type { DashboardFilterState, WeekRange } from '../dashboard.type';
+import type { DashboardFilterState } from '../dashboard.type';
 
-export const useDashboardChart = (
-  data: LifetimeDataResponseDto,
-  filters: DashboardFilterState,
-  availableWeeks: WeekRange[],
-) => {
+export const useDashboardChart = (data: LifetimeDataResponseDto, filters: DashboardFilterState) => {
   const { t } = useTranslation('web');
 
   return useMemo(() => {
@@ -24,6 +22,18 @@ export const useDashboardChart = (
     let values: number[] = [];
 
     switch (filters.viewMode) {
+      case 'full': {
+        const yearsMap = new Map<number, number>();
+        for (const d of data) {
+          const y = new Date(d.date).getFullYear();
+          yearsMap.set(y, (yearsMap.get(y) ?? 0) + d[metricKey]);
+        }
+        const sortedYears = [...yearsMap.keys()].sort((a, b) => a - b);
+        categories = sortedYears.map(y => `${y}`);
+        values = sortedYears.map(y => yearsMap.get(y) ?? 0);
+        break;
+      }
+
       case 'yearly': {
         const yearData = data.filter(d => new Date(d.date).getFullYear() === filters.selectedYear);
         const monthMap = new Map<number, number>();
@@ -48,32 +58,40 @@ export const useDashboardChart = (
         break;
       }
 
-      case 'weekly': {
-        categories = availableWeeks.map(w => w.label);
-        values = availableWeeks.map(w => {
-          const weekData = data.filter(d => {
-            const date = new Date(d.date);
-            return date >= w.start && date <= w.end;
-          });
-          return weekData.reduce((sum, d) => sum + d[metricKey], 0);
-        });
-        break;
-      }
+      case 'custom': {
+        const strStartDate = filters.customStartDate;
+        const strEndDate = filters.customEndDate;
+        if (strStartDate && strEndDate) {
+          const startDate = parse(strStartDate, 'yyyy-MM-dd', new Date());
+          const endDate = parse(strEndDate, 'yyyy-MM-dd', new Date());
 
-      case 'daily': {
-        const monthData = data.filter(d => {
-          const date = new Date(d.date);
-          return date.getFullYear() === filters.selectedYear && date.getMonth() === filters.selectedMonth;
-        });
-        monthData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        categories = monthData.map(d => String(new Date(d.date).getDate()));
-        values = monthData.map(d => d[metricKey]);
+          const customData = data
+            .filter(d => {
+              const isoDate = parse(format(d.date, 'yyyy-MM-dd'), 'yyyy-MM-dd', new Date());
+
+              const isAfterOrEqual = isAfter(isoDate, startDate) || isEqual(isoDate, startDate);
+              const isBeforeOrEqual = isEqual(isoDate, endDate) || isBefore(isoDate, endDate);
+
+              return isAfterOrEqual && isBeforeOrEqual;
+            })
+            .sort((a, b) => {
+              if (isEqual(b.date, a.date)) {
+                return 0;
+              }
+
+              if (isAfter(b.date, a.date)) {
+                return -1;
+              }
+
+              return 1;
+            });
+
+          categories = customData.map(d => format(new Date(d.date), 'd MMM', { locale: frLocale }));
+          values = customData.map(d => d[metricKey]);
+        }
         break;
       }
     }
-
-    const isDaily = filters.viewMode === 'daily';
-    const selectedDayNum = filters.selectedDay ? new Date(filters.selectedDay).getDate() : null;
 
     const chartOptions: EChartsOption = {
       grid: { top: 10, left: 55, right: 20, bottom: 30, containLabel: false },
@@ -107,9 +125,9 @@ export const useDashboardChart = (
             case 'monthly':
               name = `${dataParams.name} ${monthLabel(filters.selectedMonth)} ${filters.selectedYear}`;
               break;
-            case 'weekly':
-            case 'daily':
-              name = `${dataParams.name} ${monthLabel(filters.selectedMonth)} ${filters.selectedYear}`;
+            case 'custom':
+              name = dataParams.name as string;
+              break;
           }
 
           return `<b>${metricName}</b><br>${dataParams.marker}${name}<span style="float: right; margin-left: 20px"><b>${Number(value).toFixed(1)} kWh</b></span>`;
@@ -118,14 +136,7 @@ export const useDashboardChart = (
       series: [
         {
           type: 'bar',
-          data: isDaily
-            ? values.map((v, i) => ({
-                value: v,
-                itemStyle: {
-                  opacity: categories[i] === String(selectedDayNum) ? 1 : 0.35,
-                },
-              }))
-            : values,
+          data: values,
           itemStyle: {
             color,
             borderRadius: [5, 5, 0, 0],
@@ -135,5 +146,5 @@ export const useDashboardChart = (
     };
 
     return chartOptions;
-  }, [data, filters, availableWeeks, t]);
+  }, [data, filters, t]);
 };

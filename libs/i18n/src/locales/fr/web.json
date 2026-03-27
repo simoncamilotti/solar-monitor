@@ -50,10 +50,10 @@
     "description": "Vue d'ensemble de votre installation solaire",
     "error": "Une erreur est survenue lors du chargement des données.",
     "viewModes": {
+      "full": "Durée d'exploitation",
       "yearly": "Annuel",
       "monthly": "Mensuel",
-      "weekly": "Hebdo",
-      "daily": "Jour"
+      "custom": "Personnalisé"
     },
     "kpi": {
       "production": "Production",
