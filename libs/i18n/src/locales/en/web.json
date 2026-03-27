@@ -69,6 +69,29 @@
       "export": "Export"
     }
   },
+  "export": {
+    "title": "Export data",
+    "description": "Choose format, scope and metrics to export.",
+    "format": "Format",
+    "scope": "Data scope",
+    "scopeFiltered": "Current filtered view",
+    "scopeAll": "All data ({{count}})",
+    "year": "Year",
+    "month": "Month",
+    "allYears": "All years",
+    "allMonths": "All months",
+    "metricsLabel": "Metrics",
+    "metrics": {
+      "produced": "Production (Wh)",
+      "consumed": "Consumption (Wh)",
+      "imported": "Import (Wh)",
+      "exported": "Export (Wh)",
+      "gridDependency": "Dependency (%)"
+    },
+    "cancel": "Cancel",
+    "export": "Export",
+    "records": "records"
+  },
   "featureFlags": {
     "title": "Feature Flags",
     "description": "Enable or disable sections of the public site.",

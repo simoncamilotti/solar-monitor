@@ -1,6 +1,6 @@
 import type { ColDef, GridReadyEvent } from 'ag-grid-community';
 import type { AgGridReactProps } from 'ag-grid-react';
-import { format, parse } from 'date-fns';
+import { format, isAfter, parse } from 'date-fns';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +18,13 @@ export const useHistoryGrid = () => {
           return format(new Date(params.data.date), 'dd-MM-yyyy');
         },
         sortable: true,
+        comparator: (valueA, valueB) => {
+          if (valueA === valueB) {
+            return 0;
+          }
+
+          return isAfter(parse(valueA, 'dd-MM-yyyy', new Date()), parse(valueB, 'dd-MM-yyyy', new Date())) ? 1 : -1;
+        },
         flex: 1,
         filter: 'agDateColumnFilter',
         filterParams: {
