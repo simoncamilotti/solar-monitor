@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 
 import { Roles, RolesGuard } from '@/core';
 import { CreateFeatureFlagRequestDto, FeatureFlagDto, UpdateFeatureFlagRequestDto } from '@/shared-models/server';
@@ -28,5 +28,13 @@ export class FeatureFlagController {
   @Roles('ADMIN')
   async update(@Param('key') key: string, @Body() dto: UpdateFeatureFlagRequestDto): Promise<FeatureFlagDto> {
     return this._featureFlagService.update(key, dto);
+  }
+
+  @Delete(':key')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  async delete(@Param('key') key: string): Promise<void> {
+    return this._featureFlagService.delete(key);
   }
 }

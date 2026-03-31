@@ -7,6 +7,7 @@ const mockFeatureFlagService = {
   findAll: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
+  delete: jest.fn(),
 };
 
 describe('FeatureFlagController', () => {
@@ -65,6 +66,22 @@ describe('FeatureFlagController', () => {
       mockFeatureFlagService.update.mockRejectedValue(new Error('DB error'));
 
       await expect(controller.update('projects', { enabled: true })).rejects.toThrow('DB error');
+    });
+  });
+
+  describe('delete', () => {
+    it('should delegate to service with key', async () => {
+      mockFeatureFlagService.delete.mockResolvedValue(undefined);
+
+      await controller.delete('projects');
+
+      expect(mockFeatureFlagService.delete).toHaveBeenCalledWith('projects');
+    });
+
+    it('should propagate errors from service', async () => {
+      mockFeatureFlagService.delete.mockRejectedValue(new Error('DB error'));
+
+      await expect(controller.delete('projects')).rejects.toThrow('DB error');
     });
   });
 });

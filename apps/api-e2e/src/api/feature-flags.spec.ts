@@ -12,7 +12,9 @@ describe('Feature Flags API', () => {
   });
 
   afterAll(async () => {
-    // Clean up created flags (no delete endpoint, so just leave them)
+    for (const key of createdKeys) {
+      await axios.delete(`/api/feature-flags/${key}`, authHeaders()).catch(() => undefined);
+    }
   });
 
   const authHeaders = () => ({ headers: { Authorization: `Bearer ${token}` } });
@@ -97,6 +99,37 @@ describe('Feature Flags API', () => {
     it('should return 404 for a non-existent flag', async () => {
       const error = await axios
         .patch('/api/feature-flags/non-existent-flag', { enabled: true }, authHeaders())
+        .catch((e: AxiosError) => e);
+
+      expect(axios.isAxiosError(error)).toBe(true);
+      expect((error as AxiosError).response?.status).toBe(404);
+    });
+  });
+
+  describe('DELETE /api/feature-flags/:key', () => {
+    it('should return 401 without a token', async () => {
+      const error = await axios.delete('/api/feature-flags/some-key').catch((e: AxiosError) => e);
+
+      expect(axios.isAxiosError(error)).toBe(true);
+      expect((error as AxiosError).response?.status).toBe(401);
+    });
+
+    it('should delete a feature flag', async () => {
+      const key = `e2e-delete-${Date.now()}`;
+      await axios.post('/api/feature-flags', { key, enabled: false }, authHeaders());
+
+      const res = await axios.delete(`/api/feature-flags/${key}`, authHeaders());
+
+      expect(res.status).toBe(204);
+
+      const list = await axios.get('/api/feature-flags', authHeaders());
+      const found = list.data.find((f: { key: string }) => f.key === key);
+      expect(found).toBeUndefined();
+    });
+
+    it('should return 404 for a non-existent flag', async () => {
+      const error = await axios
+        .delete('/api/feature-flags/non-existent-flag', authHeaders())
         .catch((e: AxiosError) => e);
 
       expect(axios.isAxiosError(error)).toBe(true);
