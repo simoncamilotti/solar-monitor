@@ -1,4 +1,6 @@
+###
 # Solar Monitor — Node 24, Prisma, 2 images (api + web)
+###
 
 name: CI/CD
 
@@ -17,7 +19,7 @@ permissions:
 
 jobs:
   ci:
-    uses: simoncamilotti/shared-workflows/.github/workflows/nx-ci.yml@790158b703d249fd544f0b054b1e33e66712a80a
+    uses: simoncamilotti/shared-workflows/.github/workflows/nx-ci.yml@main
     with:
       node_version: "24"
       nx_targets: "lint test typecheck build"
@@ -28,7 +30,7 @@ jobs:
   docker:
     if: github.ref == 'refs/heads/main' || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     needs: ci
-    uses: simoncamilotti/shared-workflows/.github/workflows/docker.yml@790158b703d249fd544f0b054b1e33e66712a80a
+    uses: simoncamilotti/shared-workflows/.github/workflows/docker.yml@main
     with:
       images: |
         [
