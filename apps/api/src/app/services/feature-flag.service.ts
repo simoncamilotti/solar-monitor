@@ -41,4 +41,14 @@ export class FeatureFlagService {
 
     return this._featureFlagMapper.toFeatureFlagDto(flag);
   }
+
+  async delete(key: string): Promise<void> {
+    const existing = await this._prismaService.featureFlag.findUnique({ where: { key } });
+
+    if (!existing) {
+      throw new NotFoundException(`Feature flag '${key}' not found`);
+    }
+
+    await this._prismaService.featureFlag.delete({ where: { key } });
+  }
 }

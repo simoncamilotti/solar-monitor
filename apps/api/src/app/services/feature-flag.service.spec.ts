@@ -12,6 +12,7 @@ const mockPrismaService = {
     findUnique: jest.fn() as jest.Mock,
     create: jest.fn() as jest.Mock,
     update: jest.fn() as jest.Mock,
+    delete: jest.fn() as jest.Mock,
   },
 };
 
@@ -90,6 +91,25 @@ describe('FeatureFlagService', () => {
       mockPrismaService.featureFlag.findUnique.mockResolvedValue(null);
 
       await expect(service.update('unknown', { enabled: true })).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a feature flag', async () => {
+      const dbFlag = { key: 'projects', enabled: true, createdAt: new Date(), updatedAt: new Date() };
+      mockPrismaService.featureFlag.findUnique.mockResolvedValue(dbFlag);
+      mockPrismaService.featureFlag.delete.mockResolvedValue(dbFlag);
+
+      await service.delete('projects');
+
+      expect(mockPrismaService.featureFlag.findUnique).toHaveBeenCalledWith({ where: { key: 'projects' } });
+      expect(mockPrismaService.featureFlag.delete).toHaveBeenCalledWith({ where: { key: 'projects' } });
+    });
+
+    it('should throw NotFoundException if flag does not exist', async () => {
+      mockPrismaService.featureFlag.findUnique.mockResolvedValue(null);
+
+      await expect(service.delete('unknown')).rejects.toThrow(NotFoundException);
     });
   });
 });
