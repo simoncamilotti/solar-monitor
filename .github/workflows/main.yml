@@ -1,0 +1,38 @@
+# Solar Monitor — Node 24, Prisma, 2 images (api + web)
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  packages: write
+
+jobs:
+  check:
+    uses: simoncamilotti/shared-workflows/.github/workflows/nx-ci.yml@main
+    with:
+      node_version: "24"
+      nx_targets: "lint test typecheck build"
+      prisma: true
+      env_file: "DATABASE_URL=postgresql://user:pass@localhost:5432/dummy"
+    secrets: inherit
+
+  docker:
+    if: github.ref == 'refs/heads/main' || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    needs: check
+    uses: simoncamilotti/shared-workflows/.github/workflows/docker.yml@main
+    with:
+      images: |
+        [
+          { "name": "api", "dockerfile": "apps/api/Dockerfile" },
+          { "name": "web", "dockerfile": "apps/web/Dockerfile" }
+        ]
+    secrets: inherit
