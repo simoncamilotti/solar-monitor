@@ -28,7 +28,7 @@ jobs:
   docker:
     if: github.ref == 'refs/heads/main' || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     needs: ci
-    uses: simoncamilotti/shared-workflows/.github/workflows/docker.yml@main
+    uses: simoncamilotti/shared-worflows/.github/workflows/docker.yml@main
     with:
       images: |
         [
