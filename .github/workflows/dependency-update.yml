@@ -1,0 +1,167 @@
+# Automated dependency updates — patch & minor only
+# Runs weekly (Sunday 3am UTC) or manually via workflow_dispatch
+# Creates a PR with a detailed report including E2E and visual regression results
+
+name: Dependency Updates
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  NODE_VERSION: '24'
+  PW_PROJECT: chromium
+  PW_CONFIG: apps/web-e2e/playwright.config.ts
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      # ── Setup ──────────────────────────────────────────────────────────
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build web app
+        run: npx nx build web
+
+      - name: Install Playwright browsers
+        run: npx playwright install ${{ env.PW_PROJECT }} --with-deps
+
+      # ── Before phase (baselines) ───────────────────────────────────────
+      - name: E2E tests (before updates)
+        id: e2e_before
+        run: >
+          npx playwright test
+          --project=${{ env.PW_PROJECT }}
+          --config=${{ env.PW_CONFIG }}
+          --ignore-pattern='visual-regression*'
+
+      - name: Capture visual baselines
+        run: >
+          npx playwright test visual-regression
+          --project=${{ env.PW_PROJECT }}
+          --config=${{ env.PW_CONFIG }}
+          --update-snapshots
+
+      # ── Update phase ───────────────────────────────────────────────────
+      - name: Check available updates (all levels)
+        run: npx npm-check-updates --jsonUpgraded > ncu-available.json 2>/dev/null || echo '{}' > ncu-available.json
+
+      - name: Apply patch & minor updates
+        run: npx npm-check-updates -u --target minor
+
+      - name: Check remaining updates (major only)
+        run: npx npm-check-updates --jsonUpgraded > ncu-remaining.json 2>/dev/null || echo '{}' > ncu-remaining.json
+
+      - name: Detect changes
+        id: check_changes
+        run: |
+          if git diff --quiet package.json; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No dependency updates available."
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Dependency updates detected."
+          fi
+
+      - name: Install updated dependencies
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: npm install
+
+      - name: Regenerate Prisma client
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: npx prisma generate
+
+      - name: Rebuild web app after updates
+        id: rebuild
+        if: steps.check_changes.outputs.has_changes == 'true'
+        continue-on-error: true
+        run: npx nx build web
+
+      # ── After phase (validation) ───────────────────────────────────────
+      - name: E2E tests (after updates)
+        id: e2e_after
+        if: steps.check_changes.outputs.has_changes == 'true' && steps.rebuild.outcome == 'success'
+        continue-on-error: true
+        run: >
+          npx playwright test
+          --project=${{ env.PW_PROJECT }}
+          --config=${{ env.PW_CONFIG }}
+          --ignore-pattern='visual-regression*'
+
+      - name: Visual regression (after updates)
+        id: visual_after
+        if: steps.check_changes.outputs.has_changes == 'true' && steps.rebuild.outcome == 'success'
+        continue-on-error: true
+        run: >
+          npx playwright test visual-regression
+          --project=${{ env.PW_PROJECT }}
+          --config=${{ env.PW_CONFIG }}
+
+      # ── Report & PR ────────────────────────────────────────────────────
+      - name: Generate report
+        if: steps.check_changes.outputs.has_changes == 'true'
+        env:
+          BUILD_OUTCOME: ${{ steps.rebuild.outcome }}
+          E2E_AFTER_OUTCOME: ${{ steps.e2e_after.outcome }}
+          VISUAL_OUTCOME: ${{ steps.visual_after.outcome }}
+        run: node scripts/generate-update-report.mjs
+
+      - name: Upload visual diff artifacts
+        if: steps.visual_after.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-diffs
+          path: |
+            dist/.playwright/apps/web-e2e/test-output/**/*-diff.png
+            dist/.playwright/apps/web-e2e/test-output/**/*-actual.png
+          retention-days: 14
+
+      - name: Upload Playwright report
+        if: steps.check_changes.outputs.has_changes == 'true' && steps.rebuild.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: dist/.playwright/apps/web-e2e/playwright-report
+          retention-days: 14
+
+      - name: Create or update PR
+        if: steps.check_changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="deps/automated-update-$(date +%Y-%m-%d)"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add package.json package-lock.json
+          git commit -m "chore(deps): update patch and minor dependencies"
+          git push -u origin "$BRANCH" --force
+
+          EXISTING_PR=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$EXISTING_PR" ]; then
+            gh pr edit "$EXISTING_PR" --body-file pr-body.md
+            echo "Updated existing PR #$EXISTING_PR"
+          else
+            gh pr create \
+              --title "chore(deps): automated patch & minor updates $(date +%Y-%m-%d)" \
+              --body-file pr-body.md \
+              --label "dependencies,automated"
+            echo "Created new PR"
+          fi
