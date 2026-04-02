@@ -3,13 +3,13 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 
 import { Public } from '@/core';
-import {
+
+import type {
   EnphaseBackfillResponseDto,
   EnphaseCallbackResponseDto,
   EnphaseSyncResponseDto,
   LifetimeDataResponseDto,
-} from '@/shared-models/server';
-
+} from '../dtos/enphase.dto';
 import { EnphaseMapper } from '../mappers/enphase.mapper';
 import { EnphaseService } from '../services/enphase.service';
 import { EnphaseApiService } from '../services/enphase-api.service';

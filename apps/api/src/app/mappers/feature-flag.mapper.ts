@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FeatureFlag } from '@prisma/client';
 
-import type { FeatureFlagDto } from '@/shared-models/server';
+import type { FeatureFlagDto } from '../dtos/feature-flag.dto';
 
 @Injectable()
 export class FeatureFlagMapper {

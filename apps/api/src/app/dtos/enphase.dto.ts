@@ -5,9 +5,8 @@ import {
   enphaseCallbackResponseDtoSchema,
   enphaseSyncResponseDtoSchema,
   enphaseSystemDtoSchema,
-  lifetimeDataDtoSchema,
   lifetimeDataResponseDtoSchema,
-} from '../schemas/enphase.schema';
+} from '@/shared-models';
 
 export class EnphaseSystemDto extends createZodDto(enphaseSystemDtoSchema) {}
 
@@ -16,7 +15,5 @@ export class EnphaseCallbackResponseDto extends createZodDto(enphaseCallbackResp
 export class EnphaseSyncResponseDto extends createZodDto(enphaseSyncResponseDtoSchema) {}
 
 export class EnphaseBackfillResponseDto extends createZodDto(enphaseBackfillResponseDtoSchema) {}
-
-export class LifetimeDataDto extends createZodDto(lifetimeDataDtoSchema) {}
 
 export class LifetimeDataResponseDto extends createZodDto(lifetimeDataResponseDtoSchema) {}

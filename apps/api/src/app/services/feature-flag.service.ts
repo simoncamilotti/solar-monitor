@@ -1,8 +1,12 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '@/core';
-import { CreateFeatureFlagRequestDto, FeatureFlagDto, UpdateFeatureFlagRequestDto } from '@/shared-models/server';
 
+import type {
+  CreateFeatureFlagRequestDto,
+  FeatureFlagDto,
+  UpdateFeatureFlagRequestDto,
+} from '../dtos/feature-flag.dto';
 import { FeatureFlagMapper } from '../mappers/feature-flag.mapper';
 
 @Injectable()
