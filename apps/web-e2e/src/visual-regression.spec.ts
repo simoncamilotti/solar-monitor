@@ -51,7 +51,7 @@ const pages = [
 
 async function waitForPageReady(page: Page, waitSelector: string) {
   await page.locator(waitSelector).waitFor({ state: 'visible' });
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   // Extra stabilization for ECharts canvas animations
   await page.waitForTimeout(500);
 }
