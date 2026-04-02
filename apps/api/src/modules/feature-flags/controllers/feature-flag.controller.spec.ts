@@ -1,4 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 
 import { FeatureFlagService } from '../services/feature-flag.service';
 import { FeatureFlagController } from './feature-flag.controller';

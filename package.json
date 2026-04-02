@@ -14,6 +14,9 @@
     "lint:api": "nx lint api",
     "lint:web": "nx lint web",
     "lint:all": "nx run-many -t lint",
+    "typecheck:api": "nx typecheck api",
+    "typecheck:web": "nx typecheck web",
+    "typecheck:all": "nx run-many -t typecheck",
     "e2e:api": "nx e2e api-e2e",
     "e2e:web": "nx e2e web-e2e",
     "e2e:web-ui": "nx e2e web-e2e --ui",
@@ -24,7 +27,7 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx libs/api/core/src/prisma/seed.ts",
-    "pre-commit": "npm run format && npm run lint:all && npm run test:all",
+    "pre-commit": "npm run format && nx run-many -t lint test typecheck",
     "pre-commit-e2e": "npm run pre-commit && npm run e2e:api && npm run e2e:web"
   },
   "private": true,

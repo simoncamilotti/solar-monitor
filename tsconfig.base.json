@@ -15,10 +15,7 @@
     "baseUrl": ".",
     "paths": {
       "@/core": ["libs/api/core/src/index.ts"],
-      "@/shared-models": ["libs/shared-models/src/index.ts"],
-      "@/i18n": ["libs/i18n/src/index.ts"],
-      "@/shared-web": ["libs/shared-web/src/index.ts"],
-      "@/shared-web/api": ["libs/shared-web/src/lib/api/axiosInstance.ts"]
+      "@/shared-models": ["libs/shared-models/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
