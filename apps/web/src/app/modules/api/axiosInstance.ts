@@ -1,12 +1,20 @@
 import type { InternalAxiosRequestConfig } from 'axios';
 import Axios from 'axios';
 
-import { createAxiosInstance } from '@/shared-web/api';
-
 import { RoutePaths } from '../../routes/paths.const';
 import { getStoredToken } from '../auth/auth';
 
-export const axiosInstance = createAxiosInstance();
+const errorInterceptor = (error: unknown) => {
+  if (Axios.isAxiosError(error)) {
+    return Promise.reject(error.response?.data ?? error);
+  }
+  return Promise.reject(error);
+};
+
+const instance = Axios.create({ baseURL: '/api' });
+instance.interceptors.response.use(_ => _, errorInterceptor);
+
+export const axiosInstance = instance;
 
 const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
   config.headers = config.headers ?? {};

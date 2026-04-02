@@ -2,8 +2,8 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
-import enWeb from '../locales/en/web.json';
-import frWeb from '../locales/fr/web.json';
+import enWeb from './locales/en/web.json';
+import frWeb from './locales/fr/web.json';
 
 const resources = {
   fr: { web: frWeb },

@@ -1,4 +1,4 @@
-import '@/i18n';
+import './i18n/init-i18n';
 import './app/modules/charts/init-echarts';
 
 import ReactDOM from 'react-dom/client';

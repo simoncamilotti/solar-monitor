@@ -4,9 +4,8 @@ import type { createBrowserRouter } from 'react-router';
 import { RouterProvider } from 'react-router';
 import { Toaster } from 'sonner';
 
-import { ReactQueryProvider } from '@/shared-web';
-
 import { ThemeProvider } from './modules/layout/providers/ThemeProvider';
+import { ReactQueryProvider } from './modules/providers/ReactQueryProvider';
 
 export const App: FunctionComponent<{
   router: ReturnType<typeof createBrowserRouter>;

@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 
 import { EnphaseMapper } from '../mappers/enphase.mapper';
 import { EnphaseService } from '../services/enphase.service';
