@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { EnphaseLifetimeData } from '@prisma/client';
+import type { EnphaseLifetimeData } from '@prisma/client';
 import { Decimal } from 'decimal.js';
 
-import { EnphaseSystemDto, LifetimeDataResponseDto } from '@/shared-models/server';
-
+import type { EnphaseSystemDto, LifetimeDataResponseDto } from '../dtos/enphase.dto';
 import type { EnphaseSystemRaw, LifetimeData, LifetimeDataRecord } from '../types/enphase.types';
 
 @Injectable()

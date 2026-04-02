@@ -28,6 +28,10 @@ node_modules
 .env
 /apps/web/public/config.js
 
+# keycloak dev data
+config/keycloak/data/*.mv.db
+config/keycloak/data/*.trace.db
+
 # playwright
 playwright/.auth/
 

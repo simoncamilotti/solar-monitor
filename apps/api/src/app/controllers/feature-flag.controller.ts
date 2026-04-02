@@ -1,8 +1,12 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 
 import { Roles, RolesGuard } from '@/core';
-import { CreateFeatureFlagRequestDto, FeatureFlagDto, UpdateFeatureFlagRequestDto } from '@/shared-models/server';
 
+import type {
+  CreateFeatureFlagRequestDto,
+  FeatureFlagDto,
+  UpdateFeatureFlagRequestDto,
+} from '../dtos/feature-flag.dto';
 import { FeatureFlagService } from '../services/feature-flag.service';
 
 @Controller('feature-flags')

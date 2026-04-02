@@ -4,7 +4,7 @@ import {
   createFeatureFlagDtoRequestSchema,
   featureFlagDtoSchema,
   updateFeatureFlagRequestDtoSchema,
-} from '../schemas/feature-flag.schema';
+} from '@/shared-models';
 
 export class FeatureFlagDto extends createZodDto(featureFlagDtoSchema) {}
 

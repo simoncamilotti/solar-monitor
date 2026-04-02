@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/core';
-import { LifetimeDataResponseDto } from '@/shared-models/server';
 
+import type { LifetimeDataResponseDto } from '../dtos/enphase.dto';
 import { EnphaseMapper } from '../mappers/enphase.mapper';
 
 @Injectable()

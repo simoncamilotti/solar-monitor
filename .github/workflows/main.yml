@@ -19,10 +19,10 @@ jobs:
   check:
     uses: simoncamilotti/shared-workflows/.github/workflows/nx-ci.yml@main
     with:
-      node_version: "24"
-      nx_targets: "lint test typecheck build"
+      node_version: '24'
+      nx_targets: 'lint test typecheck build'
       prisma: true
-      env_file: "DATABASE_URL=postgresql://user:pass@localhost:5432/dummy"
+      env_file: 'DATABASE_URL=postgresql://user:pass@localhost:5432/dummy'
     secrets: inherit
 
   docker:
