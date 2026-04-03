@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 
 import type { LifetimeDataDto, LifetimeDataResponseDto } from '@/shared-models';
 
+import { filterByMonth, filterByYear } from '../../shared/data/data-filters';
+import { aggregateEntries } from '../../shared/metrics/metric-computation';
 import type { DashboardFilterState } from '../dashboard.type';
 
 export type DashboardKpis = {
@@ -14,29 +16,6 @@ export type DashboardKpis = {
   consumptionDelta: number | null;
   autonomyDelta: number | null;
   selfConsumptionDelta: number | null;
-};
-
-const aggregate = (entries: LifetimeDataDto[]) => {
-  const produced = entries.reduce((s, e) => s + e.kwhProduced, 0);
-  const consumed = entries.reduce((s, e) => s + e.kwhConsumed, 0);
-  const imported = entries.reduce((s, e) => s + e.kwhImported, 0);
-  const exported = entries.reduce((s, e) => s + e.kwhExported, 0);
-
-  const autonomy = consumed > 0 ? (1 - imported / consumed) * 100 : 0;
-  const selfConsumption = produced > 0 ? ((produced - exported) / produced) * 100 : 0;
-
-  return { produced, consumed, autonomy, selfConsumption };
-};
-
-const filterByYear = (data: LifetimeDataResponseDto, year: number) => {
-  return data.filter(d => new Date(d.date).getFullYear() === year);
-};
-
-const filterByMonth = (data: LifetimeDataResponseDto, year: number, month: number) => {
-  return data.filter(d => {
-    const date = new Date(d.date);
-    return date.getFullYear() === year && date.getMonth() === month;
-  });
 };
 
 const filterCurrentPeriod = (data: LifetimeDataResponseDto, filters: DashboardFilterState): LifetimeDataDto[] => {
@@ -97,8 +76,8 @@ export const useDashboardKpis = (data: LifetimeDataResponseDto, filters: Dashboa
     const currentData = filterCurrentPeriod(data, filters);
     const previousData = filterPreviousPeriod(data, filters);
 
-    const current = aggregate(currentData);
-    const previous = aggregate(previousData);
+    const current = aggregateEntries(currentData);
+    const previous = aggregateEntries(previousData);
 
     return {
       production: current.produced,

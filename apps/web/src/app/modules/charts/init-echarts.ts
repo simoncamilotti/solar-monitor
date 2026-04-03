@@ -1,4 +1,4 @@
-import { BarChart } from 'echarts/charts';
+import { BarChart, LineChart } from 'echarts/charts';
 import {
   DataZoomInsideComponent,
   GridComponent,
@@ -21,6 +21,7 @@ echarts.use([
   MarkLineComponent,
   MarkAreaComponent,
   BarChart,
+  LineChart,
   SVGRenderer,
   DataZoomInsideComponent,
 ]);

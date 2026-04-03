@@ -4,6 +4,7 @@
     "nav": {
       "home": "Accueil",
       "history": "Historique",
+      "compare": "Comparaison",
       "settings": "Paramétrage",
       "logout": "Déconnexion"
     }
@@ -91,6 +92,34 @@
     "cancel": "Annuler",
     "export": "Exporter",
     "records": "enregistrements"
+  },
+  "compare": {
+    "title": "Comparaison",
+    "description": "Comparez vos données entre différentes périodes",
+    "granularity": {
+      "years": "Années",
+      "months": "Mois",
+      "days": "Jours"
+    },
+    "resolution": {
+      "daily": "Par jour",
+      "weekly": "Par semaine",
+      "monthly": "Par mois",
+      "quarterly": "Par trimestre"
+    },
+    "periods": {
+      "empty": "Aucune période sélectionnée",
+      "add": "Ajouter"
+    },
+    "metrics": {
+      "kwhProduced": "Production",
+      "kwhConsumed": "Consommation",
+      "kwhImported": "Importer",
+      "kwhExported": "Exporter",
+      "autonomy": "Autonomie",
+      "selfConsumption": "Autoconsommation",
+      "gridDependency": "Dépéndence réseau"
+    }
   },
   "featureFlags": {
     "title": "Feature Flags",

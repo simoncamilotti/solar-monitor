@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 
 import type { LifetimeDataResponseDto } from '@/shared-models';
 
+import { metricColors } from '../../shared/metrics/metric-colors';
 import { METRICS_MAPPING } from '../components/DashboardChart';
-import { dashboardMetricColors } from '../constants/dashboard-colors';
 import type { DashboardFilterState } from '../dashboard.type';
 
 export const useDashboardChart = (data: LifetimeDataResponseDto, filters: DashboardFilterState) => {
@@ -16,7 +16,7 @@ export const useDashboardChart = (data: LifetimeDataResponseDto, filters: Dashbo
 
   return useMemo(() => {
     const metricKey = filters.selectedMetric;
-    const color = dashboardMetricColors[metricKey];
+    const color = metricColors[metricKey];
 
     let categories: string[] = [];
     let values: number[] = [];

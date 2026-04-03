@@ -3,6 +3,7 @@ import { redirect } from 'react-router';
 
 import { isAuthenticated, login } from '../modules/auth/auth';
 import { Layout } from '../modules/layout/components/Layout';
+import { ComparePage } from '../pages/ComparePage';
 import { HistoryPage } from '../pages/HistoryPage';
 import { HomePage } from '../pages/HomePage';
 import { SettingsPage } from '../pages/SettingsPage';
@@ -23,6 +24,10 @@ export const routes: RouteObject[] = [
       {
         path: RoutePaths.HOME,
         element: <HomePage />,
+      },
+      {
+        path: RoutePaths.COMPARE,
+        element: <ComparePage />,
       },
       {
         path: RoutePaths.HISTORY,

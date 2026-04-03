@@ -2,7 +2,7 @@ import { RefreshCw, ShieldCheck, SolarPanel, Zap } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { dashboardMetricColors } from '../constants/dashboard-colors';
+import { metricColors } from '../../shared/metrics/metric-colors';
 import type { DashboardKpis } from '../hooks/use-dashboard-kpis.hook';
 import { KPICard } from './KPICard';
 
@@ -21,7 +21,7 @@ export const DashboardKPIGrid: FunctionComponent<DashboardKPIGridProps> = ({ kpi
         unit="kWh"
         delta={kpis.consumptionDelta}
         icon={Zap}
-        color={dashboardMetricColors.kwhConsumed}
+        color={metricColors.kwhConsumed}
         index={0}
       />
       <KPICard
@@ -30,7 +30,7 @@ export const DashboardKPIGrid: FunctionComponent<DashboardKPIGridProps> = ({ kpi
         unit="kWh"
         delta={kpis.productionDelta}
         icon={SolarPanel}
-        color={dashboardMetricColors.kwhProduced}
+        color={metricColors.kwhProduced}
         index={1}
       />
       <KPICard
@@ -39,7 +39,7 @@ export const DashboardKPIGrid: FunctionComponent<DashboardKPIGridProps> = ({ kpi
         unit="%"
         delta={kpis.autonomyDelta}
         icon={ShieldCheck}
-        color={dashboardMetricColors.kwhImported}
+        color={metricColors.kwhImported}
         index={2}
       />
       <KPICard
@@ -48,7 +48,7 @@ export const DashboardKPIGrid: FunctionComponent<DashboardKPIGridProps> = ({ kpi
         unit="%"
         delta={kpis.selfConsumptionDelta}
         icon={RefreshCw}
-        color={dashboardMetricColors.kwhExported}
+        color={metricColors.kwhExported}
         index={3}
       />
     </div>

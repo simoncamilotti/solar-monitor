@@ -7,7 +7,9 @@ import type { LifetimeDataResponseDto } from '@/shared-models';
 
 export type ExportFormat = 'csv' | 'excel';
 
-export type ExportMetric = 'kwhProduced' | 'kwhConsumed' | 'kwhImported' | 'kwhExported' | 'gridDependency';
+import type { EnergyMetricKey } from '../../shared/metrics/metric.type';
+
+export type ExportMetric = EnergyMetricKey | 'gridDependency';
 
 export type ExportConfig = {
   format: ExportFormat;

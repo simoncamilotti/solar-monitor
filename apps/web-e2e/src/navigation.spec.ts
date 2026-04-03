@@ -15,6 +15,12 @@ test.describe('Navigation', () => {
     await expect(page).toHaveURL(/\/settings/);
   });
 
+  test('should navigate to compare page via sidebar link', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('a[href="/compare"]').click();
+    await expect(page).toHaveURL(/\/compare/);
+  });
+
   test('should navigate back to home from settings', async ({ page }) => {
     await page.goto('/settings');
     await page.locator('nav a[href="/"]').click();
