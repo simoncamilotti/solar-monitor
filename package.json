@@ -19,6 +19,7 @@
     "typecheck:all": "nx run-many -t typecheck",
     "e2e:api": "nx e2e api-e2e",
     "e2e:web": "nx e2e web-e2e",
+    "e2e:web-update-snapshots": "nx e2e web-e2e --update-snapshots",
     "e2e:web-ui": "nx e2e web-e2e --ui",
     "format": "nx format",
     "format:check": "nx format:check",

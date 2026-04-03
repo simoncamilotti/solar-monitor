@@ -5,6 +5,11 @@ const featureFlags = [
   { key: 'blog', enabled: false },
 ];
 
+const syncStatus = [
+  { systemId: 1, lastSyncDate: '2024-06-10T12:00:00Z', totalRecords: 180 },
+  { systemId: 2, lastSyncDate: null, totalRecords: 0 },
+];
+
 /**
  * Intercepts all API requests and returns mock data.
  * Must be called before any page navigation.
@@ -33,6 +38,22 @@ export async function mockApi(page: Page): Promise<void> {
 
     return route.continue();
   });
+
+  await page.route('**/api/enphase/sync-status', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(syncStatus),
+    }),
+  );
+
+  await page.route('**/api/enphase/sync?*', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Sync triggered' }),
+    }),
+  );
 
   await page.route('**/api/feature-flags/*', route => {
     if (route.request().method() === 'PATCH') {

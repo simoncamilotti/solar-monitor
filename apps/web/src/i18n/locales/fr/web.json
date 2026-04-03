@@ -121,6 +121,23 @@
       "gridDependency": "Dépéndence réseau"
     }
   },
+  "settings": {
+    "title": "Paramétrage",
+    "description": "Configuration de votre installation et synchronisation"
+  },
+  "sync": {
+    "title": "Synchronisation",
+    "description": "État de la synchronisation des données avec Enphase.",
+    "system": "Système",
+    "lastSync": "Dernière synchro",
+    "records": "enregistrements",
+    "never": "Jamais",
+    "trigger": "Synchroniser",
+    "success": "Synchronisation terminée avec succès",
+    "error": "Erreur lors de la synchronisation",
+    "loadError": "Impossible de charger le statut de synchronisation.",
+    "noSystems": "Aucun système Enphase configuré."
+  },
   "featureFlags": {
     "title": "Feature Flags",
     "description": "Activez ou désactivez des sections du site public.",
