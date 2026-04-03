@@ -5,6 +5,7 @@ import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Chart } from '../../charts/components/Chart';
+import { ALL_METRICS, metricColors } from '../../shared/metrics';
 import type { ComparisonChartType, ComparisonMetricKey } from '../comparison.type';
 
 type ComparisonChartProps = {
@@ -13,26 +14,6 @@ type ComparisonChartProps = {
   chartType: ComparisonChartType;
   onMetricChange: (metric: ComparisonMetricKey) => void;
   onChartTypeChange: (type: ComparisonChartType) => void;
-};
-
-const METRICS: ComparisonMetricKey[] = [
-  'kwhProduced',
-  'kwhConsumed',
-  'kwhImported',
-  'kwhExported',
-  'autonomy',
-  'selfConsumption',
-  'gridDependency',
-];
-
-const METRIC_COLORS: Record<ComparisonMetricKey, string> = {
-  kwhProduced: 'hsl(280, 80%, 55%)',
-  kwhConsumed: 'hsl(310, 40%, 65%)',
-  kwhImported: 'hsl(200, 70%, 55%)',
-  kwhExported: 'hsl(142, 71%, 45%)',
-  autonomy: 'hsl(45, 80%, 50%)',
-  selfConsumption: 'hsl(25, 75%, 55%)',
-  gridDependency: 'hsl(0, 60%, 55%)',
 };
 
 export const ComparisonChart: FunctionComponent<ComparisonChartProps> = ({
@@ -53,7 +34,7 @@ export const ComparisonChart: FunctionComponent<ComparisonChartProps> = ({
     >
       <div className="flex items-center justify-between mb-4 gap-4">
         <div className="flex flex-wrap gap-1.5">
-          {METRICS.map(m => (
+          {ALL_METRICS.map(m => (
             <button
               key={m}
               onClick={() => onMetricChange(m)}
@@ -62,7 +43,7 @@ export const ComparisonChart: FunctionComponent<ComparisonChartProps> = ({
                   ? 'text-primary-foreground'
                   : 'bg-muted text-muted-foreground hover:text-foreground'
               }`}
-              style={selectedMetric === m ? { backgroundColor: METRIC_COLORS[m] } : undefined}
+              style={selectedMetric === m ? { backgroundColor: metricColors[m] } : undefined}
             >
               {t(`compare.metrics.${m}`)}
             </button>

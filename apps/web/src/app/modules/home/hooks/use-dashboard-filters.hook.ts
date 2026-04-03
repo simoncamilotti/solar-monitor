@@ -3,13 +3,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { LifetimeDataResponseDto } from '@/shared-models';
 
+import { ENERGY_METRICS } from '../../shared/metrics/metric-constants';
 import type { DashboardFilterState, DashboardMetricKey, DashboardViewMode } from '../dashboard.type';
 import { getMonthsForYear } from './get-months-for-year';
 
 const STORAGE_KEY = 'dashboard-filters';
 
 const VALID_VIEW_MODES: DashboardViewMode[] = ['full', 'yearly', 'monthly', 'custom'];
-const VALID_METRICS: DashboardMetricKey[] = ['kwhProduced', 'kwhConsumed', 'kwhImported', 'kwhExported'];
 
 const readFromStorage = (): Partial<DashboardFilterState> | null => {
   try {
@@ -40,7 +40,7 @@ const buildInitialState = (data: LifetimeDataResponseDto): DashboardFilterState 
       : latestMonth;
 
   const selectedMetric =
-    stored?.selectedMetric && VALID_METRICS.includes(stored.selectedMetric) ? stored.selectedMetric : 'kwhConsumed';
+    stored?.selectedMetric && ENERGY_METRICS.includes(stored.selectedMetric) ? stored.selectedMetric : 'kwhConsumed';
 
   const getCustomDate = (key: 'customStartDate' | 'customEndDate'): string | null => {
     const index = key === 'customStartDate' ? 0 : data.length - 1;

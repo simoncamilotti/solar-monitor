@@ -16,9 +16,15 @@ type ComparisonPeriodListProps = {
 };
 
 const getPeriodChipLabel = (period: ComparisonPeriod, monthName: (i: number) => string): string => {
-  if (isYearPeriod(period)) return `${period.year}`;
-  if (isMonthPeriod(period)) return `${monthName(period.month)} ${period.year}`;
-  if (isDayPeriod(period)) return period.date;
+  if (isYearPeriod(period)) {
+    return `${period.year}`;
+  }
+  if (isMonthPeriod(period)) {
+    return `${monthName(period.month)} ${period.year}`;
+  }
+  if (isDayPeriod(period)) {
+    return period.date;
+  }
   return '';
 };
 

@@ -2,11 +2,8 @@ import type { EChartsOption } from 'echarts';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ComparisonFilterState, ComparisonMetricKey, ComparisonSeries } from '../comparison.type';
-
-const PERCENTAGE_METRICS: ComparisonMetricKey[] = ['autonomy', 'selfConsumption', 'gridDependency'];
-
-const getUnit = (metric: ComparisonMetricKey): string => (PERCENTAGE_METRICS.includes(metric) ? '%' : 'kWh');
+import { getMetricUnit } from '../../shared/metrics';
+import type { ComparisonFilterState, ComparisonSeries } from '../comparison.type';
 
 export const useComparisonChart = (
   series: ComparisonSeries[],
@@ -19,7 +16,7 @@ export const useComparisonChart = (
       return undefined;
     }
 
-    const unit = getUnit(filters.metric);
+    const unit = getMetricUnit(filters.metric);
     const metricLabel = t(`compare.metrics.${filters.metric}`);
     const isLine = filters.chartType === 'line';
     const isDays = filters.granularity === 'days';

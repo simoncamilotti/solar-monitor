@@ -1,15 +1,10 @@
+import type { MetricKey } from '../shared/metrics/metric.type';
+
 export type ComparisonGranularity = 'years' | 'months' | 'days';
 
 export type ComparisonChartType = 'bar' | 'line';
 
-export type ComparisonMetricKey =
-  | 'kwhProduced'
-  | 'kwhConsumed'
-  | 'kwhImported'
-  | 'kwhExported'
-  | 'autonomy'
-  | 'selfConsumption'
-  | 'gridDependency';
+export type ComparisonMetricKey = MetricKey;
 
 export type ComparisonResolution = 'daily' | 'weekly' | 'monthly' | 'quarterly';
 

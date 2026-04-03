@@ -4,60 +4,21 @@ import { useTranslation } from 'react-i18next';
 
 import type { LifetimeDataDto, LifetimeDataResponseDto } from '@/shared-models';
 
-import type {
-  ComparisonFilterState,
-  ComparisonMetricKey,
-  ComparisonPeriod,
-  ComparisonSeries,
-} from '../comparison.type';
+import { filterByDay, filterByMonth, filterByYear } from '../../shared/data';
+import { computeMetric } from '../../shared/metrics';
+import type { ComparisonFilterState, ComparisonPeriod, ComparisonSeries } from '../comparison.type';
 import { comparisonPeriodColors } from '../constants/comparison-colors';
 import { isDayPeriod, isMonthPeriod, isYearPeriod } from './use-comparison-filters.hook';
-
-const computeMetric = (metric: ComparisonMetricKey, entries: LifetimeDataDto[]): number => {
-  const produced = entries.reduce((s, e) => s + e.kwhProduced, 0);
-  const consumed = entries.reduce((s, e) => s + e.kwhConsumed, 0);
-  const imported = entries.reduce((s, e) => s + e.kwhImported, 0);
-  const exported = entries.reduce((s, e) => s + e.kwhExported, 0);
-
-  switch (metric) {
-    case 'kwhProduced':
-      return produced;
-    case 'kwhConsumed':
-      return consumed;
-    case 'kwhImported':
-      return imported;
-    case 'kwhExported':
-      return exported;
-    case 'autonomy':
-      return consumed > 0 ? (1 - imported / consumed) * 100 : 0;
-    case 'selfConsumption':
-      return produced > 0 ? ((produced - exported) / produced) * 100 : 0;
-    case 'gridDependency':
-      return consumed > 0 ? (imported / consumed) * 100 : 0;
-  }
-};
-
-const filterByYear = (data: LifetimeDataResponseDto, year: number) =>
-  data.filter(d => new Date(d.date).getFullYear() === year);
-
-const filterByMonth = (data: LifetimeDataResponseDto, year: number, month: number) =>
-  data.filter(d => {
-    const date = new Date(d.date);
-    return date.getFullYear() === year && date.getMonth() === month;
-  });
-
-const filterByDay = (data: LifetimeDataResponseDto, dateStr: string) =>
-  data.filter(d => {
-    const date = new Date(d.date);
-    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    return key === dateStr;
-  });
 
 const daysInMonth = (year: number, month: number): number => new Date(year, month + 1, 0).getDate();
 
 const getPeriodLabel = (period: ComparisonPeriod, monthNames: (i: number) => string): string => {
-  if (isYearPeriod(period)) return `${period.year}`;
-  if (isMonthPeriod(period)) return `${monthNames(period.month)} ${period.year}`;
+  if (isYearPeriod(period)) {
+    return `${period.year}`;
+  }
+  if (isMonthPeriod(period)) {
+    return `${monthNames(period.month)} ${period.year}`;
+  }
   return period.date;
 };
 

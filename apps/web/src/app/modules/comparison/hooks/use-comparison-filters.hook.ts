@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { LifetimeDataResponseDto } from '@/shared-models';
 
+import { ALL_METRICS } from '../../shared/metrics';
 import type {
   ComparisonChartType,
   ComparisonFilterState,
@@ -17,15 +18,6 @@ import type {
 const STORAGE_KEY = 'comparison-filters';
 
 const VALID_GRANULARITIES: ComparisonGranularity[] = ['years', 'months', 'days'];
-const VALID_METRICS: ComparisonMetricKey[] = [
-  'kwhProduced',
-  'kwhConsumed',
-  'kwhImported',
-  'kwhExported',
-  'autonomy',
-  'selfConsumption',
-  'gridDependency',
-];
 const VALID_CHART_TYPES: ComparisonChartType[] = ['bar', 'line'];
 
 const RESOLUTIONS_BY_GRANULARITY: Record<ComparisonGranularity, ComparisonResolution[]> = {
@@ -56,9 +48,15 @@ export const isMonthPeriod = (p: ComparisonPeriod): p is MonthPeriod => 'year' i
 export const isDayPeriod = (p: ComparisonPeriod): p is DayPeriod => 'date' in p;
 
 const periodsEqual = (a: ComparisonPeriod, b: ComparisonPeriod): boolean => {
-  if (isYearPeriod(a) && isYearPeriod(b)) return a.year === b.year;
-  if (isMonthPeriod(a) && isMonthPeriod(b)) return a.year === b.year && a.month === b.month;
-  if (isDayPeriod(a) && isDayPeriod(b)) return a.date === b.date;
+  if (isYearPeriod(a) && isYearPeriod(b)) {
+    return a.year === b.year;
+  }
+  if (isMonthPeriod(a) && isMonthPeriod(b)) {
+    return a.year === b.year && a.month === b.month;
+  }
+  if (isDayPeriod(a) && isDayPeriod(b)) {
+    return a.date === b.date;
+  }
   return false;
 };
 
@@ -68,7 +66,7 @@ const buildInitialState = (): ComparisonFilterState => {
   const granularity =
     stored?.granularity && VALID_GRANULARITIES.includes(stored.granularity) ? stored.granularity : 'years';
 
-  const metric = stored?.metric && VALID_METRICS.includes(stored.metric) ? stored.metric : 'kwhConsumed';
+  const metric = stored?.metric && ALL_METRICS.includes(stored.metric) ? stored.metric : 'kwhConsumed';
 
   const chartType = stored?.chartType && VALID_CHART_TYPES.includes(stored.chartType) ? stored.chartType : 'bar';
 

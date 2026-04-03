@@ -1,5 +1,7 @@
+import type { EnergyMetricKey } from '../shared/metrics';
+
 export type DashboardViewMode = 'full' | 'yearly' | 'monthly' | 'custom';
-export type DashboardMetricKey = 'kwhProduced' | 'kwhConsumed' | 'kwhImported' | 'kwhExported';
+export type DashboardMetricKey = EnergyMetricKey;
 
 export type DateRange = {
   min: Date | null;

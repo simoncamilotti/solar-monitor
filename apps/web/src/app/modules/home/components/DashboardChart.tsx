@@ -4,7 +4,7 @@ import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Chart } from '../../charts/components/Chart';
-import { dashboardMetricColors } from '../constants/dashboard-colors';
+import { metricColors } from '../../shared/metrics/metric-colors';
 import type { DashboardMetricKey } from '../dashboard.type';
 
 export const METRICS_MAPPING: Array<{ key: DashboardMetricKey; labelKey: string }> = [
@@ -52,7 +52,7 @@ export const DashboardChart: FunctionComponent<DashboardChartProps> = ({
                   ? 'text-primary-foreground'
                   : 'bg-muted text-muted-foreground hover:text-foreground'
               }`}
-              style={selectedMetric === m.key ? { backgroundColor: dashboardMetricColors[m.key] } : undefined}
+              style={selectedMetric === m.key ? { backgroundColor: metricColors[m.key] } : undefined}
             >
               {t(m.labelKey)}
             </button>
