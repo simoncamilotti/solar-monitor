@@ -72,6 +72,7 @@ test.describe('Visual regression', () => {
 
   for (const { name, path, waitFor } of pages) {
     test(`${name} - dark theme`, async ({ page }) => {
+      await page.clock.setFixedTime(new Date('2024-07-01T12:00:00Z'));
       await page.goto(path);
       await waitForPageReady(page, waitFor);
       await expect(page).toHaveScreenshot(`${name}-dark.png`, {
@@ -82,6 +83,7 @@ test.describe('Visual regression', () => {
     });
 
     test(`${name} - light theme`, async ({ page }) => {
+      await page.clock.setFixedTime(new Date('2024-07-01T12:00:00Z'));
       await page.goto(path);
       await waitForPageReady(page, waitFor);
       await switchToLightTheme(page);

@@ -121,6 +121,23 @@
       "gridDependency": "Grid dependency"
     }
   },
+  "settings": {
+    "title": "Settings",
+    "description": "Configure your installation and synchronization"
+  },
+  "sync": {
+    "title": "Synchronization",
+    "description": "Data synchronization status with Enphase.",
+    "system": "System",
+    "lastSync": "Last sync",
+    "records": "records",
+    "never": "Never",
+    "trigger": "Sync now",
+    "success": "Synchronization completed successfully",
+    "error": "Error during synchronization",
+    "loadError": "Unable to load synchronization status.",
+    "noSystems": "No Enphase system configured."
+  },
   "featureFlags": {
     "title": "Feature Flags",
     "description": "Enable or disable sections of the public site.",

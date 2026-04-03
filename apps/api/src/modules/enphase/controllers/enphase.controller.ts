@@ -9,6 +9,7 @@ import type {
   EnphaseCallbackResponseDto,
   EnphaseSyncResponseDto,
   LifetimeDataResponseDto,
+  SyncStatusResponseDto,
 } from '../dtos/enphase.dto';
 import { EnphaseMapper } from '../mappers/enphase.mapper';
 import { EnphaseService } from '../services/enphase.service';
@@ -90,6 +91,13 @@ export class EnphaseController {
   @ApiResponse({ status: 200, description: 'Returns all lifetime data' })
   async getAll(): Promise<LifetimeDataResponseDto> {
     return this._enphaseService.getAllLifetimeData();
+  }
+
+  @Get('sync-status')
+  @ApiOperation({ summary: 'Get sync status for all systems' })
+  @ApiResponse({ status: 200, description: 'Returns sync status per system' })
+  async getSyncStatus(): Promise<SyncStatusResponseDto> {
+    return this._enphaseService.getSyncStatus();
   }
 
   @Get('sync')

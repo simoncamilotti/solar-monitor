@@ -10,6 +10,9 @@ const mockPrismaService = {
   enphaseLifetimeData: {
     findMany: jest.fn(),
   },
+  enphaseToken: {
+    findMany: jest.fn(),
+  },
 };
 
 const mockEnphaseMapper = {
@@ -65,6 +68,44 @@ describe('EnphaseService', () => {
       mockEnphaseMapper.toLifetimeDataResponseDto.mockReturnValue([]);
 
       const result = await service.getAllLifetimeData();
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('getSyncStatus', () => {
+    it('should return sync status for each system', async () => {
+      mockPrismaService.enphaseToken.findMany.mockResolvedValue([
+        {
+          systemId: 123,
+          lifetimeData: [{ date: new Date('2026-04-02') }],
+          _count: { lifetimeData: 42 },
+        },
+      ]);
+
+      const result = await service.getSyncStatus();
+
+      expect(result).toEqual([{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42 }]);
+    });
+
+    it('should return null lastSyncDate when no data exists', async () => {
+      mockPrismaService.enphaseToken.findMany.mockResolvedValue([
+        {
+          systemId: 456,
+          lifetimeData: [],
+          _count: { lifetimeData: 0 },
+        },
+      ]);
+
+      const result = await service.getSyncStatus();
+
+      expect(result).toEqual([{ systemId: 456, lastSyncDate: null, totalRecords: 0 }]);
+    });
+
+    it('should return empty array when no systems configured', async () => {
+      mockPrismaService.enphaseToken.findMany.mockResolvedValue([]);
+
+      const result = await service.getSyncStatus();
 
       expect(result).toEqual([]);
     });
