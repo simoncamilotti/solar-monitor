@@ -1,4 +1,4 @@
-import { Calendar, Sun } from 'lucide-react';
+import { Calendar, GitCompare, Sun } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router';
@@ -7,6 +7,7 @@ export const SidebarNav: FunctionComponent = () => {
   const { t } = useTranslation('web');
   const navItems = [
     { icon: Sun, label: t('sidebar.nav.home'), to: '/' },
+    { icon: GitCompare, label: t('sidebar.nav.compare'), to: '/compare' },
     { icon: Calendar, label: t('sidebar.nav.history'), to: '/history' },
   ];
 

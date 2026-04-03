@@ -45,6 +45,7 @@ async function mockHistoryApi(page: Page) {
 
 const pages = [
   { name: 'dashboard', path: '/', waitFor: 'main' },
+  { name: 'compare', path: '/compare', waitFor: 'main' },
   { name: 'history', path: '/history', waitFor: 'main' },
   { name: 'settings', path: '/settings', waitFor: 'form' },
 ] as const;

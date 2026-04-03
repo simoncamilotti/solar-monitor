@@ -4,6 +4,7 @@
     "nav": {
       "home": "Home",
       "history": "History",
+      "compare": "Comparison",
       "settings": "Settings",
       "logout": "Logout"
     }
@@ -91,6 +92,34 @@
     "cancel": "Cancel",
     "export": "Export",
     "records": "records"
+  },
+  "compare": {
+    "title": "Comparison",
+    "description": "Compare your data across different periods",
+    "granularity": {
+      "years": "Years",
+      "months": "Months",
+      "days": "Days"
+    },
+    "resolution": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "quarterly": "Quarterly"
+    },
+    "periods": {
+      "empty": "No period selected",
+      "add": "Add"
+    },
+    "metrics": {
+      "kwhProduced": "Production",
+      "kwhConsumed": "Consumption",
+      "kwhImported": "Import",
+      "kwhExported": "Export",
+      "autonomy": "Autonomy",
+      "selfConsumption": "Self-consumption",
+      "gridDependency": "Grid dependency"
+    }
   },
   "featureFlags": {
     "title": "Feature Flags",
