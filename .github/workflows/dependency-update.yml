@@ -17,6 +17,7 @@ env:
   NODE_VERSION: '24'
   PW_PROJECT: chromium
   PW_CONFIG: apps/web-e2e/playwright.config.ts
+  DATABASE_URL: postgresql://user:pass@localhost:5432/dummy
 
 jobs:
   update-dependencies:
