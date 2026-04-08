@@ -5,10 +5,10 @@ const adapter = new PrismaPg({ connectionString: process.env['DATABASE_URL'] });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  await prisma.featureFlag.upsert({
-    where: { key: 'example-feature' },
+  await prisma.syncSchedule.upsert({
+    where: { id: 'default' },
     update: {},
-    create: { key: 'example-feature', enabled: false },
+    create: { id: 'default', syncTime: '02:00' },
   });
 
   console.log('Seed completed.');

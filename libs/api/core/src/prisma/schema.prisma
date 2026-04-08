@@ -15,10 +15,9 @@ model User {
   @@index([keycloakId], name: "user_kc_index")
 }
 
-model FeatureFlag {
-  key       String   @id
-  enabled   Boolean  @default(false)
-  createdAt DateTime @default(now())
+model SyncSchedule {
+  id        String   @id @default("default")
+  syncTime  String   @default("02:00")
   updatedAt DateTime @updatedAt
 }
 

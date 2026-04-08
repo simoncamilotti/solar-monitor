@@ -20,6 +20,15 @@ vi.mock('../hooks/use-trigger-sync-mutation.hook', () => ({
   }),
 }));
 
+const mockBackfillMutate = vi.fn();
+vi.mock('../hooks/use-backfill-mutation.hook', () => ({
+  useBackfillMutation: () => ({
+    mutate: mockBackfillMutate,
+    isPending: false,
+    variables: undefined,
+  }),
+}));
+
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { SyncStatusCard } from './SyncStatusCard';
@@ -93,5 +102,48 @@ describe('SyncStatusCard', () => {
     render(<SyncStatusCard />);
 
     expect(screen.getByText(/sync.never/)).toBeDefined();
+  });
+
+  it('should show split button for system with no records', () => {
+    mockUseSyncStatus.mockReturnValue({
+      data: [{ systemId: 789, lastSyncDate: null, totalRecords: 0 }],
+      isPending: false,
+      isError: false,
+    });
+    render(<SyncStatusCard />);
+
+    expect(screen.getByLabelText('More sync options')).toBeDefined();
+  });
+
+  it('should not show split button for system with records', () => {
+    mockUseSyncStatus.mockReturnValue({
+      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42 }],
+      isPending: false,
+      isError: false,
+    });
+    render(<SyncStatusCard />);
+
+    expect(screen.queryByLabelText('More sync options')).toBeNull();
+  });
+
+  it('should call backfill mutate when backfill option is clicked', () => {
+    mockUseSyncStatus.mockReturnValue({
+      data: [{ systemId: 789, lastSyncDate: null, totalRecords: 0 }],
+      isPending: false,
+      isError: false,
+    });
+    render(<SyncStatusCard />);
+
+    fireEvent.click(screen.getByLabelText('More sync options'));
+    fireEvent.click(screen.getByText('sync.backfill'));
+
+    expect(mockBackfillMutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        systemId: 789,
+        startDate: '2015-01-01',
+        endDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      }),
+      expect.objectContaining({ onSuccess: expect.any(Function), onError: expect.any(Function) }),
+    );
   });
 });

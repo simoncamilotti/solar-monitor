@@ -47,7 +47,7 @@ const pages = [
   { name: 'dashboard', path: '/', waitFor: 'main' },
   { name: 'compare', path: '/compare', waitFor: 'main' },
   { name: 'history', path: '/history', waitFor: 'main' },
-  { name: 'settings', path: '/settings', waitFor: 'form' },
+  { name: 'settings', path: '/settings', waitFor: 'input[type="time"]' },
 ] as const;
 
 async function waitForPageReady(page: Page, waitSelector: string) {

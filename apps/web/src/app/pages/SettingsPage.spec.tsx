@@ -2,12 +2,12 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-vi.mock('../modules/settings/components/FeatureFlagList', () => ({
-  FeatureFlagList: () => <div data-testid="feature-flag-list" />,
-}));
-
 vi.mock('../modules/settings/components/SyncStatusCard', () => ({
   SyncStatusCard: () => <div data-testid="sync-status-card" />,
+}));
+
+vi.mock('../modules/settings/components/SyncScheduleCard', () => ({
+  SyncScheduleCard: () => <div data-testid="sync-schedule-card" />,
 }));
 
 import { render, screen } from '@testing-library/react';
@@ -32,9 +32,9 @@ describe('SettingsPage', () => {
     expect(screen.getByTestId('sync-status-card')).toBeDefined();
   });
 
-  it('should render the feature flag list', () => {
+  it('should render the sync schedule card', () => {
     render(<SettingsPage />);
 
-    expect(screen.getByTestId('feature-flag-list')).toBeDefined();
+    expect(screen.getByTestId('sync-schedule-card')).toBeDefined();
   });
 });

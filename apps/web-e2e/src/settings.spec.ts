@@ -9,37 +9,14 @@ test.describe('Settings page', () => {
     await mockApi(page);
   });
 
-  test('should display feature flags list', async ({ page }) => {
+  test('should display sync status section', async ({ page }) => {
     await page.goto('/settings');
-    await expect(page.getByText('dark-mode')).toBeVisible();
-    await expect(page.getByText('blog')).toBeVisible();
+    await expect(page.getByText('#1')).toBeVisible();
+    await expect(page.getByText('#2')).toBeVisible();
   });
 
-  test('should display feature flag toggle switches', async ({ page }) => {
+  test('should display sync schedule section', async ({ page }) => {
     await page.goto('/settings');
-    const switches = page.locator('button[role="switch"]');
-    await expect(switches).toHaveCount(2);
-  });
-
-  test('should toggle a feature flag', async ({ page }) => {
-    await page.goto('/settings');
-    const firstSwitch = page.locator('button[role="switch"]').first();
-    await expect(firstSwitch).toHaveAttribute('aria-checked', 'true');
-    await firstSwitch.click();
-    await expect(firstSwitch).toHaveAttribute('aria-checked', 'false');
-  });
-
-  test('should display the feature flag creation form', async ({ page }) => {
-    await page.goto('/settings');
-    await expect(page.locator('form')).toBeVisible();
-    await expect(page.locator('form input')).toBeVisible();
-  });
-
-  test('should create a new feature flag', async ({ page }) => {
-    await page.goto('/settings');
-    const input = page.locator('form input');
-    await input.fill('new-flag');
-    await page.locator('form button[type="submit"]').click();
-    await expect(page.getByText('new-flag')).toBeVisible();
+    await expect(page.locator('input[type="time"]')).toBeVisible();
   });
 });
