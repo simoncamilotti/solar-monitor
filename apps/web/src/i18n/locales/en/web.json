@@ -136,21 +136,18 @@
     "success": "Synchronization completed successfully",
     "error": "Error during synchronization",
     "loadError": "Unable to load synchronization status.",
-    "noSystems": "No Enphase system configured."
+    "noSystems": "No Enphase system configured.",
+    "backfill": "Import history",
+    "backfillSuccess": "History import completed ({{count}} days)",
+    "backfillError": "Error during history import"
   },
-  "featureFlags": {
-    "title": "Feature Flags",
-    "description": "Enable or disable sections of the public site.",
-    "placeholder": "Flag name (e.g. my-feature)",
-    "keyHint": "Lowercase only, words separated by hyphens.",
-    "add": "Add",
-    "empty": "No feature flags configured.",
-    "enabled": "enabled",
-    "disabled": "disabled",
-    "toggled": "Flag \"{{key}}\" {{state}}",
-    "toggleError": "Error updating flag",
-    "created": "Flag \"{{key}}\" created",
-    "createError": "Error creating flag",
-    "alreadyExists": "This flag already exists"
+  "syncSchedule": {
+    "title": "Sync schedule",
+    "description": "Choose the daily synchronization time with Enphase.",
+    "time": "Sync time (UTC)",
+    "save": "Save",
+    "success": "Schedule updated successfully",
+    "error": "Error updating schedule",
+    "loadError": "Unable to load sync schedule."
   }
 }

@@ -1,3 +1,4 @@
+import { SchedulerRegistry } from '@nestjs/schedule';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 
@@ -17,7 +18,17 @@ const mockPrismaService = {
   enphaseLifetimeData: {
     upsert: jest.fn(),
   },
+  syncSchedule: {
+    findUnique: jest.fn().mockResolvedValue(null),
+    upsert: jest.fn(),
+  },
   $transaction: jest.fn((promises: Array<Promise<unknown>>) => Promise.all(promises)),
+};
+
+const mockSchedulerRegistry = {
+  doesExist: jest.fn().mockReturnValue(false),
+  addCronJob: jest.fn(),
+  deleteCronJob: jest.fn(),
 };
 
 const mockApiService = {
@@ -54,6 +65,7 @@ describe('EnphaseSyncService', () => {
         { provide: EnphaseApiService, useValue: mockApiService },
         { provide: EnphaseAuthService, useValue: mockAuthService },
         { provide: EnphaseMapper, useValue: mockMapper },
+        { provide: SchedulerRegistry, useValue: mockSchedulerRegistry },
       ],
     }).compile();
 

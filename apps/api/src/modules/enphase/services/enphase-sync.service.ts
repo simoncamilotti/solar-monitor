@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
 
 import { PrismaService } from '@/core';
 
@@ -8,8 +9,10 @@ import type { LifetimeData } from '../types/enphase.types';
 import { EnphaseApiService } from './enphase-api.service';
 import { EnphaseAuthService } from './enphase-auth.service';
 
+const SYNC_CRON_NAME = 'enphase-daily-sync';
+
 @Injectable()
-export class EnphaseSyncService {
+export class EnphaseSyncService implements OnModuleInit {
   private readonly _logger = new Logger(EnphaseSyncService.name);
 
   constructor(
@@ -17,9 +20,31 @@ export class EnphaseSyncService {
     private readonly _apiService: EnphaseApiService,
     private readonly _authService: EnphaseAuthService,
     private readonly _mapper: EnphaseMapper,
+    private readonly _schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  @Cron(CronExpression.EVERY_DAY_AT_2AM)
+  async onModuleInit(): Promise<void> {
+    const schedule = await this._prismaService.syncSchedule.findUnique({ where: { id: 'default' } });
+    const syncTime = schedule?.syncTime ?? '02:00';
+    this._registerSyncCron(syncTime);
+  }
+
+  async updateSyncTime(syncTime: string): Promise<void> {
+    await this._prismaService.syncSchedule.upsert({
+      where: { id: 'default' },
+      update: { syncTime },
+      create: { id: 'default', syncTime },
+    });
+
+    this._registerSyncCron(syncTime);
+    this._logger.log(`Sync schedule updated to ${syncTime} UTC`);
+  }
+
+  async getSyncSchedule(): Promise<{ syncTime: string }> {
+    const schedule = await this._prismaService.syncSchedule.findUnique({ where: { id: 'default' } });
+    return { syncTime: schedule?.syncTime ?? '02:00' };
+  }
+
   async syncAllSystems(): Promise<void> {
     const tokens = await this._prismaService.enphaseToken.findMany();
 
@@ -73,6 +98,20 @@ export class EnphaseSyncService {
         this._logger.error(`Failed to refresh token for system ${token.systemId}: ${error}`);
       }
     }
+  }
+
+  private _registerSyncCron(syncTime: string): void {
+    const [hours, minutes] = syncTime.split(':');
+    const cronExpression = `${minutes} ${hours} * * *`;
+
+    if (this._schedulerRegistry.doesExist('cron', SYNC_CRON_NAME)) {
+      this._schedulerRegistry.deleteCronJob(SYNC_CRON_NAME);
+    }
+
+    const job = new CronJob(cronExpression, () => this.syncAllSystems(), null, true, 'Etc/UTC');
+    this._schedulerRegistry.addCronJob(SYNC_CRON_NAME, job);
+
+    this._logger.log(`Registered daily sync cron: ${cronExpression} (UTC)`);
   }
 
   private async _upsertLifetimeData(systemId: number, lifetimeData: LifetimeData, startDate: string): Promise<number> {

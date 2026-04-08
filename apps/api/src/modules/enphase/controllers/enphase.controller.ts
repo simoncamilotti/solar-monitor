@@ -1,5 +1,5 @@
-import { BadRequestException, Controller, Get, Logger, ParseIntPipe, Query, Res } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Get, Logger, ParseIntPipe, Put, Query, Res } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 
 import { Public } from '@/core';
@@ -9,8 +9,10 @@ import type {
   EnphaseCallbackResponseDto,
   EnphaseSyncResponseDto,
   LifetimeDataResponseDto,
+  SyncScheduleDto,
   SyncStatusResponseDto,
 } from '../dtos/enphase.dto';
+import { UpdateSyncScheduleRequestDto } from '../dtos/enphase.dto';
 import { EnphaseMapper } from '../mappers/enphase.mapper';
 import { EnphaseService } from '../services/enphase.service';
 import { EnphaseApiService } from '../services/enphase-api.service';
@@ -131,5 +133,21 @@ export class EnphaseController {
 
     const count = await this._enphaseSyncService.backfillLifetimeData(systemId, startDate, endDate);
     return { message: 'Backfill completed', daysBackfilled: count };
+  }
+
+  @Get('sync-schedule')
+  @ApiOperation({ summary: 'Get current sync schedule' })
+  @ApiResponse({ status: 200, description: 'Returns the current sync schedule' })
+  async getSyncSchedule(): Promise<SyncScheduleDto> {
+    return this._enphaseSyncService.getSyncSchedule();
+  }
+
+  @Put('sync-schedule')
+  @ApiOperation({ summary: 'Update sync schedule' })
+  @ApiBody({ type: UpdateSyncScheduleRequestDto })
+  @ApiResponse({ status: 200, description: 'Schedule updated' })
+  async updateSyncSchedule(@Body() dto: UpdateSyncScheduleRequestDto): Promise<SyncScheduleDto> {
+    await this._enphaseSyncService.updateSyncTime(dto.syncTime);
+    return { syncTime: dto.syncTime };
   }
 }

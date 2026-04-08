@@ -41,5 +41,14 @@ export const syncStatusResponseDtoSchema = z.array(syncStatusDtoSchema);
 
 export type LifetimeDataDto = z.infer<typeof lifetimeDataDtoSchema>;
 export type LifetimeDataResponseDto = z.infer<typeof lifetimeDataResponseDtoSchema>;
+export type EnphaseBackfillResponseDto = z.infer<typeof enphaseBackfillResponseDtoSchema>;
+export const syncScheduleDtoSchema = z.object({
+  syncTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be in HH:mm format'),
+});
+
+export const updateSyncScheduleRequestDtoSchema = syncScheduleDtoSchema;
+
 export type SyncStatusDto = z.infer<typeof syncStatusDtoSchema>;
 export type SyncStatusResponseDto = z.infer<typeof syncStatusResponseDtoSchema>;
+export type SyncScheduleDto = z.infer<typeof syncScheduleDtoSchema>;
+export type UpdateSyncScheduleRequestDto = z.infer<typeof updateSyncScheduleRequestDtoSchema>;

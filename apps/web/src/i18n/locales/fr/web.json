@@ -136,21 +136,18 @@
     "success": "Synchronisation terminée avec succès",
     "error": "Erreur lors de la synchronisation",
     "loadError": "Impossible de charger le statut de synchronisation.",
-    "noSystems": "Aucun système Enphase configuré."
+    "noSystems": "Aucun système Enphase configuré.",
+    "backfill": "Importer l'historique",
+    "backfillSuccess": "Import de l'historique terminé ({{count}} jours)",
+    "backfillError": "Erreur lors de l'import de l'historique"
   },
-  "featureFlags": {
-    "title": "Feature Flags",
-    "description": "Activez ou désactivez des sections du site public.",
-    "placeholder": "Nom du flag (ex: my-feature)",
-    "keyHint": "Minuscules uniquement, mots séparés par des tirets.",
-    "add": "Ajouter",
-    "empty": "Aucun feature flag configuré.",
-    "enabled": "activé",
-    "disabled": "désactivé",
-    "toggled": "Flag \"{{key}}\" {{state}}",
-    "toggleError": "Erreur lors de la mise à jour du flag",
-    "created": "Flag \"{{key}}\" créé",
-    "createError": "Erreur lors de la création du flag",
-    "alreadyExists": "Ce flag existe déjà"
+  "syncSchedule": {
+    "title": "Planification de la synchronisation",
+    "description": "Choisissez l'heure de synchronisation quotidienne avec Enphase.",
+    "time": "Heure de synchronisation (UTC)",
+    "save": "Enregistrer",
+    "success": "Planification mise à jour avec succès",
+    "error": "Erreur lors de la mise à jour de la planification",
+    "loadError": "Impossible de charger la planification."
   }
 }

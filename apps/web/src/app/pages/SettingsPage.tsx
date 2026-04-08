@@ -3,7 +3,7 @@ import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '../modules/layout/components/PageHeader';
-import { FeatureFlagList } from '../modules/settings/components/FeatureFlagList';
+import { SyncScheduleCard } from '../modules/settings/components/SyncScheduleCard';
 import { SyncStatusCard } from '../modules/settings/components/SyncStatusCard';
 
 export const SettingsPage: FunctionComponent = () => {
@@ -19,7 +19,7 @@ export const SettingsPage: FunctionComponent = () => {
 
       <div className="space-y-8">
         <SyncStatusCard />
-        <FeatureFlagList />
+        <SyncScheduleCard />
       </div>
     </div>
   );
