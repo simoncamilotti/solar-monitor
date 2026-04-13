@@ -50,7 +50,7 @@ jobs:
           npx playwright test
           --project=${{ env.PW_PROJECT }}
           --config=${{ env.PW_CONFIG }}
-          --ignore-pattern='visual-regression*'
+          --grep-invert="Visual regression"
 
       - name: Capture visual baselines
         run: >
@@ -103,7 +103,7 @@ jobs:
           npx playwright test
           --project=${{ env.PW_PROJECT }}
           --config=${{ env.PW_CONFIG }}
-          --ignore-pattern='visual-regression*'
+          --grep-invert="Visual regression"
 
       - name: Visual regression (after updates)
         id: visual_after
