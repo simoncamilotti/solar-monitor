@@ -23,6 +23,7 @@ jobs:
       nx_targets: 'lint test typecheck build'
       prisma: true
       env_file: 'DATABASE_URL=postgresql://user:pass@localhost:5432/dummy'
+      runner: solar-monitor-runners
     secrets: inherit
 
   docker:
@@ -30,6 +31,8 @@ jobs:
     needs: check
     uses: simoncamilotti/shared-workflows/.github/workflows/docker.yml@main
     with:
+      runner: solar-monitor-runners
+      remote_buildkit: true
       images: |
         [
           { "name": "api", "dockerfile": "apps/api/Dockerfile" },
