@@ -1,0 +1,51 @@
+name: Tâche
+description: Une évolution, un refactor, de l'outillage ou de la documentation
+labels: ['type: chore']
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Objectif
+      description: Ce qu'il faut obtenir, en une ou deux phrases.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Pourquoi
+      description: Le problème que ça résout. Si la raison n'est pas évidente dans six mois, elle a sa place ici.
+    validations:
+      required: true
+
+  - type: textarea
+    id: work
+    attributes:
+      label: À faire
+      description: La checklist des étapes.
+      value: |
+        - [ ] 
+    validations:
+      required: false
+
+  - type: textarea
+    id: done
+    attributes:
+      label: Critères de sortie
+      description: Comment on sait que c'est terminé.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Périmètre
+      options:
+        - API (NestJS / Enphase)
+        - Web (React)
+        - Base de données (Prisma)
+        - CI / Docker
+        - Documentation
+        - Transverse
+    validations:
+      required: true
