@@ -31,10 +31,20 @@ export const lifetimeDataDtoSchema = z.object({
 
 export const lifetimeDataResponseDtoSchema = z.array(lifetimeDataDtoSchema);
 
+/** Une plage de jours absente de l'historique stocké, bornes incluses. */
+export const syncGapDtoSchema = z.object({
+  from: z.iso.date(),
+  to: z.iso.date(),
+  days: z.int(),
+});
+
 export const syncStatusDtoSchema = z.object({
   systemId: z.number(),
   lastSyncDate: z.string().nullable(),
   totalRecords: z.number(),
+  /** Nombre de jours que couvrirait la plage stockée si elle était complète. */
+  expectedRecords: z.number(),
+  gaps: z.array(syncGapDtoSchema),
 });
 
 export const syncStatusResponseDtoSchema = z.array(syncStatusDtoSchema);
@@ -48,6 +58,7 @@ export const syncScheduleDtoSchema = z.object({
 
 export const updateSyncScheduleRequestDtoSchema = syncScheduleDtoSchema;
 
+export type SyncGapDto = z.infer<typeof syncGapDtoSchema>;
 export type SyncStatusDto = z.infer<typeof syncStatusDtoSchema>;
 export type SyncStatusResponseDto = z.infer<typeof syncStatusResponseDtoSchema>;
 export type SyncScheduleDto = z.infer<typeof syncScheduleDtoSchema>;
