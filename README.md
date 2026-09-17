@@ -216,6 +216,10 @@ Two GitHub Actions workflows:
 - **Single user by design.** The application is built for one household and one Enphase account.
   The `User` model only records the Keycloak identity; there is no per-user data partitioning and
   no role model.
+- **Issue references in pull requests.** Use `Closes #N` only on the pull request that completes an
+  issue; use `Concerne #N` on the intermediate ones, since an issue usually spans several pull
+  requests. Either keyword marks the issue `status: en cours` for as long as the pull request is
+  open, and the label is removed when it closes.
 
 ## License
 
