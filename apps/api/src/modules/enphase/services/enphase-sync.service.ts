@@ -66,7 +66,7 @@ export class EnphaseSyncService implements OnModuleInit {
 
     const lifetimeData = await this._apiService.getLifetimeData(systemId, dateStr);
 
-    await this._upsertLifetimeData(systemId, lifetimeData, dateStr);
+    await this._upsertLifetimeData(systemId, lifetimeData);
 
     this._logger.log(`Saved lifetime data for system ${systemId}`);
   }
@@ -76,7 +76,7 @@ export class EnphaseSyncService implements OnModuleInit {
 
     const lifetimeData = await this._apiService.getLifetimeData(systemId, startDate, endDate);
 
-    const count = await this._upsertLifetimeData(systemId, lifetimeData, startDate);
+    const count = await this._upsertLifetimeData(systemId, lifetimeData);
 
     this._logger.log(`Backfilled ${count} days for system ${systemId}`);
     return count;
@@ -114,12 +114,12 @@ export class EnphaseSyncService implements OnModuleInit {
     this._logger.log(`Registered daily sync cron: ${cronExpression} (UTC)`);
   }
 
-  private async _upsertLifetimeData(systemId: number, lifetimeData: LifetimeData, startDate: string): Promise<number> {
+  private async _upsertLifetimeData(systemId: number, lifetimeData: LifetimeData): Promise<number> {
     const token = await this._prismaService.enphaseToken.findUniqueOrThrow({
       where: { systemId },
     });
 
-    const records = this._mapper.toLifetimeDataRecords(lifetimeData, startDate);
+    const records = this._mapper.toLifetimeDataRecords(lifetimeData);
 
     await this._prismaService.$transaction(
       records.map(record =>

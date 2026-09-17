@@ -44,10 +44,10 @@ const mockMapper = {
 };
 
 const LIFETIME_DATA: LifetimeData = {
-  whProduced: [1000, 2000],
-  whConsumed: [500, 600],
-  whImported: [100, 200],
-  whExported: [400, 500],
+  whProduced: { startDate: '2026-03-10', values: [1000, 2000] },
+  whConsumed: { startDate: '2026-03-10', values: [500, 600] },
+  whImported: { startDate: '2026-03-10', values: [100, 200] },
+  whExported: { startDate: '2026-03-10', values: [400, 500] },
 };
 
 const TOKEN_RECORD = { id: 'token-uuid', systemId: 42 };
@@ -117,12 +117,24 @@ describe('EnphaseSyncService', () => {
       expect(mockPrismaService.enphaseLifetimeData.upsert).toHaveBeenCalledTimes(2);
     });
 
+    // Les dates viennent des séries renvoyées par Enphase, pas de la plage demandée :
+    // le mapper ne doit donc recevoir aucune date depuis ici.
+    it('should let the mapper date the records from the API response alone', async () => {
+      mockApiService.getLifetimeData.mockResolvedValue(LIFETIME_DATA);
+      mockPrismaService.enphaseToken.findUniqueOrThrow.mockResolvedValue(TOKEN_RECORD);
+      mockMapper.toLifetimeDataRecords.mockReturnValue([]);
+
+      await service.backfillLifetimeData(42, '2026-01-01', '2026-03-11');
+
+      expect(mockMapper.toLifetimeDataRecords).toHaveBeenCalledWith(LIFETIME_DATA);
+    });
+
     it('should return 0 for empty data range', async () => {
       mockApiService.getLifetimeData.mockResolvedValue({
-        whProduced: [],
-        whConsumed: [],
-        whImported: [],
-        whExported: [],
+        whProduced: { startDate: '2026-03-10', values: [] },
+        whConsumed: { startDate: '2026-03-10', values: [] },
+        whImported: { startDate: '2026-03-10', values: [] },
+        whExported: { startDate: '2026-03-10', values: [] },
       });
       mockPrismaService.enphaseToken.findUniqueOrThrow.mockResolvedValue(TOKEN_RECORD);
       mockMapper.toLifetimeDataRecords.mockReturnValue([]);

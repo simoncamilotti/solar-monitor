@@ -3,7 +3,7 @@ import type { EnphaseLifetimeData } from '@prisma/client';
 import { Decimal } from 'decimal.js';
 
 import type { EnphaseSystemDto, LifetimeDataResponseDto } from '../dtos/enphase.dto';
-import type { EnphaseSystemRaw, LifetimeData, LifetimeDataRecord } from '../types/enphase.types';
+import type { EnphaseSystemRaw, LifetimeData, LifetimeDataRecord, LifetimeSeries } from '../types/enphase.types';
 
 @Injectable()
 export class EnphaseMapper {
@@ -19,26 +19,57 @@ export class EnphaseMapper {
     return systems.map(system => this.toSystemDto(system));
   }
 
-  toLifetimeDataRecords(lifetimeData: LifetimeData, startDate: string): LifetimeDataRecord[] {
-    const length = Math.min(
-      lifetimeData.whProduced.length,
-      lifetimeData.whConsumed.length,
-      lifetimeData.whImported.length,
-      lifetimeData.whExported.length,
-    );
+  /**
+   * Aligne les quatre séries sur les DATES et non sur les index.
+   *
+   * Chaque série démarre à sa propre date, qu'Enphase renvoie dans `start_date` :
+   * elle est tronquée au meter_start_date du compteur concerné, et ce compteur
+   * diffère entre production, consommation, import et export. Indexer les quatre
+   * depuis une même date écrit donc des valeurs sur les mauvais jours.
+   *
+   * Seules les dates couvertes par les quatre séries produisent un enregistrement :
+   * les quatre colonnes sont obligatoires en base, et compléter à zéro écrirait des
+   * relevés faux plutôt que de les omettre.
+   */
+  toLifetimeDataRecords(lifetimeData: LifetimeData): LifetimeDataRecord[] {
+    const produced = this._indexByDate(lifetimeData.whProduced);
+    const consumed = this._indexByDate(lifetimeData.whConsumed);
+    const imported = this._indexByDate(lifetimeData.whImported);
+    const exported = this._indexByDate(lifetimeData.whExported);
 
-    return Array.from({ length }, (_, index) => {
-      const date = new Date(startDate);
+    const records: LifetimeDataRecord[] = [];
+
+    for (const [day, whProduced] of [...produced].sort(([a], [b]) => a.localeCompare(b))) {
+      const whConsumed = consumed.get(day);
+      const whImported = imported.get(day);
+      const whExported = exported.get(day);
+
+      if (whConsumed === undefined || whImported === undefined || whExported === undefined) {
+        continue;
+      }
+
+      records.push({ date: new Date(`${day}T00:00:00.000Z`), whProduced, whConsumed, whImported, whExported });
+    }
+
+    return records;
+  }
+
+  private _indexByDate(series: LifetimeSeries): Map<string, number> {
+    const start = new Date(`${series.startDate}T00:00:00.000Z`);
+
+    if (Number.isNaN(start.getTime())) {
+      throw new Error(`Invalid Enphase start_date: ${series.startDate}`);
+    }
+
+    const byDate = new Map<string, number>();
+
+    series.values.forEach((value, index) => {
+      const date = new Date(start);
       date.setUTCDate(date.getUTCDate() + index);
-
-      return {
-        date,
-        whProduced: lifetimeData.whProduced[index] ?? 0,
-        whConsumed: lifetimeData.whConsumed[index] ?? 0,
-        whImported: lifetimeData.whImported[index] ?? 0,
-        whExported: lifetimeData.whExported[index] ?? 0,
-      };
+      byDate.set(date.toISOString().slice(0, 10), value);
     });
+
+    return byDate;
   }
 
   toLifetimeDataResponseDto(lifetimeData: EnphaseLifetimeData[]): LifetimeDataResponseDto {
