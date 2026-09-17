@@ -1,64 +1,86 @@
 # Solar Monitoring
 
-Nx monorepo with a NestJS API, a React client, and shared libraries. Ready for Keycloak OIDC auth, PostgreSQL, and GitOps deployment.
+Nx monorepo pairing a NestJS API with a React client, collecting daily solar production and
+consumption data from the Enphase Developer API v4. Keycloak OIDC authentication, PostgreSQL via
+Prisma, deployed through GitOps.
 
 ## Technical Stack
 
-| Layer        | Technology                         |
-| :----------- | :--------------------------------- |
-| **Monorepo** | Nx 22                              |
-| **Backend**  | NestJS 11, Prisma 7, PostgreSQL 17 |
-| **Frontend** | React 19, TailwindCSS, Radix UI    |
-| **Auth**     | Keycloak 23 (OIDC)                 |
-| **CI/CD**    | GitHub Actions, GitOps (Kustomize) |
+| Layer        | Technology                                             |
+| :----------- | :----------------------------------------------------- |
+| **Monorepo** | Nx 22, TypeScript 5.9                                  |
+| **Backend**  | NestJS 11, Prisma 7, PostgreSQL 17                     |
+| **Frontend** | React 19, Vite 7, TailwindCSS 3, ECharts 6, ag-grid 35 |
+| **Shared**   | Zod 4 schemas shared between API and client            |
+| **Auth**     | Keycloak (OIDC) — `keycloak-js` 26 on the client       |
+| **i18n**     | i18next — French and English, French as fallback       |
+| **Testing**  | Jest (API, libs), Vitest (web), Playwright (web E2E)   |
+| **CI/CD**    | GitHub Actions, GHCR, GitOps (Kustomize)               |
 
 ## Architecture
 
 ```
 apps/
-  api/           -> NestJS API (port 3000, prefix /api)
-  web/           -> React client (port 4200)
-  api-e2e/       -> E2E Tests API (Jest)
-  web-e2e/       -> E2E Tests Web (Playwright)
+  api/           NestJS API      (port 3000, prefix /api)
+  web/           React client    (port 4200, proxies /api to :3000)
+  api-e2e/       API E2E tests   (Jest)
+  web-e2e/       Web E2E tests   (Playwright, incl. visual regression)
 
 libs/
-  api/core/      -> Global NestJS module (Prisma, Health, Logger, Auth, Throttler)
-  shared-models/ -> Shared DTOs and Zod schemas
-  shared-web/    -> Shared React utilities (React Query, Axios)
-  i18n/          -> Internationalization (i18next)
+  api/core/      Global NestJS module: auth (JWT/Keycloak), Prisma, health, logging, throttling
+  shared-models/ Zod schemas and DTOs shared between API and client
 ```
+
+Frontend concerns that are sometimes expected in a library live under `apps/web/src`:
+
+| Concern            | Location                                        |
+| :----------------- | :---------------------------------------------- |
+| Axios instance     | `apps/web/src/app/modules/api/axiosInstance.ts` |
+| React Query client | `apps/web/src/app/modules/providers/`           |
+| i18n setup         | `apps/web/src/i18n/`                            |
+| Locale files       | `apps/web/src/i18n/locales/{en,fr}/web.json`    |
+
+### Path Aliases (`tsconfig.base.json`)
+
+| Alias             | Target                            |
+| :---------------- | :-------------------------------- |
+| `@/core`          | `libs/api/core/src/index.ts`      |
+| `@/shared-models` | `libs/shared-models/src/index.ts` |
 
 ## Prerequisites
 
-- Node.js 24+
+- Node.js 24 (see `.nvmrc`)
 - Docker & Docker Compose
 - npm
 
 ## Environment & Configuration
 
+Copy `.env.example` to `.env`, then adjust:
+
 | File                        | Value to update            | Description              |
 | :-------------------------- | :------------------------- | :----------------------- |
 | `.env`                      | `DB_NAME`                  | Database name            |
 | `.env`                      | `DATABASE_URL`             | Full connection string   |
+| `.env`                      | `CORS_ORIGINS`             | Comma-separated origins  |
 | `.env`                      | `KEYCLOAK_CLIENT_ID`       | Keycloak client ID       |
 | `.env`                      | `KEYCLOAK_ISSUER_URL`      | Keycloak realm URL       |
 | `apps/web/public/config.js` | `realm`, `clientId`, `url` | Frontend Keycloak config |
 
+The frontend config is runtime, not build-time: copy `config/web/config.example.js` to
+`apps/web/public/config.js`. In production it is mounted as a volume, which is why nginx serves it
+with `no-store`.
+
+The API validates its environment at startup against a Zod schema (`apps/api/src/env.ts`) and
+refuses to boot if anything is missing.
+
 ### CI/CD (GitHub Repository Settings)
 
-| Type     | Name                    | Description                                                    |
-| :------- | :---------------------- | :------------------------------------------------------------- |
-| Variable | `GITOPS_REPO`           | GitOps repository (e.g. `org/gitops`)                          |
-| Variable | `DOCKER_MANUAL_ONLY`    | Set to `true` to restrict Docker builds to manual trigger only |
-| Secret   | `GITOPS_PAT`            | Personal access token for GitOps repo                          |
-| Secret   | `SLACK_WEBHOOK_URL`     | Slack incoming webhook for deploy notifications                |
-| Secret   | `NX_CLOUD_ACCESS_TOKEN` | Nx Cloud access token (optional)                               |
-
-### Nx Cloud
-
-| File      | Value to update | Description                |
-| :-------- | :-------------- | :------------------------- |
-| `nx.json` | `nxCloudId`     | Your Nx Cloud workspace ID |
+| Type     | Name                 | Description                                                    |
+| :------- | :------------------- | :------------------------------------------------------------- |
+| Variable | `GITOPS_REPO`        | GitOps repository (e.g. `org/gitops`)                          |
+| Variable | `DOCKER_MANUAL_ONLY` | Set to `true` to restrict Docker builds to manual trigger only |
+| Secret   | `GITOPS_PAT`         | Personal access token for the GitOps repo                      |
+| Secret   | `SLACK_WEBHOOK_URL`  | Slack incoming webhook for deploy notifications                |
 
 ## Main Commands
 
@@ -70,52 +92,64 @@ npm run serve:api              # Start API
 npm run serve:web              # Start Web
 ```
 
-### Build
+### Build, Lint & Format
 
 ```bash
-npm run build:api              # Build API
-npm run build:web              # Build Web
-npm run build:all              # Build all
+npm run build:api / build:web / build:all
+npm run lint:api  / lint:web  / lint:all
+npm run format                 # Prettier via nx format
+npm run format:check
 ```
 
 ### Tests
 
 ```bash
-npm run test:api               # API unit tests
-npm run test:web               # Web unit tests
-npm run test:all               # All unit tests
+npm run test:api               # Jest
+npm run test:web               # Vitest
+npm run test:all
 
-npm run e2e:api                # E2E tests API (Jest)
-npm run e2e:web                # E2E tests Web (Playwright)
-npm run e2e:web-ui             # E2E tests Web (Playwright UI mode)
+npm run e2e:api                # Jest — requires the API and its database running
+npm run e2e:web                # Playwright
+npm run e2e:web-ui             # Playwright UI mode
+npm run e2e:web-update-snapshots
 ```
 
-### Lint & Format
+Run a single test file:
 
 ```bash
-npm run lint:api               # Lint API
-npm run lint:web               # Lint Web
-npm run lint:all               # Lint all
-npm run format                 # Format code
+npx nx test api -- --testPathPattern=<pattern>
+npx nx test web -- --run <pattern>
+npx nx e2e web-e2e -- --grep "<test name>"
 ```
+
+> `npm run typecheck:all` currently only covers `web`: the `api`, `core` and `shared-models`
+> projects have no `typecheck` target yet.
 
 ### Database
 
 ```bash
-npm run prisma:generate        # Generate Prisma client
+npm run prisma:generate        # After any schema change
 npm run prisma:migrate:dev     # Create or apply migrations (dev)
 npm run prisma:migrate:deploy  # Apply migrations (prod)
-npm run prisma:studio          # Prisma Studio (DB GUI)
+npm run prisma:seed            # Idempotent default rows
+npm run prisma:studio          # Database GUI
 ```
+
+Schema: `libs/api/core/src/prisma/schema.prisma` · config: `prisma.config.ts` (repository root) ·
+migrations: `libs/api/core/src/prisma/migrations/`.
+
+Models: `User` (Keycloak identity), `SyncSchedule` (daily sync time), `EnphaseToken` (OAuth2
+credentials per system), `EnphaseLifetimeData` (daily Wh readings).
 
 ## Enphase Solar Monitoring
 
-Integration with the [Enphase Developer API v4](https://developer-v4.enphase.com) to collect daily solar production, consumption, import, and export data.
+Integration with the [Enphase Developer API v4](https://developer-v4.enphase.com) collecting daily
+production, consumption, import and export data.
 
 ### Setup
 
 1. Create an application on the [Enphase Developer Portal](https://developer-v4.enphase.com/signup)
-2. Add the following variables to your `.env`:
+2. Add the following to your `.env`:
 
 ```env
 ENPHASE_CLIENT_ID=your_client_id
@@ -124,29 +158,37 @@ ENPHASE_API_KEY=your_api_key
 ENPHASE_REDIRECT_URI=http://localhost:3000/api/enphase/callback
 ```
 
-3. Apply the database migration:
-
-```bash
-npm run prisma:migrate:deploy
-```
-
-4. Start the API and navigate to `http://localhost:3000/api/enphase/authorize` to link your Enphase account via OAuth2.
+3. Apply the migrations: `npm run prisma:migrate:deploy`
+4. Start the API and open `http://localhost:3000/api/enphase/authorize` to link your Enphase
+   account over OAuth2.
 
 ### API Endpoints
 
-| Endpoint                     | Auth     | Description                                                     |
-| :--------------------------- | :------- | :-------------------------------------------------------------- |
-| `GET /api/enphase/authorize` | Public   | Redirects to Enphase OAuth2 authorization page                  |
-| `GET /api/enphase/callback`  | Public   | Handles OAuth2 callback and stores tokens                       |
-| `GET /api/enphase/sync`      | Required | Triggers manual sync (`?system_id=`)                            |
-| `GET /api/enphase/backfill`  | Required | Backfills historical data (`?system_id=&start_date=&end_date=`) |
+| Endpoint                         | Auth     | Description                                                       |
+| :------------------------------- | :------- | :---------------------------------------------------------------- |
+| `GET /health`                    | Public   | Health check (database, memory, disk) — outside the `/api` prefix |
+| `GET /api/enphase/authorize`     | Public   | Redirects to the Enphase OAuth2 authorization page                |
+| `GET /api/enphase/callback`      | Public   | Handles the OAuth2 callback and stores the tokens                 |
+| `GET /api/enphase/all`           | Required | Returns the full daily history                                    |
+| `GET /api/enphase/sync-status`   | Required | Last sync date and record count per system                        |
+| `GET /api/enphase/sync`          | Required | Triggers a manual sync (`?system_id=`)                            |
+| `GET /api/enphase/backfill`      | Required | Backfills history (`?system_id=&start_date=&end_date=`)           |
+| `GET /api/enphase/sync-schedule` | Required | Returns the configured daily sync time                            |
+| `PUT /api/enphase/sync-schedule` | Required | Updates the daily sync time (`{ "syncTime": "HH:mm" }`)           |
 
-### Automated Tasks
+Every route is protected by a global JWT guard; public routes opt out with the `@Public()`
+decorator. Rate limiting is global at 100 requests per 60 s. Swagger UI is served at `/docs`
+outside production.
 
-| Schedule       | Task                                                      |
-| :------------- | :-------------------------------------------------------- |
-| Every day 2 AM | Fetch previous day's lifetime data for all linked systems |
-| Every 6 hours  | Proactively refresh tokens expiring within 12 hours       |
+### Scheduled Tasks
+
+| Schedule                                                        | Task                                                  |
+| :-------------------------------------------------------------- | :---------------------------------------------------- |
+| Daily, at the time held in `SyncSchedule` (default `02:00` UTC) | Fetch the previous day's data for every linked system |
+| Every 6 hours                                                   | Refresh tokens expiring within the next 12 hours      |
+
+The daily time is configurable from the Settings page and re-registers the cron job at runtime; it
+is **not** hard-coded.
 
 ## Docker Infrastructure
 
@@ -157,7 +199,24 @@ npm run prisma:migrate:deploy
 
 ## CI/CD
 
-Two GitHub Actions workflows are included:
+Two GitHub Actions workflows:
 
-- **CI** (`ci.yml`): Runs lint, tests, typecheck and build on push to `main` and on pull requests.
-- **Docker** (`docker.yml`): Builds and pushes Docker images to GHCR, then deploys via GitOps (Kustomize). Triggers on push to `main` (path-filtered), release, or manual dispatch. Set `DOCKER_MANUAL_ONLY=true` to restrict to manual trigger only.
+- **`main.yml`** — delegates to reusable workflows: `nx-ci` (lint, test, typecheck, build) on every
+  push and pull request, then `docker` (build, push to GHCR, GitOps deploy via Kustomize) on `main`,
+  on release, or on manual dispatch. Both jobs run on self-hosted runners with a remote BuildKit
+  builder.
+- **`dependency-update.yml`** — weekly patch and minor dependency updates, validated by E2E and
+  visual regression runs before and after, opening a pull request with a report.
+
+## Conventions
+
+- **Documentation travels with the change.** Any modification to the project structure, to a path
+  alias, or to an API endpoint updates this README **in the same pull request**. Every path, alias
+  and endpoint quoted above is expected to exist in the repository.
+- **Single user by design.** The application is built for one household and one Enphase account.
+  The `User` model only records the Keycloak identity; there is no per-user data partitioning and
+  no role model.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
