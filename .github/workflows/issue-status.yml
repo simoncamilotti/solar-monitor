@@ -1,0 +1,87 @@
+# Marque « en cours » les issues qu'une pull request référence, et retire la marque
+# à sa fermeture.
+#
+# Pourquoi un label et pas un Projects v2 : le GITHUB_TOKEN intégré ne peut pas écrire
+# dans un tableau Projects v2 appartenant à un compte utilisateur. Il faudrait un PAT
+# en secret, avec son expiration à gérer. Un label coûte une ligne de configuration et
+# zéro secret.
+#
+# La clôture des issues n'est pas gérée ici : elle est déjà native via le mot-clé
+# `Closes #N` dans le corps de la PR. Voir la convention dans le README.
+
+name: Statut des issues
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, converted_to_draft, closed]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: issue-status-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const LABEL = 'status: en cours';
+            const pr = context.payload.pull_request;
+
+            // Une PR en brouillon ou fermée ne signale pas un travail en cours.
+            const inProgress = !pr.draft && pr.state === 'open';
+
+            // Les références de la PR, titre et corps confondus. `Closes #12` comme
+            // `Concerne #12` comptent : dans les deux cas le travail a commencé.
+            const refs = [...new Set(
+              [...`${pr.title}\n${pr.body ?? ''}`.matchAll(/#(\d+)/g)].map(m => Number(m[1]))
+            )];
+
+            if (refs.length === 0) {
+              core.info('Aucune issue référencée par cette PR.');
+              return;
+            }
+
+            for (const number of refs) {
+              let issue;
+              try {
+                ({ data: issue } = await github.rest.issues.get({
+                  ...context.repo,
+                  issue_number: number,
+                }));
+              } catch {
+                core.info(`#${number} : introuvable, ignorée.`);
+                continue;
+              }
+
+              // `issues.get` renvoie aussi les pull requests : on ne marque que les issues.
+              if (issue.pull_request) {
+                core.info(`#${number} : c'est une PR, ignorée.`);
+                continue;
+              }
+
+              const labelled = issue.labels.some(l => (l.name ?? l) === LABEL);
+
+              if (inProgress && !labelled && issue.state === 'open') {
+                await github.rest.issues.addLabels({
+                  ...context.repo,
+                  issue_number: number,
+                  labels: [LABEL],
+                });
+                core.info(`#${number} : marquée « en cours ».`);
+              } else if (!inProgress && labelled) {
+                await github.rest.issues.removeLabel({
+                  ...context.repo,
+                  issue_number: number,
+                  name: LABEL,
+                }).catch(() => core.info(`#${number} : label déjà retiré.`));
+                core.info(`#${number} : marque retirée.`);
+              } else {
+                core.info(`#${number} : rien à faire.`);
+              }
+            }
