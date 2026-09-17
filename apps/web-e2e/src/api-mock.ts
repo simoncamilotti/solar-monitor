@@ -1,8 +1,16 @@
 import type { Page } from '@playwright/test';
 
 const syncStatus = [
-  { systemId: 1, lastSyncDate: '2024-06-10T12:00:00Z', totalRecords: 180 },
-  { systemId: 2, lastSyncDate: null, totalRecords: 0 },
+  // Un historique troué, pour que le rendu des trous et le bouton « combler »
+  // soient réellement exercés.
+  {
+    systemId: 1,
+    lastSyncDate: '2024-06-10T12:00:00Z',
+    totalRecords: 180,
+    expectedRecords: 190,
+    gaps: [{ from: '2024-05-01', to: '2024-05-10', days: 10 }],
+  },
+  { systemId: 2, lastSyncDate: null, totalRecords: 0, expectedRecords: 0, gaps: [] },
 ];
 
 const syncSchedule = { syncTime: '02:00' };
