@@ -84,12 +84,45 @@ describe('EnphaseApiService', () => {
       const result = await service.getLifetimeData(1, '2026-03-10', '2026-03-11');
 
       expect(result).toEqual({
-        whProduced: [1000, 2000],
-        whConsumed: [500, 600],
-        whImported: [100, 200],
-        whExported: [400, 500],
+        whProduced: { startDate: '2026-03-10', values: [1000, 2000] },
+        whConsumed: { startDate: '2026-03-10', values: [500, 600] },
+        whImported: { startDate: '2026-03-10', values: [100, 200] },
+        whExported: { startDate: '2026-03-10', values: [400, 500] },
       });
       expect(mockHttpService.get).toHaveBeenCalledTimes(4);
+    });
+
+    // Enphase tronque chaque série au meter_start_date de SON compteur : la date
+    // renvoyée peut différer de celle demandée, et différer d'une série à l'autre.
+    it('should carry the start date each endpoint returns, not the requested one', async () => {
+      mockAuthService.getValidAccessToken.mockResolvedValue('token');
+
+      mockHttpService.get
+        .mockReturnValueOnce(
+          of({
+            data: {
+              system_id: 1,
+              start_date: '2026-03-12',
+              meta: LIFETIME_META,
+              production: [1000],
+              meter_start_date: '2026-03-12',
+            },
+          }),
+        )
+        .mockReturnValueOnce(
+          of({ data: { system_id: 1, start_date: '2026-04-01', meta: LIFETIME_META, consumption: [500] } }),
+        )
+        .mockReturnValueOnce(
+          of({ data: { system_id: 1, start_date: '2026-04-01', meta: LIFETIME_META, import: [100] } }),
+        )
+        .mockReturnValueOnce(
+          of({ data: { system_id: 1, start_date: '2026-04-01', meta: LIFETIME_META, export: [400] } }),
+        );
+
+      const result = await service.getLifetimeData(1, '2026-01-01');
+
+      expect(result.whProduced.startDate).toBe('2026-03-12');
+      expect(result.whConsumed.startDate).toBe('2026-04-01');
     });
   });
 

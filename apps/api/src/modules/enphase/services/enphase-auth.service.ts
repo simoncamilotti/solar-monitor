@@ -22,6 +22,22 @@ export class EnphaseAuthService {
 
   private readonly _pendingStates = new Map<string, number>();
 
+  /**
+   * Rafraîchissements en vol, par systemId.
+   *
+   * Enphase fait tourner le refresh token : celui qui vient de servir est
+   * invalidé. Or une synchronisation lance quatre appels en parallèle, et chacun
+   * réclame un jeton valide — près de l'expiration, les quatre déclenchaient donc
+   * quatre rafraîchissements concurrents, dont trois utilisaient un refresh token
+   * déjà consommé et écrasaient en base une valeur invalide. Il fallait alors
+   * relier le compte à la main.
+   *
+   * Les appels concurrents partagent désormais la même promesse : un seul aller-retour
+   * réseau, une seule écriture. La carte est en mémoire, donc cette garantie vaut
+   * pour un unique processus — ce qui correspond au déploiement mono-réplique actuel.
+   */
+  private readonly _refreshesInFlight = new Map<number, Promise<string>>();
+
   constructor(
     private readonly _prismaService: PrismaService,
     private readonly _httpService: HttpService,
@@ -73,6 +89,18 @@ export class EnphaseAuthService {
   }
 
   async refreshAccessToken(systemId: number): Promise<string> {
+    const inFlight = this._refreshesInFlight.get(systemId);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    const refresh = this._refreshAccessToken(systemId).finally(() => this._refreshesInFlight.delete(systemId));
+    this._refreshesInFlight.set(systemId, refresh);
+
+    return refresh;
+  }
+
+  private async _refreshAccessToken(systemId: number): Promise<string> {
     const token = await this._prismaService.enphaseToken.findUnique({ where: { systemId } });
     if (!token) {
       throw new Error(`No Enphase token found for system ${systemId}`);

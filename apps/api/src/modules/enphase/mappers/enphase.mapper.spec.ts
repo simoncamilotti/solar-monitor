@@ -1,6 +1,6 @@
 import type { EnphaseLifetimeData } from '@prisma/client';
 
-import type { EnphaseSystemRaw, LifetimeData } from '../types/enphase.types';
+import type { EnphaseSystemRaw, LifetimeData, LifetimeSeries } from '../types/enphase.types';
 import { EnphaseMapper } from './enphase.mapper';
 
 describe('EnphaseMapper', () => {
@@ -65,15 +65,19 @@ describe('EnphaseMapper', () => {
   });
 
   describe('toLifetimeDataRecords', () => {
-    it('should map lifetime data to records with correct dates', () => {
-      const lifetimeData: LifetimeData = {
-        whProduced: [1000, 2000, 3000],
-        whConsumed: [500, 600, 700],
-        whImported: [100, 200, 300],
-        whExported: [400, 500, 600],
-      };
+    const series = (startDate: string, values: number[]): LifetimeSeries => ({ startDate, values });
 
-      const records = mapper.toLifetimeDataRecords(lifetimeData, '2026-03-10');
+    const aligned = (startDate: string, p: number[], c: number[], i: number[], e: number[]): LifetimeData => ({
+      whProduced: series(startDate, p),
+      whConsumed: series(startDate, c),
+      whImported: series(startDate, i),
+      whExported: series(startDate, e),
+    });
+
+    it('should map lifetime data to records with correct dates', () => {
+      const records = mapper.toLifetimeDataRecords(
+        aligned('2026-03-10', [1000, 2000, 3000], [500, 600, 700], [100, 200, 300], [400, 500, 600]),
+      );
 
       expect(records).toHaveLength(3);
       expect(records[0]).toEqual({
@@ -100,14 +104,7 @@ describe('EnphaseMapper', () => {
     });
 
     it('should return single record for single-day data', () => {
-      const lifetimeData: LifetimeData = {
-        whProduced: [5000],
-        whConsumed: [3000],
-        whImported: [1000],
-        whExported: [2000],
-      };
-
-      const records = mapper.toLifetimeDataRecords(lifetimeData, '2026-01-15');
+      const records = mapper.toLifetimeDataRecords(aligned('2026-01-15', [5000], [3000], [1000], [2000]));
 
       expect(records).toHaveLength(1);
       expect(records[0]).toEqual({
@@ -120,30 +117,85 @@ describe('EnphaseMapper', () => {
     });
 
     it('should return empty array for empty data', () => {
-      const lifetimeData: LifetimeData = {
-        whProduced: [],
-        whConsumed: [],
-        whImported: [],
-        whExported: [],
-      };
-
-      const records = mapper.toLifetimeDataRecords(lifetimeData, '2026-03-10');
+      const records = mapper.toLifetimeDataRecords(aligned('2026-03-10', [], [], [], []));
 
       expect(records).toEqual([]);
     });
 
     it('should handle month boundary correctly', () => {
-      const lifetimeData: LifetimeData = {
-        whProduced: [100, 200],
-        whConsumed: [50, 60],
-        whImported: [10, 20],
-        whExported: [40, 50],
-      };
-
-      const records = mapper.toLifetimeDataRecords(lifetimeData, '2026-01-31');
+      const records = mapper.toLifetimeDataRecords(aligned('2026-01-31', [100, 200], [50, 60], [10, 20], [40, 50]));
 
       expect(records[0].date).toEqual(new Date('2026-01-31'));
       expect(records[1].date).toEqual(new Date('2026-02-01'));
+    });
+
+    it('should handle a leap day correctly', () => {
+      const records = mapper.toLifetimeDataRecords(aligned('2028-02-28', [100, 200], [50, 60], [10, 20], [40, 50]));
+
+      expect(records[0].date).toEqual(new Date('2028-02-28'));
+      expect(records[1].date).toEqual(new Date('2028-02-29'));
+    });
+
+    // Enphase tronque la plage au meter_start_date et renvoie la date réellement
+    // servie dans `start_date`. S'indexer sur la date DEMANDÉE décalait alors tous
+    // les relevés.
+    it('should index on the start date returned by Enphase, not the requested one', () => {
+      const records = mapper.toLifetimeDataRecords(
+        aligned('2026-06-01', [1000, 2000], [500, 600], [100, 200], [400, 500]),
+      );
+
+      expect(records.map(r => r.date)).toEqual([new Date('2026-06-01'), new Date('2026-06-02')]);
+      expect(records[0].whProduced).toBe(1000);
+    });
+
+    // Les quatre séries viennent de compteurs différents et peuvent donc démarrer
+    // à des dates différentes : l'alignement se fait par date, pas par index.
+    it('should align series that start on different dates', () => {
+      const records = mapper.toLifetimeDataRecords({
+        whProduced: series('2026-03-10', [1000, 2000, 3000]),
+        whConsumed: series('2026-03-11', [600, 700]),
+        whImported: series('2026-03-11', [200, 300]),
+        whExported: series('2026-03-11', [500, 600]),
+      });
+
+      expect(records).toHaveLength(2);
+      expect(records[0]).toEqual({
+        date: new Date('2026-03-11'),
+        whProduced: 2000,
+        whConsumed: 600,
+        whImported: 200,
+        whExported: 500,
+      });
+      expect(records[1].date).toEqual(new Date('2026-03-12'));
+      expect(records[1].whProduced).toBe(3000);
+    });
+
+    it('should skip days not covered by all four series', () => {
+      const records = mapper.toLifetimeDataRecords({
+        whProduced: series('2026-03-10', [1000, 2000, 3000]),
+        whConsumed: series('2026-03-10', [500, 600]),
+        whImported: series('2026-03-10', [100, 200]),
+        whExported: series('2026-03-10', [400, 500]),
+      });
+
+      expect(records.map(r => r.date)).toEqual([new Date('2026-03-10'), new Date('2026-03-11')]);
+    });
+
+    it('should return no record when a meter has no overlapping day', () => {
+      const records = mapper.toLifetimeDataRecords({
+        whProduced: series('2026-03-10', [1000]),
+        whConsumed: series('2026-05-01', [600]),
+        whImported: series('2026-05-01', [200]),
+        whExported: series('2026-05-01', [500]),
+      });
+
+      expect(records).toEqual([]);
+    });
+
+    it('should reject an unparsable start date rather than produce invalid dates', () => {
+      expect(() => mapper.toLifetimeDataRecords(aligned('not-a-date', [1], [1], [1], [1]))).toThrow(
+        'Invalid Enphase start_date: not-a-date',
+      );
     });
   });
 
