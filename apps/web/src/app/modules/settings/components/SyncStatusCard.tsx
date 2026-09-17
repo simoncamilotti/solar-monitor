@@ -7,6 +7,7 @@ import { useBackfillMutation } from '../hooks/use-backfill-mutation.hook';
 import { useSyncStatus } from '../hooks/use-sync-status.hook';
 import { useTriggerSyncMutation } from '../hooks/use-trigger-sync-mutation.hook';
 import { SyncStatusSkeleton } from './SyncStatusSkeleton';
+import type { BackfillRange } from './SyncSystemItem';
 import { SyncSystemItem } from './SyncSystemItem';
 
 const BACKFILL_START_DATE = '2015-01-01';
@@ -24,10 +25,13 @@ export const SyncStatusCard: FunctionComponent = () => {
     });
   };
 
-  const handleBackfill = (systemId: number) => {
-    const endDate = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+  // Sans plage, on importe tout l'historique. Avec, on comble un trou précis
+  // repéré par `SyncSystemItem` — pas besoin de tout réimporter pour 17 jours.
+  const handleBackfill = (systemId: number, range?: BackfillRange) => {
+    const startDate = range?.startDate ?? BACKFILL_START_DATE;
+    const endDate = range?.endDate ?? format(subDays(new Date(), 1), 'yyyy-MM-dd');
     backfillMutation.mutate(
-      { systemId, startDate: BACKFILL_START_DATE, endDate },
+      { systemId, startDate, endDate },
       {
         onSuccess: data => toast.success(t('sync.backfillSuccess', { count: data.daysBackfilled })),
         onError: () => toast.error(t('sync.backfillError')),

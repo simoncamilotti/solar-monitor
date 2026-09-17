@@ -19,12 +19,16 @@ const systemWithRecords: SyncStatusDto = {
   systemId: 42,
   lastSyncDate: '2026-04-01T12:00:00Z',
   totalRecords: 180,
+  expectedRecords: 180,
+  gaps: [],
 };
 
 const systemWithoutRecords: SyncStatusDto = {
   systemId: 99,
   lastSyncDate: null,
   totalRecords: 0,
+  expectedRecords: 0,
+  gaps: [],
 };
 
 describe('SyncSystemItem', () => {
@@ -113,5 +117,61 @@ describe('SyncSystemItem', () => {
     render(<SyncSystemItem {...defaultProps} system={systemWithoutRecords} />);
 
     expect(screen.getByText(/sync.never/)).toBeDefined();
+  });
+
+  describe("couverture de l'historique", () => {
+    const systemWithGaps: SyncStatusDto = {
+      systemId: 7,
+      lastSyncDate: '2026-04-02T00:00:00Z',
+      totalRecords: 106,
+      expectedRecords: 123,
+      gaps: [
+        { from: '2026-03-16', to: '2026-04-01', days: 17 },
+        { from: '2026-01-05', to: '2026-01-05', days: 1 },
+      ],
+    };
+
+    it('should show the stored/expected ratio when the history is incomplete', () => {
+      render(<SyncSystemItem {...defaultProps} system={systemWithGaps} />);
+
+      expect(screen.getByText(/106 \/ 123/)).toBeDefined();
+    });
+
+    it('should not show a ratio when the history is complete', () => {
+      render(<SyncSystemItem {...defaultProps} system={systemWithRecords} />);
+
+      expect(screen.queryByText(/180 \/ 180/)).toBeNull();
+    });
+
+    it('should list every gap with its bounds', () => {
+      render(<SyncSystemItem {...defaultProps} system={systemWithGaps} />);
+
+      expect(screen.getAllByText('sync.fillGap')).toHaveLength(2);
+      expect(screen.getByText(/2026-03-16 → 2026-04-01/)).toBeDefined();
+      expect(screen.getByText(/2026-01-05 → 2026-01-05/)).toBeDefined();
+    });
+
+    it('should render no gap section when the history is contiguous', () => {
+      render(<SyncSystemItem {...defaultProps} system={systemWithRecords} />);
+
+      expect(screen.queryByText('sync.fillGap')).toBeNull();
+    });
+
+    // Le bouton doit combler LE trou, pas réimporter tout l'historique.
+    it('should backfill only the clicked gap range', () => {
+      render(<SyncSystemItem {...defaultProps} system={systemWithGaps} />);
+
+      fireEvent.click(screen.getAllByText('sync.fillGap')[0]);
+
+      expect(defaultProps.onBackfill).toHaveBeenCalledWith(7, { startDate: '2026-03-16', endDate: '2026-04-01' });
+    });
+
+    it('should disable the fill buttons while a sync is running', () => {
+      render(<SyncSystemItem {...defaultProps} system={systemWithGaps} isSyncing={true} />);
+
+      for (const button of screen.getAllByText('sync.fillGap')) {
+        expect((button.closest('button') as HTMLButtonElement).disabled).toBe(true);
+      }
+    });
   });
 });

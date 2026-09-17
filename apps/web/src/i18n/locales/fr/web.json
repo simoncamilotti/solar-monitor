@@ -139,7 +139,10 @@
     "noSystems": "Aucun système Enphase configuré.",
     "backfill": "Importer l'historique",
     "backfillSuccess": "Import de l'historique terminé ({{count}} jours)",
-    "backfillError": "Erreur lors de l'import de l'historique"
+    "backfillError": "Erreur lors de l'import de l'historique",
+    "missingDays_one": "{{count}} jour manquant",
+    "missingDays_other": "{{count}} jours manquants",
+    "fillGap": "Combler"
   },
   "syncSchedule": {
     "title": "Planification de la synchronisation",

@@ -139,7 +139,10 @@
     "noSystems": "No Enphase system configured.",
     "backfill": "Import history",
     "backfillSuccess": "History import completed ({{count}} days)",
-    "backfillError": "Error during history import"
+    "backfillError": "Error during history import",
+    "missingDays_one": "{{count}} missing day",
+    "missingDays_other": "{{count}} missing days",
+    "fillGap": "Fill"
   },
   "syncSchedule": {
     "title": "Sync schedule",

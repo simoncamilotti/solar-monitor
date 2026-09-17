@@ -61,7 +61,7 @@ describe('SyncStatusCard', () => {
 
   it('should render system info when data loaded', () => {
     mockUseSyncStatus.mockReturnValue({
-      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42 }],
+      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42, expectedRecords: 42, gaps: [] }],
       isPending: false,
       isError: false,
     });
@@ -82,7 +82,7 @@ describe('SyncStatusCard', () => {
 
   it('should call mutate when sync button is clicked', () => {
     mockUseSyncStatus.mockReturnValue({
-      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42 }],
+      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42, expectedRecords: 42, gaps: [] }],
       isPending: false,
       isError: false,
     });
@@ -95,7 +95,7 @@ describe('SyncStatusCard', () => {
 
   it('should display never when lastSyncDate is null', () => {
     mockUseSyncStatus.mockReturnValue({
-      data: [{ systemId: 789, lastSyncDate: null, totalRecords: 0 }],
+      data: [{ systemId: 789, lastSyncDate: null, totalRecords: 0, expectedRecords: 0, gaps: [] }],
       isPending: false,
       isError: false,
     });
@@ -106,7 +106,7 @@ describe('SyncStatusCard', () => {
 
   it('should show split button for system with no records', () => {
     mockUseSyncStatus.mockReturnValue({
-      data: [{ systemId: 789, lastSyncDate: null, totalRecords: 0 }],
+      data: [{ systemId: 789, lastSyncDate: null, totalRecords: 0, expectedRecords: 0, gaps: [] }],
       isPending: false,
       isError: false,
     });
@@ -117,7 +117,7 @@ describe('SyncStatusCard', () => {
 
   it('should not show split button for system with records', () => {
     mockUseSyncStatus.mockReturnValue({
-      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42 }],
+      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42, expectedRecords: 42, gaps: [] }],
       isPending: false,
       isError: false,
     });
@@ -128,7 +128,7 @@ describe('SyncStatusCard', () => {
 
   it('should call backfill mutate when backfill option is clicked', () => {
     mockUseSyncStatus.mockReturnValue({
-      data: [{ systemId: 789, lastSyncDate: null, totalRecords: 0 }],
+      data: [{ systemId: 789, lastSyncDate: null, totalRecords: 0, expectedRecords: 0, gaps: [] }],
       isPending: false,
       isError: false,
     });
