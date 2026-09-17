@@ -163,6 +163,88 @@ describe('EnphaseAuthService', () => {
     });
   });
 
+  describe('refreshAccessToken — concurrence', () => {
+    // Enphase fait tourner le refresh token. Quatre rafraîchissements concurrents
+    // en déclenchaient trois avec un jeton déjà consommé, qui écrasaient en base
+    // une valeur invalide : le compte devait être relié à la main.
+    it('should perform a single refresh when called concurrently for the same system', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 1,
+        refreshToken: 'refresh-token',
+        accessToken: 'old',
+        expiresAt: new Date(),
+      });
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      const results = await Promise.all([
+        service.refreshAccessToken(1),
+        service.refreshAccessToken(1),
+        service.refreshAccessToken(1),
+        service.refreshAccessToken(1),
+      ]);
+
+      expect(results).toEqual(Array(4).fill('new-access-token'));
+      expect(mockHttpService.post).toHaveBeenCalledTimes(1);
+      expect(mockPrismaService.enphaseToken.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('should refresh each system separately when called concurrently', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 1,
+        refreshToken: 'refresh-token',
+        accessToken: 'old',
+        expiresAt: new Date(),
+      });
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      await Promise.all([service.refreshAccessToken(1), service.refreshAccessToken(2)]);
+
+      expect(mockHttpService.post).toHaveBeenCalledTimes(2);
+    });
+
+    it('should allow a later refresh once the in-flight one has settled', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 1,
+        refreshToken: 'refresh-token',
+        accessToken: 'old',
+        expiresAt: new Date(),
+      });
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      await service.refreshAccessToken(1);
+      await service.refreshAccessToken(1);
+
+      expect(mockHttpService.post).toHaveBeenCalledTimes(2);
+    });
+
+    it('should share the failure with every concurrent caller and not leave the system stuck', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 1,
+        refreshToken: 'refresh-token',
+        accessToken: 'old',
+        expiresAt: new Date(),
+      });
+      mockHttpService.post.mockImplementationOnce(() => {
+        throw new Error('enphase is down');
+      });
+
+      const outcomes = await Promise.allSettled([service.refreshAccessToken(1), service.refreshAccessToken(1)]);
+
+      expect(outcomes.every(o => o.status === 'rejected')).toBe(true);
+      expect(mockHttpService.post).toHaveBeenCalledTimes(1);
+
+      // La carte des rafraîchissements en vol doit avoir été purgée : un appel
+      // ultérieur repart, il ne rejoue pas l'échec précédent.
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      await expect(service.refreshAccessToken(1)).resolves.toBe('new-access-token');
+    });
+  });
+
   describe('getValidAccessToken', () => {
     it('should return existing token if not expiring soon', async () => {
       const futureDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
