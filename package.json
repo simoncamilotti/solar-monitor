@@ -28,6 +28,7 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx libs/api/core/src/prisma/seed.ts",
+    "enphase:verify": "tsx scripts/verify-enphase-history.ts",
     "pre-commit": "npm run format && nx run-many -t lint test typecheck",
     "pre-commit-e2e": "npm run pre-commit && npm run e2e:api && npm run e2e:web"
   },

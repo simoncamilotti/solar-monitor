@@ -180,6 +180,21 @@ Every route is protected by a global JWT guard; public routes opt out with the `
 decorator. Rate limiting is global at 100 requests per 60 s. Swagger UI is served at `/docs`
 outside production.
 
+### Verifying the stored history
+
+```bash
+npm run enphase:verify
+```
+
+Compares every stored day against what the Enphase API returns today for the same range, and reports
+any divergence. It reads the lifetime data and never writes it; the only write it may perform is
+rotating an expired OAuth token, which is unavoidable to reach the API.
+
+It also looks for a _constant_ offset between the two sets. Stored readings for day `D` matching the
+API's `D+k` is the signature of a date-alignment fault rather than a value change, and the report
+then prints the backfill range that rewrites the affected days in place. The command exits `1` when
+anything diverges.
+
 ### Scheduled Tasks
 
 | Schedule                                                        | Task                                                  |
