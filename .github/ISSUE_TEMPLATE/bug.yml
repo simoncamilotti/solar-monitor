@@ -1,0 +1,43 @@
+name: Bug
+description: Signaler un comportement incorrect
+labels: ['type: bug']
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: Ce qui se passe
+      description: Le comportement constaté, et celui attendu à la place.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Les étapes minimales pour le reproduire.
+      placeholder: |
+        1. Aller sur /history
+        2. Exporter en CSV
+        3. Les en-têtes affichent « Wh » alors que les valeurs sont en kWh
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Traces
+      description: Logs, message d'erreur, capture, chemin de fichier concerné.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Périmètre
+      options:
+        - API (NestJS / Enphase)
+        - Web (React)
+        - Base de données (Prisma)
+        - CI / Docker
+    validations:
+      required: true
