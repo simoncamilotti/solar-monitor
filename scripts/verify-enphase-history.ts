@@ -16,6 +16,10 @@
  *
  * Exits 1 when a divergence is found, so it can gate a script.
  */
+// `npm run` n'est pas une tâche Nx : rien ne charge .env automatiquement, contrairement
+// à `nx serve api`. Même mécanisme que prisma.config.ts.
+import 'dotenv/config';
+
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
