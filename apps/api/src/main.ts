@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { Logger as PinoLogger } from 'nestjs-pino';
@@ -22,7 +23,9 @@ async function createApp(): Promise<INestApplication> {
     throw new Error(`Invalid timezone. Should be defined to ${DEFAULT_TIMEZONE}, got: ${process.env.TZ}`);
   }
 
-  const app = await NestFactory.create(AppModule, {
+  // The adapter is passed explicitly: Nest would otherwise resolve it through its dynamic package
+  // loader, which webpack cannot see, leaving `@nestjs/platform-express` out of the built image.
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(), {
     bufferLogs: true,
   });
 
@@ -43,8 +46,8 @@ export const setupApp = async (app: INestApplication): Promise<void> => {
 
 async function main(): Promise<void> {
   const app = await createApp();
-  // when running jest integration tests we can get the error "listen EADDRINUSE: address already in use :::XXXX" even when running in band.
-  // this looks to be happening when jest switch to the next test suite. A small hack here is to assign the port to 0 in these cases,
+  // when running integration tests we can get the error "listen EADDRINUSE: address already in use :::XXXX" even when running in band.
+  // this looks to be happening when the runner switches to the next test suite. A small hack here is to assign the port to 0 in these cases,
   // where 0 means "assign me a random port that is available"
   const port = process.env.NODE_ENV === 'test' ? 0 : (process.env.PORT ?? 3000);
   await app.listen(port);
