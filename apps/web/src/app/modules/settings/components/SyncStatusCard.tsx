@@ -25,8 +25,8 @@ export const SyncStatusCard: FunctionComponent = () => {
     });
   };
 
-  // Sans plage, on importe tout l'historique. Avec, on comble un trou précis
-  // repéré par `SyncSystemItem` — pas besoin de tout réimporter pour 17 jours.
+  // With no range we import the whole history. With one, we fill a specific gap spotted by
+  // `SyncSystemItem` — no need to re-import everything for 17 days.
   const handleBackfill = (systemId: number, range?: BackfillRange) => {
     const startDate = range?.startDate ?? BACKFILL_START_DATE;
     const endDate = range?.endDate ?? format(subDays(new Date(), 1), 'yyyy-MM-dd');

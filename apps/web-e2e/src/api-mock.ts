@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test';
 
 const syncStatus = [
-  // Un historique troué, pour que le rendu des trous et le bouton « combler »
-  // soient réellement exercés.
+  // A history with a hole in it, so that the gap rendering and the backfill button are actually
+  // exercised.
   {
     systemId: 1,
     lastSyncDate: '2024-06-10T12:00:00Z',

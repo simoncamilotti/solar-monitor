@@ -136,9 +136,8 @@ describe('EnphaseMapper', () => {
       expect(records[1].date).toEqual(new Date('2028-02-29'));
     });
 
-    // Enphase tronque la plage au meter_start_date et renvoie la date réellement
-    // servie dans `start_date`. S'indexer sur la date DEMANDÉE décalait alors tous
-    // les relevés.
+    // Enphase truncates the range to the meter_start_date and returns the date actually served
+    // in `start_date`. Indexing on the REQUESTED date used to shift every reading.
     it('should index on the start date returned by Enphase, not the requested one', () => {
       const records = mapper.toLifetimeDataRecords(
         aligned('2026-06-01', [1000, 2000], [500, 600], [100, 200], [400, 500]),
@@ -148,8 +147,8 @@ describe('EnphaseMapper', () => {
       expect(records[0].whProduced).toBe(1000);
     });
 
-    // Les quatre séries viennent de compteurs différents et peuvent donc démarrer
-    // à des dates différentes : l'alignement se fait par date, pas par index.
+    // The four series come from different meters and can therefore start on different dates:
+    // alignment happens by date, not by index.
     it('should align series that start on different dates', () => {
       const records = mapper.toLifetimeDataRecords({
         whProduced: series('2026-03-10', [1000, 2000, 3000]),

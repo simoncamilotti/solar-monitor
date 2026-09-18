@@ -23,18 +23,16 @@ export class EnphaseAuthService {
   private readonly _pendingStates = new Map<string, number>();
 
   /**
-   * Rafraîchissements en vol, par systemId.
+   * In-flight refreshes, keyed by systemId.
    *
-   * Enphase fait tourner le refresh token : celui qui vient de servir est
-   * invalidé. Or une synchronisation lance quatre appels en parallèle, et chacun
-   * réclame un jeton valide — près de l'expiration, les quatre déclenchaient donc
-   * quatre rafraîchissements concurrents, dont trois utilisaient un refresh token
-   * déjà consommé et écrasaient en base une valeur invalide. Il fallait alors
-   * relier le compte à la main.
+   * Enphase rotates refresh tokens: the one just used is invalidated. A sync fires four calls in
+   * parallel and each of them needs a valid token, so near expiry all four triggered concurrent
+   * refreshes — three of them spending an already-consumed refresh token and writing the invalid
+   * result back to the database. Recovering meant re-linking the account by hand.
    *
-   * Les appels concurrents partagent désormais la même promesse : un seul aller-retour
-   * réseau, une seule écriture. La carte est en mémoire, donc cette garantie vaut
-   * pour un unique processus — ce qui correspond au déploiement mono-réplique actuel.
+   * Concurrent callers now share the same promise: one network round trip, one write. The map
+   * lives in memory, so the guarantee holds within a single process — which matches the current
+   * single-replica deployment.
    */
   private readonly _refreshesInFlight = new Map<number, Promise<string>>();
 

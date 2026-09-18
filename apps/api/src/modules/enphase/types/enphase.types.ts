@@ -53,10 +53,10 @@ export type ImportLifetimeResponse = LifetimeBaseResponse & {
 };
 
 /**
- * Une série de relevés quotidiens, avec la date de son premier point telle que
- * l'API Enphase la renvoie. Elle peut différer de la date demandée : Enphase
- * tronque au `meter_start_date` du compteur concerné, et ce compteur n'est pas
- * le même pour la production, la consommation, l'import et l'export.
+ * A series of daily readings, carrying the date of its first point exactly as the Enphase API
+ * returns it. That date can differ from the one requested: Enphase truncates to the
+ * `meter_start_date` of the meter involved, and that meter is not the same for production,
+ * consumption, import and export.
  */
 export type LifetimeSeries = {
   startDate: string;
