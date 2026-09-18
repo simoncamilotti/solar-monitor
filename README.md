@@ -9,7 +9,7 @@ Prisma, deployed through GitOps.
 | Layer        | Technology                                             |
 | :----------- | :----------------------------------------------------- |
 | **Monorepo** | Nx 22, TypeScript 5.9                                  |
-| **Backend**  | NestJS 11, Prisma 7, PostgreSQL 17                     |
+| **Backend**  | NestJS 12, Prisma 7, PostgreSQL 17                     |
 | **Frontend** | React 19, Vite 7, TailwindCSS 3, ECharts 6, ag-grid 35 |
 | **Shared**   | Zod 4 schemas shared between API and client            |
 | **Auth**     | Keycloak (OIDC) — `keycloak-js` 26 on the client       |
