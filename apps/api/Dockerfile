@@ -25,8 +25,10 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV TZ=Etc/UTC
 
+# `generatePackageJson` makes webpack emit both a package.json holding only what the bundle
+# requires and a lockfile pruned to match. Copying the workspace lockfile over that pruned one —
+# as this stage used to — hands `npm ci` the whole monorepo tree to resolve against.
 COPY --from=build /app/dist/apps/api ./
-COPY --from=build /app/package-lock.json ./
 RUN npm ci --omit=dev
 
 # Prisma client (runtime)

@@ -62,11 +62,11 @@ describe('ExportModal', () => {
     expect(screen.getByText('export.title')).toBeDefined();
   });
 
-  it('should render format selection buttons', () => {
+  it('should announce csv as the only export format', () => {
     render(<ExportModal {...defaultProps} />);
 
     expect(screen.getByText('CSV')).toBeDefined();
-    expect(screen.getByText('Excel')).toBeDefined();
+    expect(screen.queryByText('Excel')).toBeNull();
   });
 
   it('should render year and month selects', () => {
