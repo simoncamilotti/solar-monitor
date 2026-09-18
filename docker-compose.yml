@@ -21,9 +21,10 @@ services:
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-    command: start-dev
+    command: start-dev --import-realm
     volumes:
       - ./config/keycloak/data:/opt/keycloak/data/h2
+      - ./config/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     networks:
       - solar-monitor_network
 
