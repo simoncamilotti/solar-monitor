@@ -71,12 +71,12 @@ test.describe('History page', () => {
     await expect(page.locator('[role="dialog"]')).toContainText('Exporter les données');
   });
 
-  test('should display format options in export modal', async ({ page }) => {
+  test('should announce csv as the only export format', async ({ page }) => {
     await page.goto('/history');
     await page.locator('button', { hasText: 'Exporter' }).first().click();
     const dialog = page.locator('[role="dialog"]');
-    await expect(dialog.locator('button', { hasText: 'CSV' })).toBeVisible();
-    await expect(dialog.locator('button', { hasText: 'Excel' })).toBeVisible();
+    await expect(dialog.getByText('CSV')).toBeVisible();
+    await expect(dialog.getByText('Excel')).toBeHidden();
   });
 
   test('should display metric checkboxes in export modal', async ({ page }) => {

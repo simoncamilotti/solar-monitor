@@ -1,18 +1,7 @@
+const { languageRef } = vi.hoisted(() => ({ languageRef: { current: 'fr' } }));
+
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ i18n: { language: 'fr' } }),
-}));
-
-const { mockWriteFile } = vi.hoisted(() => ({
-  mockWriteFile: vi.fn(),
-}));
-
-vi.mock('xlsx', () => ({
-  utils: {
-    json_to_sheet: vi.fn().mockReturnValue({}),
-    book_new: vi.fn().mockReturnValue({}),
-    book_append_sheet: vi.fn(),
-  },
-  writeFile: mockWriteFile,
+  useTranslation: () => ({ i18n: { language: languageRef.current } }),
 }));
 
 import { renderHook } from '@testing-library/react';
@@ -35,9 +24,37 @@ const mockData: LifetimeDataResponseDto = [
   },
 ];
 
+let capturedBlob: Blob | undefined;
+let clickSpy: ReturnType<typeof vi.spyOn>;
+
+/**
+ * Reads back what the hook handed to the browser as a download. jsdom's Blob has no `text()`, hence
+ * the FileReader. The leading BOM is an Excel concern, not part of the payload under test.
+ */
+const exportedCsv = (): Promise<string> =>
+  new Promise((resolve, reject) => {
+    if (!capturedBlob) return reject(new Error('no download was triggered'));
+
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).replace(/^\uFEFF/, ''));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(capturedBlob);
+  });
+
 describe('useExport', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    languageRef.current = 'fr';
+    capturedBlob = undefined;
+    URL.createObjectURL = vi.fn((blob: Blob) => {
+      capturedBlob = blob;
+      return 'blob:mock';
+    });
+    URL.revokeObjectURL = vi.fn();
+    clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    clickSpy.mockRestore();
   });
 
   describe('getAvailableYears', () => {
@@ -57,21 +74,21 @@ describe('useExport', () => {
   describe('getFilteredData', () => {
     it('should return all data when no filters applied', () => {
       const { result } = renderHook(() => useExport(mockData));
-      const config: ExportConfig = { format: 'csv', year: 'all', month: 'all', metrics: ['kwhProduced'] };
+      const config: ExportConfig = { year: 'all', month: 'all', metrics: ['kwhProduced'] };
 
       expect(result.current.getFilteredData(config)).toHaveLength(3);
     });
 
     it('should filter by year', () => {
       const { result } = renderHook(() => useExport(mockData));
-      const config: ExportConfig = { format: 'csv', year: '2024', month: 'all', metrics: ['kwhProduced'] };
+      const config: ExportConfig = { year: '2024', month: 'all', metrics: ['kwhProduced'] };
 
       expect(result.current.getFilteredData(config)).toHaveLength(2);
     });
 
     it('should filter by month', () => {
       const { result } = renderHook(() => useExport(mockData));
-      const config: ExportConfig = { format: 'csv', year: 'all', month: '5', metrics: ['kwhProduced'] };
+      const config: ExportConfig = { year: 'all', month: '5', metrics: ['kwhProduced'] };
 
       const filtered = result.current.getFilteredData(config);
       expect(filtered).toHaveLength(1);
@@ -80,64 +97,94 @@ describe('useExport', () => {
 
     it('should filter by year and month', () => {
       const { result } = renderHook(() => useExport(mockData));
-      const config: ExportConfig = { format: 'csv', year: '2024', month: '0', metrics: ['kwhProduced'] };
+      const config: ExportConfig = { year: '2024', month: '0', metrics: ['kwhProduced'] };
 
       expect(result.current.getFilteredData(config)).toHaveLength(1);
     });
 
     it('should return empty array when no data', () => {
       const { result } = renderHook(() => useExport(undefined));
-      const config: ExportConfig = { format: 'csv', year: 'all', month: 'all', metrics: ['kwhProduced'] };
+      const config: ExportConfig = { year: 'all', month: 'all', metrics: ['kwhProduced'] };
 
       expect(result.current.getFilteredData(config)).toEqual([]);
     });
   });
 
   describe('exportData', () => {
-    it('should export as CSV', () => {
+    it('should trigger a csv download', () => {
       const { result } = renderHook(() => useExport(mockData));
-      const config: ExportConfig = {
-        format: 'csv',
-        year: 'all',
-        month: 'all',
-        metrics: ['kwhProduced', 'kwhConsumed'],
-      };
 
-      result.current.exportData(config);
+      result.current.exportData({ year: 'all', month: 'all', metrics: ['kwhProduced'] });
 
-      expect(mockWriteFile).toHaveBeenCalledOnce();
-      expect(mockWriteFile.mock.calls[0][1]).toMatch(/\.csv$/);
-      expect(mockWriteFile.mock.calls[0][2]).toEqual({ bookType: 'csv' });
+      expect(clickSpy).toHaveBeenCalledOnce();
+      expect(URL.createObjectURL).toHaveBeenCalledOnce();
+      expect(capturedBlob?.type).toBe('text/csv;charset=utf-8');
     });
 
-    it('should export as Excel', () => {
+    it('should write a header row followed by one row per entry', async () => {
       const { result } = renderHook(() => useExport(mockData));
-      const config: ExportConfig = {
-        format: 'excel',
-        year: 'all',
-        month: 'all',
-        metrics: ['kwhProduced'],
-      };
 
-      result.current.exportData(config);
+      result.current.exportData({ year: 'all', month: 'all', metrics: ['kwhProduced', 'kwhConsumed'] });
 
-      expect(mockWriteFile).toHaveBeenCalledOnce();
-      expect(mockWriteFile.mock.calls[0][1]).toMatch(/\.xlsx$/);
-      expect(mockWriteFile.mock.calls[0][2]).toEqual({ bookType: 'xlsx' });
+      expect(await exportedCsv()).toBe(
+        [
+          'Date;Production (Wh);Consommation (Wh)',
+          '2023-03-15;10,00;8,00',
+          '2024-01-10;12,00;9,00',
+          '2024-06-20;15,00;11,00',
+        ].join('\n'),
+      );
+    });
+
+    it('should only write the requested metrics, in the requested order', async () => {
+      const { result } = renderHook(() => useExport(mockData));
+
+      result.current.exportData({ year: '2023', month: 'all', metrics: ['gridDependency', 'kwhExported'] });
+
+      expect(await exportedCsv()).toBe(['Date;Dépendance (%);Export (Wh)', '2023-03-15;20,00;4,00'].join('\n'));
+    });
+
+    it('should use the anglo-saxon dialect in english', async () => {
+      languageRef.current = 'en';
+      const { result } = renderHook(() => useExport(mockData));
+
+      result.current.exportData({ year: '2023', month: 'all', metrics: ['kwhProduced'] });
+
+      expect(await exportedCsv()).toBe(['Date,Production (Wh)', '2023-03-15,10.00'].join('\n'));
+    });
+
+    it('should fall back to french for an unknown language', async () => {
+      languageRef.current = 'de';
+      const { result } = renderHook(() => useExport(mockData));
+
+      result.current.exportData({ year: '2023', month: 'all', metrics: ['kwhProduced'] });
+
+      expect(await exportedCsv()).toBe(['Date;Production (Wh)', '2023-03-15;10,00'].join('\n'));
+    });
+
+    it('should name the file after the export date', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-09-18T10:00:00Z'));
+
+      const { result } = renderHook(() => useExport(mockData));
+      // Spied after the render, which appends its own container to the body.
+      const appendSpy = vi.spyOn(document.body, 'appendChild');
+      result.current.exportData({ year: 'all', month: 'all', metrics: ['kwhProduced'] });
+
+      const link = appendSpy.mock.calls[0][0] as HTMLAnchorElement;
+      expect(link.download).toBe('solar-data-2026-09-18.csv');
+
+      appendSpy.mockRestore();
+      vi.useRealTimers();
     });
 
     it('should not export when filtered data is empty', () => {
       const { result } = renderHook(() => useExport(mockData));
-      const config: ExportConfig = {
-        format: 'csv',
-        year: '1999',
-        month: 'all',
-        metrics: ['kwhProduced'],
-      };
 
-      result.current.exportData(config);
+      result.current.exportData({ year: '1999', month: 'all', metrics: ['kwhProduced'] });
 
-      expect(mockWriteFile).not.toHaveBeenCalled();
+      expect(clickSpy).not.toHaveBeenCalled();
+      expect(URL.createObjectURL).not.toHaveBeenCalled();
     });
   });
 });

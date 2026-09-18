@@ -1,18 +1,14 @@
 import { format } from 'date-fns';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import * as XLSX from 'xlsx';
 
 import type { LifetimeDataResponseDto } from '@/shared-models';
-
-export type ExportFormat = 'csv' | 'excel';
 
 import type { EnergyMetricKey } from '../../shared/metrics/metric.type';
 
 export type ExportMetric = EnergyMetricKey | 'gridDependency';
 
 export type ExportConfig = {
-  format: ExportFormat;
   year: string;
   month: string;
   metrics: ExportMetric[];
@@ -35,6 +31,32 @@ const METRIC_HEADERS: Record<string, Record<ExportMetric, string>> = {
   },
 };
 
+/**
+ * French spreadsheets read `;` as the column separator and `,` as the decimal mark. Emitting the
+ * anglo-saxon pair to a French Excel lands every row in a single column, so the two travel together.
+ */
+const CSV_DIALECTS: Record<string, { separator: string; decimal: string }> = {
+  fr: { separator: ';', decimal: ',' },
+  en: { separator: ',', decimal: '.' },
+};
+
+const escapeCell = (value: string, separator: string): string =>
+  value.includes(separator) || /["\n\r]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+
+const downloadCsv = (content: string, filename: string): void => {
+  // The BOM is what makes Excel read the file as UTF-8 rather than as the system code page.
+  const blob = new Blob([`\uFEFF${content}`], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
 export const useExport = (data: LifetimeDataResponseDto | undefined) => {
   const { i18n } = useTranslation();
 
@@ -51,20 +73,26 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
     [data],
   );
 
-  const buildRows = useCallback(
+  const buildCsv = useCallback(
     (filteredData: LifetimeDataResponseDto, metrics: ExportMetric[]) => {
-      const headers = METRIC_HEADERS[i18n.language] ?? METRIC_HEADERS['fr'];
+      const locale = i18n.language in METRIC_HEADERS ? i18n.language : 'fr';
+      const headers = METRIC_HEADERS[locale];
+      const { separator, decimal } = CSV_DIALECTS[locale];
 
-      return filteredData.map(row => {
-        const entry: Record<string, string | number> = {
-          Date: format(new Date(row.date), 'yyyy-MM-dd'),
-        };
-        for (const metric of metrics) {
-          entry[headers[metric]] =
-            metric === 'gridDependency' ? Number(row[metric].toFixed(2)) : Number(row[metric].toFixed(2));
-        }
-        return entry;
-      });
+      const headerLine = ['Date', ...metrics.map(metric => headers[metric])]
+        .map(cell => escapeCell(cell, separator))
+        .join(separator);
+
+      const lines = filteredData.map(row =>
+        [
+          format(new Date(row.date), 'yyyy-MM-dd'),
+          ...metrics.map(metric => row[metric].toFixed(2).replace('.', decimal)),
+        ]
+          .map(cell => escapeCell(cell, separator))
+          .join(separator),
+      );
+
+      return [headerLine, ...lines].join('\n');
     },
     [i18n.language],
   );
@@ -72,24 +100,13 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
   const exportData = useCallback(
     (config: ExportConfig) => {
       const filteredData = getFilteredData(config);
-      const rows = buildRows(filteredData, config.metrics);
 
-      if (rows.length === 0) return;
-
-      const worksheet = XLSX.utils.json_to_sheet(rows);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
+      if (filteredData.length === 0) return;
 
       const timestamp = format(new Date(), 'yyyy-MM-dd');
-      const filename = `solar-data-${timestamp}`;
-
-      if (config.format === 'csv') {
-        XLSX.writeFile(workbook, `${filename}.csv`, { bookType: 'csv' });
-      } else {
-        XLSX.writeFile(workbook, `${filename}.xlsx`, { bookType: 'xlsx' });
-      }
+      downloadCsv(buildCsv(filteredData, config.metrics), `solar-data-${timestamp}.csv`);
     },
-    [getFilteredData, buildRows],
+    [getFilteredData, buildCsv],
   );
 
   const getAvailableYears = useCallback((): string[] => {

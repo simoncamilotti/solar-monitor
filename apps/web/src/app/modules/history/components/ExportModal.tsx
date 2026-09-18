@@ -1,11 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Download, FileSpreadsheet, FileText, X } from 'lucide-react';
+import { Check, Download, FileText, X } from 'lucide-react';
 import { type FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { LifetimeDataResponseDto } from '@/shared-models';
 
-import type { ExportConfig, ExportFormat, ExportMetric } from '../hooks/use-export.hook';
+import type { ExportConfig, ExportMetric } from '../hooks/use-export.hook';
 import { useExport } from '../hooks/use-export.hook';
 
 type ExportModalProps = {
@@ -21,7 +21,6 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
   const { exportData, getFilteredData, getAvailableYears } = useExport(data);
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  const [format, setFormat] = useState<ExportFormat>('csv');
   const [year, setYear] = useState('all');
   const [month, setMonth] = useState('all');
   const [metrics, setMetrics] = useState<ExportMetric[]>([...ALL_METRICS]);
@@ -29,16 +28,16 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
   const years = useMemo(() => getAvailableYears(), [getAvailableYears]);
 
   const filteredCount = useMemo(() => {
-    const config: ExportConfig = { format, year, month, metrics };
+    const config: ExportConfig = { year, month, metrics };
     return getFilteredData(config).length;
-  }, [format, year, month, metrics, getFilteredData]);
+  }, [year, month, metrics, getFilteredData]);
 
   const toggleMetric = (metric: ExportMetric) => {
     setMetrics(prev => (prev.includes(metric) ? prev.filter(m => m !== metric) : [...prev, metric]));
   };
 
   const handleExport = () => {
-    exportData({ format, year, month, metrics });
+    exportData({ year, month, metrics });
     onClose();
   };
 
@@ -102,29 +101,9 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {t('export.format')}
                 </span>
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setFormat('csv')}
-                    className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
-                      format === 'csv'
-                        ? 'bg-primary text-primary-foreground shadow-md'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                    }`}
-                  >
-                    <FileText className="w-4 h-4" />
-                    CSV
-                  </button>
-                  <button
-                    onClick={() => setFormat('excel')}
-                    className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
-                      format === 'excel'
-                        ? 'bg-primary text-primary-foreground shadow-md'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                    }`}
-                  >
-                    <FileSpreadsheet className="w-4 h-4" />
-                    Excel
-                  </button>
+                <div className="mt-2 flex items-center gap-2 rounded-lg bg-muted px-4 py-2.5 text-sm font-medium text-muted-foreground">
+                  <FileText className="w-4 h-4" />
+                  CSV
                 </div>
               </div>
 
