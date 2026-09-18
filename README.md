@@ -14,7 +14,7 @@ Prisma, deployed through GitOps.
 | **Shared**   | Zod 4 schemas shared between API and client            |
 | **Auth**     | Keycloak (OIDC) — `keycloak-js` 26 on the client       |
 | **i18n**     | i18next — French and English, French as fallback       |
-| **Testing**  | Jest (API, libs), Vitest (web), Playwright (web E2E)   |
+| **Testing**  | Vitest (API, libs, web), Playwright (web E2E)          |
 | **CI/CD**    | GitHub Actions, GHCR, GitOps (Kustomize)               |
 
 ## Architecture
@@ -23,7 +23,7 @@ Prisma, deployed through GitOps.
 apps/
   api/           NestJS API      (port 3000, prefix /api)
   web/           React client    (port 4200, proxies /api to :3000)
-  api-e2e/       API E2E tests   (Jest)
+  api-e2e/       API E2E tests   (Vitest)
   web-e2e/       Web E2E tests   (Playwright, incl. visual regression)
 
 libs/
@@ -104,11 +104,11 @@ npm run format:check
 ### Tests
 
 ```bash
-npm run test:api               # Jest
+npm run test:api               # Vitest
 npm run test:web               # Vitest
 npm run test:all
 
-npm run e2e:api                # Jest — requires the API and its database running
+npm run e2e:api                # Vitest — requires the API and its database running
 npm run e2e:web                # Playwright
 npm run e2e:web-ui             # Playwright UI mode
 npm run e2e:web-update-snapshots

@@ -1,24 +1,25 @@
 import { HealthCheckService } from '@nestjs/terminus';
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 
 import { HealthController } from './health.controller';
 import { HealthService } from './health.service';
 
 const mockHealthCheckService = {
-  check: jest.fn(),
+  check: vi.fn(),
 };
 
 const mockHealthService = {
-  database: jest.fn(),
-  memory: jest.fn(),
-  disk: jest.fn(),
+  database: vi.fn(),
+  memory: vi.fn(),
+  disk: vi.fn(),
 };
 
 describe('HealthController', () => {
   let controller: HealthController;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [HealthController],

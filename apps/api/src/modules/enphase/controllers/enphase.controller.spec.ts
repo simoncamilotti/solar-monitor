@@ -10,39 +10,39 @@ import { EnphaseSyncService } from '../services/enphase-sync.service';
 import { EnphaseController } from './enphase.controller';
 
 const mockAuthService = {
-  getAuthorizationUrl: jest.fn(),
-  exchangeCodeForTokens: jest.fn(),
-  storeTokens: jest.fn(),
-  validateState: jest.fn(),
+  getAuthorizationUrl: vi.fn(),
+  exchangeCodeForTokens: vi.fn(),
+  storeTokens: vi.fn(),
+  validateState: vi.fn(),
 };
 
 const mockApiService = {
-  getSystems: jest.fn(),
+  getSystems: vi.fn(),
 };
 
 const mockSyncService = {
-  syncLifetimeData: jest.fn(),
-  backfillLifetimeData: jest.fn(),
+  syncLifetimeData: vi.fn(),
+  backfillLifetimeData: vi.fn(),
 };
 
 const mockEnphaseService = {
-  getAllLifetimeData: jest.fn(),
+  getAllLifetimeData: vi.fn(),
 };
 
 const mockMapper = {
-  toSystemDtoList: jest.fn(),
+  toSystemDtoList: vi.fn(),
 };
 
 const createMockResponse = () => ({
-  redirect: jest.fn(),
-  json: jest.fn(),
+  redirect: vi.fn(),
+  json: vi.fn(),
 });
 
 describe('EnphaseController', () => {
   let controller: EnphaseController;
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [EnphaseController],
