@@ -31,7 +31,7 @@ export const lifetimeDataDtoSchema = z.object({
 
 export const lifetimeDataResponseDtoSchema = z.array(lifetimeDataDtoSchema);
 
-/** Une plage de jours absente de l'historique stocké, bornes incluses. */
+/** A range of days missing from the stored history, bounds included. */
 export const syncGapDtoSchema = z.object({
   from: z.iso.date(),
   to: z.iso.date(),
@@ -42,7 +42,7 @@ export const syncStatusDtoSchema = z.object({
   systemId: z.number(),
   lastSyncDate: z.string().nullable(),
   totalRecords: z.number(),
-  /** Nombre de jours que couvrirait la plage stockée si elle était complète. */
+  /** Number of days the stored range would cover if it were complete. */
   expectedRecords: z.number(),
   gaps: z.array(syncGapDtoSchema),
 });

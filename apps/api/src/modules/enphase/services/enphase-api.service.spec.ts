@@ -8,11 +8,11 @@ import { EnphaseApiService } from './enphase-api.service';
 import { EnphaseAuthService } from './enphase-auth.service';
 
 const mockHttpService = {
-  get: jest.fn(),
+  get: vi.fn(),
 };
 
 const mockAuthService = {
-  getValidAccessToken: jest.fn(),
+  getValidAccessToken: vi.fn(),
 };
 
 const LIFETIME_META = {
@@ -26,7 +26,7 @@ describe('EnphaseApiService', () => {
   let service: EnphaseApiService;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     process.env['ENPHASE_API_KEY'] = 'test-api-key';
 
@@ -92,8 +92,8 @@ describe('EnphaseApiService', () => {
       expect(mockHttpService.get).toHaveBeenCalledTimes(4);
     });
 
-    // Enphase tronque chaque série au meter_start_date de SON compteur : la date
-    // renvoyée peut différer de celle demandée, et différer d'une série à l'autre.
+    // Enphase truncates each series to the meter_start_date of ITS OWN meter: the returned date
+    // can differ from the requested one, and differ from one series to the next.
     it('should carry the start date each endpoint returns, not the requested one', async () => {
       mockAuthService.getValidAccessToken.mockResolvedValue('token');
 

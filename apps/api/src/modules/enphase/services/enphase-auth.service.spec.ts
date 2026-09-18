@@ -10,14 +10,14 @@ import { EnphaseAuthService } from './enphase-auth.service';
 
 const mockPrismaService = {
   enphaseToken: {
-    findUnique: jest.fn(),
-    update: jest.fn(),
-    upsert: jest.fn(),
+    findUnique: vi.fn(),
+    update: vi.fn(),
+    upsert: vi.fn(),
   },
 };
 
 const mockHttpService = {
-  post: jest.fn(),
+  post: vi.fn(),
 };
 
 const TOKEN_RESPONSE: EnphaseTokenResponse = {
@@ -31,7 +31,7 @@ describe('EnphaseAuthService', () => {
   let service: EnphaseAuthService;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     process.env['ENPHASE_CLIENT_ID'] = 'test-client-id';
     process.env['ENPHASE_CLIENT_SECRET'] = 'test-client-secret';
@@ -164,9 +164,9 @@ describe('EnphaseAuthService', () => {
   });
 
   describe('refreshAccessToken — concurrence', () => {
-    // Enphase fait tourner le refresh token. Quatre rafraîchissements concurrents
-    // en déclenchaient trois avec un jeton déjà consommé, qui écrasaient en base
-    // une valeur invalide : le compte devait être relié à la main.
+    // Enphase rotates refresh tokens. Four concurrent refreshes fired three of them with an
+    // already-consumed token, writing an invalid value back to the database: the account then had
+    // to be re-linked by hand.
     it('should perform a single refresh when called concurrently for the same system', async () => {
       mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
         systemId: 1,
@@ -236,8 +236,8 @@ describe('EnphaseAuthService', () => {
       expect(outcomes.every(o => o.status === 'rejected')).toBe(true);
       expect(mockHttpService.post).toHaveBeenCalledTimes(1);
 
-      // La carte des rafraîchissements en vol doit avoir été purgée : un appel
-      // ultérieur repart, il ne rejoue pas l'échec précédent.
+      // The in-flight refresh map must have been cleared: a later call starts over rather than
+      // replaying the previous failure.
       mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
       mockPrismaService.enphaseToken.update.mockResolvedValue({});
 

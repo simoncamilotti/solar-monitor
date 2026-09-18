@@ -1,13 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 
 import { PrismaService } from '../../prisma/services/prisma.service';
-import { JWTPayload } from '../types/jwt-payload.type';
+import type { JWTPayload } from '../types/jwt-payload.type';
 import { AuthService } from './auth.service';
 
 const mockPrismaService = {
   user: {
-    findUnique: jest.fn(),
-    create: jest.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
   },
 };
 
@@ -35,7 +36,7 @@ describe('AuthService', () => {
   let service: AuthService;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [AuthService, { provide: PrismaService, useValue: mockPrismaService }],

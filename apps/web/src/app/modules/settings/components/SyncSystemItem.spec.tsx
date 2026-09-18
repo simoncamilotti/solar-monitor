@@ -157,7 +157,7 @@ describe('SyncSystemItem', () => {
       expect(screen.queryByText('sync.fillGap')).toBeNull();
     });
 
-    // Le bouton doit combler LE trou, pas réimporter tout l'historique.
+    // The button must fill THE gap, not re-import the whole history.
     it('should backfill only the clicked gap range', () => {
       render(<SyncSystemItem {...defaultProps} system={systemWithGaps} />);
 

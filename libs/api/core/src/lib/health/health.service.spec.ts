@@ -1,19 +1,20 @@
 import { DiskHealthIndicator, MemoryHealthIndicator, PrismaHealthIndicator } from '@nestjs/terminus';
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 
 import { PrismaService } from '../prisma/services/prisma.service';
 import { HealthService } from './health.service';
 
 const mockPrismaHealthIndicator = {
-  pingCheck: jest.fn(),
+  pingCheck: vi.fn(),
 };
 
 const mockMemoryHealthIndicator = {
-  checkHeap: jest.fn(),
+  checkHeap: vi.fn(),
 };
 
 const mockDiskHealthIndicator = {
-  checkStorage: jest.fn(),
+  checkStorage: vi.fn(),
 };
 
 const mockPrismaService = {};
@@ -22,7 +23,7 @@ describe('HealthService', () => {
   let service: HealthService;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

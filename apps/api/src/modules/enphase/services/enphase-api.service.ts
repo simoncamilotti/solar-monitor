@@ -51,8 +51,8 @@ export class EnphaseApiService {
       this.getExportLifetime(systemId, startDate, endDate),
     ]);
 
-    // Chaque série porte SA date de départ : l'aligner sur la date demandée
-    // décalerait les valeurs dès qu'Enphase tronque au meter_start_date.
+    // Every series carries ITS OWN start date: forcing it to the requested one would shift the
+    // values as soon as Enphase truncates to the meter_start_date.
     return {
       whProduced: { startDate: production.start_date, values: production.production },
       whConsumed: { startDate: consumption.start_date, values: consumption.consumption },

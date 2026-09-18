@@ -50,15 +50,13 @@ export class EnphaseService {
   }
 
   /**
-   * Mesure la complétude de l'historique et localise ses trous.
+   * Measures how complete the history is and locates its gaps.
    *
-   * La tâche quotidienne ne va chercher que la veille : un jour raté par une coupure,
-   * un jeton expiré ou une indisponibilité de l'API ne se rattrape jamais tout seul.
-   * Un simple compteur d'enregistrements ne le montre pas — seule la comparaison avec
-   * l'étendue de la plage le révèle.
+   * The daily job only fetches the previous day: a day missed through an outage, an expired token
+   * or an API unavailability never catches up on its own. A plain record count does not show it —
+   * only comparing against the span of the range reveals it.
    *
-   * Les dates sont stockées à minuit UTC, donc comparables jour à jour sans risque
-   * de fuseau.
+   * Dates are stored at UTC midnight, so they compare day to day with no timezone risk.
    */
   private _computeCoverage(dates: Date[]): { expectedRecords: number; gaps: SyncGapDto[] } {
     if (dates.length === 0) {

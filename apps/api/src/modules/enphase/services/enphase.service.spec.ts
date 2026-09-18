@@ -8,22 +8,22 @@ import { EnphaseService } from './enphase.service';
 
 const mockPrismaService = {
   enphaseLifetimeData: {
-    findMany: jest.fn(),
+    findMany: vi.fn(),
   },
   enphaseToken: {
-    findMany: jest.fn(),
+    findMany: vi.fn(),
   },
 };
 
 const mockEnphaseMapper = {
-  toLifetimeDataResponseDto: jest.fn(),
+  toLifetimeDataResponseDto: vi.fn(),
 };
 
 describe('EnphaseService', () => {
   let service: EnphaseService;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -104,8 +104,8 @@ describe('EnphaseService', () => {
       expect(result).toEqual([]);
     });
 
-    // Le cas réel qui a motivé la fonctionnalité : 106 relevés stockés se lisaient
-    // comme une bonne nouvelle, alors qu'il en manquait 17 en un seul trou.
+    // The real case that drove the feature: 106 stored readings read like good news, while 17
+    // were missing in a single gap.
     it('should report a single gap with its exact bounds', async () => {
       mockPrismaService.enphaseToken.findMany.mockResolvedValue([
         { systemId: 1, lifetimeData: days('2026-03-14', '2026-03-15', '2026-04-02') },

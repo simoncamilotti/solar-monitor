@@ -20,16 +20,15 @@ export class EnphaseMapper {
   }
 
   /**
-   * Aligne les quatre séries sur les DATES et non sur les index.
+   * Aligns the four series on DATES rather than on indexes.
    *
-   * Chaque série démarre à sa propre date, qu'Enphase renvoie dans `start_date` :
-   * elle est tronquée au meter_start_date du compteur concerné, et ce compteur
-   * diffère entre production, consommation, import et export. Indexer les quatre
-   * depuis une même date écrit donc des valeurs sur les mauvais jours.
+   * Each series starts at its own date, which Enphase returns in `start_date`: it is truncated to
+   * the meter_start_date of the meter involved, and that meter differs between production,
+   * consumption, import and export. Indexing all four from a single date therefore writes values
+   * on the wrong days.
    *
-   * Seules les dates couvertes par les quatre séries produisent un enregistrement :
-   * les quatre colonnes sont obligatoires en base, et compléter à zéro écrirait des
-   * relevés faux plutôt que de les omettre.
+   * Only the dates covered by all four series produce a record: the four columns are mandatory in
+   * the database, and padding with zeroes would write wrong readings rather than omit them.
    */
   toLifetimeDataRecords(lifetimeData: LifetimeData): LifetimeDataRecord[] {
     const produced = this._indexByDate(lifetimeData.whProduced);

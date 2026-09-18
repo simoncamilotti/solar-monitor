@@ -16,8 +16,8 @@
  *
  * Exits 1 when a divergence is found, so it can gate a script.
  */
-// `npm run` n'est pas une tâche Nx : rien ne charge .env automatiquement, contrairement
-// à `nx serve api`. Même mécanisme que prisma.config.ts.
+// `npm run` is not an Nx task: nothing loads .env automatically, unlike `nx serve api`. Same
+// mechanism as prisma.config.ts.
 import 'dotenv/config';
 
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -315,8 +315,8 @@ const main = async (): Promise<void> => {
   }
 };
 
-// Ne s'exécute que lancé directement : importer ce fichier pour réutiliser ses
-// helpers ne doit pas déclencher la vérification.
+// Only runs when invoked directly: importing this file to reuse its helpers must not trigger the
+// verification.
 if (process.argv[1]?.endsWith('verify-enphase-history.ts')) {
   main().catch((error: unknown) => {
     console.error(error instanceof Error ? error.message : error);

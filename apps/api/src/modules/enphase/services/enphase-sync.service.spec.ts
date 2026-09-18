@@ -12,35 +12,35 @@ import { EnphaseSyncService } from './enphase-sync.service';
 
 const mockPrismaService = {
   enphaseToken: {
-    findMany: jest.fn(),
-    findUniqueOrThrow: jest.fn(),
+    findMany: vi.fn(),
+    findUniqueOrThrow: vi.fn(),
   },
   enphaseLifetimeData: {
-    upsert: jest.fn(),
+    upsert: vi.fn(),
   },
   syncSchedule: {
-    findUnique: jest.fn().mockResolvedValue(null),
-    upsert: jest.fn(),
+    findUnique: vi.fn().mockResolvedValue(null),
+    upsert: vi.fn(),
   },
-  $transaction: jest.fn((promises: Array<Promise<unknown>>) => Promise.all(promises)),
+  $transaction: vi.fn((promises: Array<Promise<unknown>>) => Promise.all(promises)),
 };
 
 const mockSchedulerRegistry = {
-  doesExist: jest.fn().mockReturnValue(false),
-  addCronJob: jest.fn(),
-  deleteCronJob: jest.fn(),
+  doesExist: vi.fn().mockReturnValue(false),
+  addCronJob: vi.fn(),
+  deleteCronJob: vi.fn(),
 };
 
 const mockApiService = {
-  getLifetimeData: jest.fn(),
+  getLifetimeData: vi.fn(),
 };
 
 const mockAuthService = {
-  refreshAccessToken: jest.fn(),
+  refreshAccessToken: vi.fn(),
 };
 
 const mockMapper = {
-  toLifetimeDataRecords: jest.fn(),
+  toLifetimeDataRecords: vi.fn(),
 };
 
 const LIFETIME_DATA: LifetimeData = {
@@ -56,7 +56,7 @@ describe('EnphaseSyncService', () => {
   let service: EnphaseSyncService;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -117,8 +117,8 @@ describe('EnphaseSyncService', () => {
       expect(mockPrismaService.enphaseLifetimeData.upsert).toHaveBeenCalledTimes(2);
     });
 
-    // Les dates viennent des séries renvoyées par Enphase, pas de la plage demandée :
-    // le mapper ne doit donc recevoir aucune date depuis ici.
+    // Dates come from the series Enphase returns, not from the requested range: the mapper must
+    // therefore receive no date from here.
     it('should let the mapper date the records from the API response alone', async () => {
       mockApiService.getLifetimeData.mockResolvedValue(LIFETIME_DATA);
       mockPrismaService.enphaseToken.findUniqueOrThrow.mockResolvedValue(TOKEN_RECORD);
