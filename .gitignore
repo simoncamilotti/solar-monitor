@@ -31,6 +31,7 @@ node_modules
 # keycloak dev data
 config/keycloak/data/*.mv.db
 config/keycloak/data/*.trace.db
+config/keycloak/data/*.lock.db
 
 # playwright
 playwright/.auth/
