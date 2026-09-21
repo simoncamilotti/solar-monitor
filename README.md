@@ -164,21 +164,22 @@ ENPHASE_REDIRECT_URI=http://localhost:3000/api/enphase/callback
 
 ### API Endpoints
 
-| Endpoint                         | Auth     | Description                                                       |
-| :------------------------------- | :------- | :---------------------------------------------------------------- |
-| `GET /health`                    | Public   | Health check (database, memory, disk) — outside the `/api` prefix |
-| `GET /api/enphase/authorize`     | Public   | Redirects to the Enphase OAuth2 authorization page                |
-| `GET /api/enphase/callback`      | Public   | Handles the OAuth2 callback and stores the tokens                 |
-| `GET /api/enphase/all`           | Required | Returns the full daily history                                    |
-| `GET /api/enphase/sync-status`   | Required | Last sync date and record count per system                        |
-| `GET /api/enphase/sync`          | Required | Triggers a manual sync (`?system_id=`)                            |
-| `GET /api/enphase/backfill`      | Required | Backfills history (`?system_id=&start_date=&end_date=`)           |
-| `GET /api/enphase/sync-schedule` | Required | Returns the configured daily sync time                            |
-| `PUT /api/enphase/sync-schedule` | Required | Updates the daily sync time (`{ "syncTime": "HH:mm" }`)           |
+| Endpoint                         | Auth     | Description                                                                          |
+| :------------------------------- | :------- | :----------------------------------------------------------------------------------- |
+| `GET /health`                    | Public   | Health check (database, memory, disk) — outside the `/api` prefix                    |
+| `GET /api/enphase/authorize`     | Public   | Redirects to the Enphase OAuth2 authorization page                                   |
+| `GET /api/enphase/callback`      | Public   | Handles the OAuth2 callback and stores the tokens                                    |
+| `GET /api/enphase/all`           | Required | Returns the full daily history                                                       |
+| `GET /api/enphase/sync-status`   | Required | Last sync date and record count per system                                           |
+| `POST /api/enphase/sync`         | Required | Triggers a manual sync (`{ "systemId": number }`)                                    |
+| `POST /api/enphase/backfill`     | Required | Backfills history (`{ "systemId", "startDate", "endDate" }`), rate-limited to 3/hour |
+| `GET /api/enphase/sync-schedule` | Required | Returns the configured daily sync time                                               |
+| `PUT /api/enphase/sync-schedule` | Required | Updates the daily sync time (`{ "syncTime": "HH:mm" }`)                              |
 
 Every route is protected by a global JWT guard; public routes opt out with the `@Public()`
-decorator. Rate limiting is global at 100 requests per 60 s. Swagger UI is served at `/docs`
-outside production.
+decorator. Rate limiting is global at 100 requests per 60 s, except `/backfill` which is capped at
+3 requests per hour — each call spends 4 of Enphase's monthly API quota. Swagger UI is served at
+`/docs` outside production.
 
 ### Verifying the stored history
 

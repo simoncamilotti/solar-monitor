@@ -153,7 +153,7 @@ describe('EnphaseController', () => {
     it('should delegate to sync service and return message', async () => {
       mockSyncService.syncLifetimeData.mockResolvedValue(undefined);
 
-      const result = await controller.triggerSync(42);
+      const result = await controller.triggerSync({ systemId: 42 });
 
       expect(result).toEqual({ message: 'Sync completed for system 42' });
       expect(mockSyncService.syncLifetimeData).toHaveBeenCalledWith(42);
@@ -162,15 +162,17 @@ describe('EnphaseController', () => {
     it('should propagate errors from sync service', async () => {
       mockSyncService.syncLifetimeData.mockRejectedValue(new Error('Sync failed'));
 
-      await expect(controller.triggerSync(42)).rejects.toThrow('Sync failed');
+      await expect(controller.triggerSync({ systemId: 42 })).rejects.toThrow('Sync failed');
     });
   });
 
+  // Date format and start-before-end validation live in enphaseBackfillRequestDtoSchema (see
+  // libs/shared-models), enforced by ZodValidationPipe before the controller method runs.
   describe('backfill', () => {
     it('should delegate to sync service and return count', async () => {
       mockSyncService.backfillLifetimeData.mockResolvedValue(30);
 
-      const result = await controller.backfill(42, '2026-01-01', '2026-01-31');
+      const result = await controller.backfill({ systemId: 42, startDate: '2026-01-01', endDate: '2026-01-31' });
 
       expect(result).toEqual({ message: 'Backfill completed', daysBackfilled: 30 });
       expect(mockSyncService.backfillLifetimeData).toHaveBeenCalledWith(42, '2026-01-01', '2026-01-31');
@@ -179,15 +181,9 @@ describe('EnphaseController', () => {
     it('should propagate errors from sync service', async () => {
       mockSyncService.backfillLifetimeData.mockRejectedValue(new Error('API error'));
 
-      await expect(controller.backfill(42, '2026-01-01', '2026-01-31')).rejects.toThrow('API error');
-    });
-
-    it('should throw when start_date format is invalid', async () => {
-      await expect(controller.backfill(42, 'not-a-date', '2026-01-31')).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw when start_date is after end_date', async () => {
-      await expect(controller.backfill(42, '2026-02-01', '2026-01-01')).rejects.toThrow(BadRequestException);
+      await expect(
+        controller.backfill({ systemId: 42, startDate: '2026-01-01', endDate: '2026-01-31' }),
+      ).rejects.toThrow('API error');
     });
   });
 });

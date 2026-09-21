@@ -51,7 +51,7 @@ export async function mockApi(page: Page): Promise<void> {
     return route.continue();
   });
 
-  await page.route('**/api/enphase/sync?*', route =>
+  await page.route('**/api/enphase/sync', route =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -59,7 +59,7 @@ export async function mockApi(page: Page): Promise<void> {
     }),
   );
 
-  await page.route('**/api/enphase/backfill?*', route =>
+  await page.route('**/api/enphase/backfill', route =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',

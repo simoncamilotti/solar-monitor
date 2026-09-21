@@ -20,6 +20,14 @@ export class EnphaseAuthService {
   private readonly _clientSecret: string;
   private readonly _redirectUri: string;
 
+  /**
+   * OAuth `state` values issued by {@link getAuthorizationUrl}, pending their callback.
+   *
+   * Lives in memory: a restart mid-flow forces the user to restart the link from
+   * `/enphase/authorize`, and a second replica would not see states issued by the first. Both are
+   * acceptable for a link flow triggered by hand, on demand, on the single-replica deployment this
+   * project targets — the same trade-off already made for {@link _refreshesInFlight} below.
+   */
   private readonly _pendingStates = new Map<string, number>();
 
   /**

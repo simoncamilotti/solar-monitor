@@ -15,10 +15,25 @@ export const enphaseSyncResponseDtoSchema = z.object({
   message: z.string(),
 });
 
+export const enphaseSyncRequestDtoSchema = z.object({
+  systemId: z.int(),
+});
+
 export const enphaseBackfillResponseDtoSchema = z.object({
   message: z.string(),
   daysBackfilled: z.int(),
 });
+
+export const enphaseBackfillRequestDtoSchema = z
+  .object({
+    systemId: z.int(),
+    startDate: z.iso.date(),
+    endDate: z.iso.date(),
+  })
+  .refine(({ startDate, endDate }) => startDate <= endDate, {
+    message: 'startDate must not be after endDate',
+    path: ['endDate'],
+  });
 
 export const lifetimeDataDtoSchema = z.object({
   date: z.date(),
@@ -51,7 +66,9 @@ export const syncStatusResponseDtoSchema = z.array(syncStatusDtoSchema);
 
 export type LifetimeDataDto = z.infer<typeof lifetimeDataDtoSchema>;
 export type LifetimeDataResponseDto = z.infer<typeof lifetimeDataResponseDtoSchema>;
+export type EnphaseSyncRequestDto = z.infer<typeof enphaseSyncRequestDtoSchema>;
 export type EnphaseBackfillResponseDto = z.infer<typeof enphaseBackfillResponseDtoSchema>;
+export type EnphaseBackfillRequestDto = z.infer<typeof enphaseBackfillRequestDtoSchema>;
 export const syncScheduleDtoSchema = z.object({
   syncTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be in HH:mm format'),
 });
