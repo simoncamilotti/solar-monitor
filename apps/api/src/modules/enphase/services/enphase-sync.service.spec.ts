@@ -129,6 +129,26 @@ describe('EnphaseSyncService', () => {
       expect(mockMapper.toLifetimeDataRecords).toHaveBeenCalledWith(LIFETIME_DATA);
     });
 
+    it('should split a large backfill into batched transactions', async () => {
+      mockApiService.getLifetimeData.mockResolvedValue(LIFETIME_DATA);
+      mockPrismaService.enphaseToken.findUniqueOrThrow.mockResolvedValue(TOKEN_RECORD);
+      const mappedRecords = Array.from({ length: 1200 }, (_, i) => ({
+        date: new Date(Date.UTC(2020, 0, i + 1)),
+        whProduced: 1000,
+        whConsumed: 500,
+        whImported: 100,
+        whExported: 400,
+      }));
+      mockMapper.toLifetimeDataRecords.mockReturnValue(mappedRecords);
+      mockPrismaService.enphaseLifetimeData.upsert.mockResolvedValue({});
+
+      const count = await service.backfillLifetimeData(42, '2020-01-01', '2023-04-13');
+
+      expect(count).toBe(1200);
+      expect(mockPrismaService.$transaction).toHaveBeenCalledTimes(3);
+      expect(mockPrismaService.enphaseLifetimeData.upsert).toHaveBeenCalledTimes(1200);
+    });
+
     it('should return 0 for empty data range', async () => {
       mockApiService.getLifetimeData.mockResolvedValue({
         whProduced: { startDate: '2026-03-10', values: [] },

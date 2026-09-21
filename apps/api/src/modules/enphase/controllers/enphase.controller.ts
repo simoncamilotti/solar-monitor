@@ -1,5 +1,6 @@
-import { BadRequestException, Body, Controller, Get, Logger, ParseIntPipe, Put, Query, Res } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Get, Logger, Post, Put, Query, Res } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 
 import { Public } from '@/core';
@@ -12,24 +13,12 @@ import type {
   SyncScheduleDto,
   SyncStatusResponseDto,
 } from '../dtos/enphase.dto';
-import { UpdateSyncScheduleRequestDto } from '../dtos/enphase.dto';
+import { EnphaseBackfillRequestDto, EnphaseSyncRequestDto, UpdateSyncScheduleRequestDto } from '../dtos/enphase.dto';
 import { EnphaseMapper } from '../mappers/enphase.mapper';
 import { EnphaseService } from '../services/enphase.service';
 import { EnphaseApiService } from '../services/enphase-api.service';
 import { EnphaseAuthService } from '../services/enphase-auth.service';
 import { EnphaseSyncService } from '../services/enphase-sync.service';
-
-const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-
-const validateDateParam = (value: string, name: string): void => {
-  if (!DATE_REGEX.test(value)) {
-    throw new BadRequestException(`${name} must be in YYYY-MM-DD format`);
-  }
-  const parsed = new Date(value);
-  if (isNaN(parsed.getTime())) {
-    throw new BadRequestException(`${name} is not a valid date`);
-  }
-};
 
 @ApiTags('Enphase')
 @Controller('enphase')
@@ -102,36 +91,25 @@ export class EnphaseController {
     return this._enphaseService.getSyncStatus();
   }
 
-  @Get('sync')
+  @Post('sync')
   @ApiOperation({ summary: 'Trigger manual sync for a system' })
-  @ApiQuery({ name: 'system_id', required: true, type: Number })
+  @ApiBody({ type: EnphaseSyncRequestDto })
   @ApiResponse({ status: 200, description: 'Sync completed' })
-  @ApiResponse({ status: 400, description: 'Invalid system_id' })
-  async triggerSync(@Query('system_id', ParseIntPipe) systemId: number): Promise<EnphaseSyncResponseDto> {
-    await this._enphaseSyncService.syncLifetimeData(systemId);
-    return { message: `Sync completed for system ${systemId}` };
+  @ApiResponse({ status: 400, description: 'Invalid systemId' })
+  async triggerSync(@Body() dto: EnphaseSyncRequestDto): Promise<EnphaseSyncResponseDto> {
+    await this._enphaseSyncService.syncLifetimeData(dto.systemId);
+    return { message: `Sync completed for system ${dto.systemId}` };
   }
 
-  @Get('backfill')
+  @Post('backfill')
+  @Throttle({ default: { limit: 3, ttl: 60 * 60 * 1000 } })
   @ApiOperation({ summary: 'Backfill historical production data' })
-  @ApiQuery({ name: 'system_id', required: true, type: Number })
-  @ApiQuery({ name: 'start_date', required: true, description: 'YYYY-MM-DD' })
-  @ApiQuery({ name: 'end_date', required: true, description: 'YYYY-MM-DD' })
+  @ApiBody({ type: EnphaseBackfillRequestDto })
   @ApiResponse({ status: 200, description: 'Backfill completed' })
   @ApiResponse({ status: 400, description: 'Invalid parameters' })
-  async backfill(
-    @Query('system_id', ParseIntPipe) systemId: number,
-    @Query('start_date') startDate: string,
-    @Query('end_date') endDate: string,
-  ): Promise<EnphaseBackfillResponseDto> {
-    validateDateParam(startDate, 'start_date');
-    validateDateParam(endDate, 'end_date');
-
-    if (new Date(startDate) > new Date(endDate)) {
-      throw new BadRequestException('start_date must be before end_date');
-    }
-
-    const count = await this._enphaseSyncService.backfillLifetimeData(systemId, startDate, endDate);
+  @ApiResponse({ status: 429, description: 'Too many backfill requests — Enphase quota is monthly' })
+  async backfill(@Body() dto: EnphaseBackfillRequestDto): Promise<EnphaseBackfillResponseDto> {
+    const count = await this._enphaseSyncService.backfillLifetimeData(dto.systemId, dto.startDate, dto.endDate);
     return { message: 'Backfill completed', daysBackfilled: count };
   }
 

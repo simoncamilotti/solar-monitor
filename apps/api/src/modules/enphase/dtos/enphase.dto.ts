@@ -1,8 +1,10 @@
 import { createZodDto } from 'nestjs-zod';
 
 import {
+  enphaseBackfillRequestDtoSchema,
   enphaseBackfillResponseDtoSchema,
   enphaseCallbackResponseDtoSchema,
+  enphaseSyncRequestDtoSchema,
   enphaseSyncResponseDtoSchema,
   enphaseSystemDtoSchema,
   lifetimeDataResponseDtoSchema,
@@ -15,7 +17,11 @@ export class EnphaseSystemDto extends createZodDto(enphaseSystemDtoSchema) {}
 
 export class EnphaseCallbackResponseDto extends createZodDto(enphaseCallbackResponseDtoSchema) {}
 
+export class EnphaseSyncRequestDto extends createZodDto(enphaseSyncRequestDtoSchema) {}
+
 export class EnphaseSyncResponseDto extends createZodDto(enphaseSyncResponseDtoSchema) {}
+
+export class EnphaseBackfillRequestDto extends createZodDto(enphaseBackfillRequestDtoSchema) {}
 
 export class EnphaseBackfillResponseDto extends createZodDto(enphaseBackfillResponseDtoSchema) {}
 

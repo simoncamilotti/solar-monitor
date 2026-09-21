@@ -11,6 +11,10 @@ import { EnphaseAuthService } from './enphase-auth.service';
 
 const SYNC_CRON_NAME = 'enphase-daily-sync';
 
+// A multi-year backfill can reach a few thousand rows. One interactive transaction for all of them
+// risks a Prisma timeout and holds locks for the duration; batching bounds both.
+const UPSERT_BATCH_SIZE = 500;
+
 @Injectable()
 export class EnphaseSyncService implements OnModuleInit {
   private readonly _logger = new Logger(EnphaseSyncService.name);
@@ -121,20 +125,24 @@ export class EnphaseSyncService implements OnModuleInit {
 
     const records = this._mapper.toLifetimeDataRecords(lifetimeData);
 
-    await this._prismaService.$transaction(
-      records.map(record =>
-        this._prismaService.enphaseLifetimeData.upsert({
-          where: {
-            date_enphaseTokenId: {
-              date: record.date,
-              enphaseTokenId: token.id,
+    for (let i = 0; i < records.length; i += UPSERT_BATCH_SIZE) {
+      const batch = records.slice(i, i + UPSERT_BATCH_SIZE);
+
+      await this._prismaService.$transaction(
+        batch.map(record =>
+          this._prismaService.enphaseLifetimeData.upsert({
+            where: {
+              date_enphaseTokenId: {
+                date: record.date,
+                enphaseTokenId: token.id,
+              },
             },
-          },
-          create: { ...record, enphaseTokenId: token.id },
-          update: { ...record, enphaseTokenId: token.id },
-        }),
-      ),
-    );
+            create: { ...record, enphaseTokenId: token.id },
+            update: { ...record, enphaseTokenId: token.id },
+          }),
+        ),
+      );
+    }
 
     return records.length;
   }
