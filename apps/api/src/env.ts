@@ -12,6 +12,9 @@ const envSchema = z.object({
   ENPHASE_CLIENT_SECRET: z.string().min(1),
   ENPHASE_API_KEY: z.string().min(1),
   ENPHASE_REDIRECT_URI: z.url(),
+  ENPHASE_TOKEN_ENCRYPTION_KEY: z
+    .string()
+    .regex(/^[0-9a-f]{64}$/i, 'Must be a 64-character hex string (32 bytes) — generate with `openssl rand -hex 32`'),
 });
 
 export type Env = z.infer<typeof envSchema>;
