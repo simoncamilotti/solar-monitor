@@ -1,4 +1,4 @@
-import { randomBytes } from 'node:crypto';
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
@@ -12,6 +12,9 @@ const ENPHASE_AUTH_URL = 'https://api.enphaseenergy.com/oauth/authorize';
 const ENPHASE_TOKEN_URL = 'https://api.enphaseenergy.com/oauth/token';
 const STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
+const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
+const ENCRYPTION_IV_LENGTH = 12;
+
 @Injectable()
 export class EnphaseAuthService {
   private readonly _logger = new Logger(EnphaseAuthService.name);
@@ -19,6 +22,7 @@ export class EnphaseAuthService {
   private readonly _clientId: string;
   private readonly _clientSecret: string;
   private readonly _redirectUri: string;
+  private readonly _encryptionKey: Buffer;
 
   /**
    * OAuth `state` values issued by {@link getAuthorizationUrl}, pending their callback.
@@ -51,6 +55,12 @@ export class EnphaseAuthService {
     this._clientId = this._requireEnv('ENPHASE_CLIENT_ID');
     this._clientSecret = this._requireEnv('ENPHASE_CLIENT_SECRET');
     this._redirectUri = this._requireEnv('ENPHASE_REDIRECT_URI');
+
+    const encryptionKey = Buffer.from(this._requireEnv('ENPHASE_TOKEN_ENCRYPTION_KEY'), 'hex');
+    if (encryptionKey.length !== 32) {
+      throw new Error('ENPHASE_TOKEN_ENCRYPTION_KEY must decode to 32 bytes (a 64-character hex string)');
+    }
+    this._encryptionKey = encryptionKey;
   }
 
   getAuthorizationUrl(): string {
@@ -114,14 +124,14 @@ export class EnphaseAuthService {
 
     const params = new URLSearchParams({
       grant_type: 'refresh_token',
-      refresh_token: token.refreshToken,
+      refresh_token: this._decrypt(token.refreshToken),
     });
 
     const tokenResponse = await this._requestToken(params);
 
     await this._prismaService.enphaseToken.update({
       where: { systemId },
-      data: this._mapTokenResponse(tokenResponse),
+      data: this._encryptTokens(this._mapTokenResponse(tokenResponse)),
     });
 
     this._logger.log(`Refreshed access token for system ${systemId}`);
@@ -140,14 +150,16 @@ export class EnphaseAuthService {
       return this.refreshAccessToken(systemId);
     }
 
-    return token.accessToken;
+    return this._decrypt(token.accessToken);
   }
 
   async storeTokens(systemId: number, tokens: EnphaseTokens): Promise<void> {
+    const encrypted = this._encryptTokens(tokens);
+
     await this._prismaService.enphaseToken.upsert({
       where: { systemId },
-      create: { systemId, ...tokens },
-      update: tokens,
+      create: { systemId, ...encrypted },
+      update: encrypted,
     });
 
     this._logger.log(`Stored tokens for system ${systemId}`);
@@ -188,5 +200,35 @@ export class EnphaseAuthService {
         this._pendingStates.delete(state);
       }
     }
+  }
+
+  /**
+   * `accessToken` and `refreshToken` are the only fields at rest that grant lasting access to the
+   * Enphase account — the refresh token in particular does not expire on any short horizon. This
+   * service is the sole reader and writer of those two columns, so encryption is centralized here
+   * rather than at the Prisma layer.
+   */
+  private _encryptTokens(tokens: EnphaseTokens): EnphaseTokens {
+    return {
+      ...tokens,
+      accessToken: this._encrypt(tokens.accessToken),
+      refreshToken: this._encrypt(tokens.refreshToken),
+    };
+  }
+
+  private _encrypt(plaintext: string): string {
+    const iv = randomBytes(ENCRYPTION_IV_LENGTH);
+    const cipher = createCipheriv(ENCRYPTION_ALGORITHM, this._encryptionKey, iv);
+    const ciphertext = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+
+    return [iv, cipher.getAuthTag(), ciphertext].map(buffer => buffer.toString('hex')).join(':');
+  }
+
+  private _decrypt(stored: string): string {
+    const [ivHex, authTagHex, ciphertextHex] = stored.split(':');
+    const decipher = createDecipheriv(ENCRYPTION_ALGORITHM, this._encryptionKey, Buffer.from(ivHex, 'hex'));
+    decipher.setAuthTag(Buffer.from(authTagHex, 'hex'));
+
+    return Buffer.concat([decipher.update(Buffer.from(ciphertextHex, 'hex')), decipher.final()]).toString('utf8');
   }
 }

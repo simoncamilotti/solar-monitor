@@ -156,11 +156,16 @@ ENPHASE_CLIENT_ID=your_client_id
 ENPHASE_CLIENT_SECRET=your_client_secret
 ENPHASE_API_KEY=your_api_key
 ENPHASE_REDIRECT_URI=http://localhost:3000/api/enphase/callback
+ENPHASE_TOKEN_ENCRYPTION_KEY=$(openssl rand -hex 32)
 ```
 
 3. Apply the migrations: `npm run prisma:migrate:deploy`
 4. Start the API and open `http://localhost:3000/api/enphase/authorize` to link your Enphase
    account over OAuth2.
+
+The access and refresh tokens are encrypted at rest (AES-256-GCM) with `ENPHASE_TOKEN_ENCRYPTION_KEY`.
+Losing or rotating that key makes the stored tokens unreadable — re-link the account through step 4
+to recover.
 
 ### API Endpoints
 
