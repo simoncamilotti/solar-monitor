@@ -6,16 +6,16 @@ Prisma, deployed through GitOps.
 
 ## Technical Stack
 
-| Layer        | Technology                                             |
-| :----------- | :----------------------------------------------------- |
-| **Monorepo** | Nx 22, TypeScript 5.9                                  |
-| **Backend**  | NestJS 12, Prisma 7, PostgreSQL 17                     |
-| **Frontend** | React 19, Vite 7, TailwindCSS 3, ECharts 6, ag-grid 35 |
-| **Shared**   | Zod 4 schemas shared between API and client            |
-| **Auth**     | Keycloak (OIDC) — `keycloak-js` 26 on the client       |
-| **i18n**     | i18next — French and English, French as fallback       |
-| **Testing**  | Vitest (API, libs, web), Playwright (web E2E)          |
-| **CI/CD**    | GitHub Actions, GHCR, GitOps (Kustomize)               |
+| Layer        | Technology                                              |
+| :----------- | :------------------------------------------------------ |
+| **Monorepo** | Nx 22, TypeScript 5.9                                   |
+| **Backend**  | NestJS 12, Prisma 7, PostgreSQL 17                      |
+| **Frontend** | React 19, Vite 7, TailwindCSS 3, ECharts 6, ag-grid 35  |
+| **Shared**   | Zod 4 schemas shared between API and client             |
+| **Auth**     | Keycloak 26.2 (OIDC) — `keycloak-js` 26.2 on the client |
+| **i18n**     | i18next — French and English, French as fallback        |
+| **Testing**  | Vitest (API, libs, web), Playwright (web E2E)           |
+| **CI/CD**    | GitHub Actions, GHCR, GitOps (Kustomize)                |
 
 ## Architecture
 
@@ -108,7 +108,7 @@ npm run test:api               # Vitest
 npm run test:web               # Vitest
 npm run test:all
 
-npm run e2e:api                # Vitest — requires the API and its database running
+npm run e2e:api                # Vitest — requires Postgres and Keycloak up
 npm run e2e:web                # Playwright
 npm run e2e:web-ui             # Playwright UI mode
 npm run e2e:web-update-snapshots
@@ -117,13 +117,13 @@ npm run e2e:web-update-snapshots
 Run a single test file:
 
 ```bash
-npx nx test api -- --testPathPattern=<pattern>
+npx nx test api -- --run <pattern>
 npx nx test web -- --run <pattern>
 npx nx e2e web-e2e -- --grep "<test name>"
 ```
 
-> `npm run typecheck:all` currently only covers `web`: the `api`, `core` and `shared-models`
-> projects have no `typecheck` target yet.
+> `npm run typecheck:all` runs `tsc --noEmit` for `api`, `core`, `shared-models` and `web` against
+> their source tsconfig — it does not cover the specs, which live under `tsconfig.spec.json`.
 
 ### Database
 
