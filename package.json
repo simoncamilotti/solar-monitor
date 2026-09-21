@@ -142,6 +142,16 @@
     "nestjs-zod": {
       "@nestjs/common": "$@nestjs/common",
       "@nestjs/swagger": "$@nestjs/swagger"
+    },
+    "deepmerge-ts": "^8.0.2",
+    "mysql2": "^3.24.4",
+    "@nestjs/platform-express": {
+      "express": {
+        "qs": "^6.16.0"
+      }
+    },
+    "@prisma/streams-local": {
+      "ajv": "^8.20.0"
     }
   }
 }
