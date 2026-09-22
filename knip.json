@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "apps/api/src/main.ts",
+    "apps/web/src/main.tsx",
+    "libs/*/src/index.ts",
+    "libs/*/*/src/index.ts",
+    "**/*.spec.{ts,tsx}",
+    "**/vitest.config.ts",
+    "**/playwright.config.ts",
+    "**/test-setup.ts",
+    "**/support/global-setup.ts"
+  ],
+  "project": ["apps/**/*.{ts,tsx}", "libs/**/*.{ts,tsx}", "*.ts"],
+  "ignore": ["apps/web/types/window.d.ts"],
+  "ignoreDependencies": ["pg", "pino-pretty"]
+}

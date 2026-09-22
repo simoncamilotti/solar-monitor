@@ -1,4 +1,5 @@
 import { Global, Module, RequestMethod } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule, Params } from 'nestjs-pino';
@@ -9,17 +10,21 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 
-const pinoOptions: Params = {
-  forRoutes: [{ method: RequestMethod.ALL, path: '*splat' }],
-  pinoHttp: {
-    level: process.env['NODE_ENV'] !== 'production' ? 'debug' : 'info',
-    genReqId: req => req.headers['x-request-id'] ?? crypto.randomUUID(),
-    redact: ['req.headers.authorization', 'req.headers.cookie'],
-    autoLogging: {
-      ignore: (req): boolean => ['/health'].some(publicPath => req.url === publicPath),
-    },
-    transport: process.env['NODE_ENV'] !== 'production' ? { target: 'pino-pretty' } : undefined,
-  } as Options,
+const buildPinoOptions = (configService: ConfigService): Params => {
+  const isProduction = configService.get<string>('NODE_ENV') === 'production';
+
+  return {
+    forRoutes: [{ method: RequestMethod.ALL, path: '*splat' }],
+    pinoHttp: {
+      level: isProduction ? 'info' : 'debug',
+      genReqId: req => req.headers['x-request-id'] ?? crypto.randomUUID(),
+      redact: ['req.headers.authorization', 'req.headers.cookie'],
+      autoLogging: {
+        ignore: (req): boolean => ['/health'].some(publicPath => req.url === publicPath),
+      },
+      transport: isProduction ? undefined : { target: 'pino-pretty' },
+    } as Options,
+  };
 };
 
 @Global()
@@ -29,7 +34,10 @@ const pinoOptions: Params = {
     HealthModule,
     PrismaModule,
     AuthModule,
-    LoggerModule.forRoot(pinoOptions),
+    LoggerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: buildPinoOptions,
+    }),
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

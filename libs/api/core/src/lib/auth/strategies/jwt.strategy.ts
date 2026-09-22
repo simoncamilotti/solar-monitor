@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -9,7 +10,12 @@ import { JWTPayload } from '../types/jwt-payload.type';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly _authService: AuthService) {
+  constructor(
+    configService: ConfigService,
+    private readonly _authService: AuthService,
+  ) {
+    const issuerUrl = configService.getOrThrow<string>('KEYCLOAK_ISSUER_URL');
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -17,10 +23,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         cache: true,
         rateLimit: true,
         jwksRequestsPerMinute: 5,
-        jwksUri: `${process.env['KEYCLOAK_ISSUER_URL']}/protocol/openid-connect/certs`,
+        jwksUri: `${issuerUrl}/protocol/openid-connect/certs`,
       }),
-      issuer: process.env['KEYCLOAK_ISSUER_URL'],
-      audience: process.env['KEYCLOAK_CLIENT_ID'],
+      issuer: issuerUrl,
+      audience: configService.getOrThrow<string>('KEYCLOAK_CLIENT_ID'),
       algorithms: ['RS256'],
     });
   }

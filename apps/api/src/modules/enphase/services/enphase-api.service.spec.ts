@@ -1,4 +1,5 @@
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { of } from 'rxjs';
@@ -13,6 +14,16 @@ const mockHttpService = {
 
 const mockAuthService = {
   getValidAccessToken: vi.fn(),
+};
+
+const mockConfigService = {
+  getOrThrow: (key: string): string => {
+    const value = process.env[key];
+    if (!value) {
+      throw new Error(`Missing required environment variable: ${key}`);
+    }
+    return value;
+  },
 };
 
 const LIFETIME_META = {
@@ -35,6 +46,7 @@ describe('EnphaseApiService', () => {
         EnphaseApiService,
         { provide: HttpService, useValue: mockHttpService },
         { provide: EnphaseAuthService, useValue: mockAuthService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 

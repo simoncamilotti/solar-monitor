@@ -1,7 +1,9 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
+import type { Env } from '../../../env';
 import type {
   ConsumptionLifetimeResponse,
   EnphaseSystemsResponse,
@@ -22,12 +24,9 @@ export class EnphaseApiService {
   constructor(
     private readonly _httpService: HttpService,
     private readonly _authService: EnphaseAuthService,
+    configService: ConfigService<Env, true>,
   ) {
-    const apiKey = process.env['ENPHASE_API_KEY'];
-    if (!apiKey) {
-      throw new Error('Missing required environment variable: ENPHASE_API_KEY');
-    }
-    this._apiKey = apiKey;
+    this._apiKey = configService.getOrThrow('ENPHASE_API_KEY', { infer: true });
   }
 
   async getSystems(accessToken: string): Promise<EnphaseSystemsResponse> {
