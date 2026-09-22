@@ -1,11 +1,19 @@
+import type { ConfigService } from '@nestjs/config';
 import type { Mock } from 'vitest';
 
 import type { AuthService } from '../services/auth.service';
 import type { JWTPayload } from '../types/jwt-payload.type';
 import { JwtStrategy } from './jwt.strategy';
 
-// Must be set before strategy construction
-process.env['KEYCLOAK_ISSUER_URL'] = 'http://localhost:8080/realms/portfolio';
+const mockConfigService = {
+  getOrThrow: vi.fn((key: string) => {
+    const values: Record<string, string> = {
+      KEYCLOAK_ISSUER_URL: 'http://localhost:8080/realms/portfolio',
+      KEYCLOAK_CLIENT_ID: 'test-client-id',
+    };
+    return values[key];
+  }),
+} as unknown as ConfigService;
 
 // Mock the external dependencies that the constructor uses
 vi.mock('passport-jwt', () => ({
@@ -33,7 +41,7 @@ describe('JwtStrategy', () => {
       getOrCreateUser: vi.fn(),
     } as unknown as AuthService;
 
-    strategy = new JwtStrategy(authService);
+    strategy = new JwtStrategy(mockConfigService, authService);
   });
 
   const createPayload = (overrides: Partial<JWTPayload> = {}): JWTPayload => ({

@@ -1,6 +1,7 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { of } from 'rxjs';
@@ -40,6 +41,16 @@ const mockHttpService = {
   post: vi.fn(),
 };
 
+const mockConfigService = {
+  getOrThrow: (key: string): string => {
+    const value = process.env[key];
+    if (!value) {
+      throw new Error(`Missing required environment variable: ${key}`);
+    }
+    return value;
+  },
+};
+
 const TOKEN_RESPONSE: EnphaseTokenResponse = {
   access_token: 'new-access-token',
   refresh_token: 'new-refresh-token',
@@ -63,6 +74,7 @@ describe('EnphaseAuthService', () => {
         EnphaseAuthService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: HttpService, useValue: mockHttpService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 

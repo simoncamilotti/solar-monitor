@@ -2,10 +2,12 @@ import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
 import { PrismaService } from '@/core';
 
+import type { Env } from '../../../env';
 import type { EnphaseTokenResponse, EnphaseTokens } from '../types/enphase.types';
 
 const ENPHASE_AUTH_URL = 'https://api.enphaseenergy.com/oauth/authorize';
@@ -51,12 +53,13 @@ export class EnphaseAuthService {
   constructor(
     private readonly _prismaService: PrismaService,
     private readonly _httpService: HttpService,
+    configService: ConfigService<Env, true>,
   ) {
-    this._clientId = this._requireEnv('ENPHASE_CLIENT_ID');
-    this._clientSecret = this._requireEnv('ENPHASE_CLIENT_SECRET');
-    this._redirectUri = this._requireEnv('ENPHASE_REDIRECT_URI');
+    this._clientId = configService.getOrThrow('ENPHASE_CLIENT_ID', { infer: true });
+    this._clientSecret = configService.getOrThrow('ENPHASE_CLIENT_SECRET', { infer: true });
+    this._redirectUri = configService.getOrThrow('ENPHASE_REDIRECT_URI', { infer: true });
 
-    const encryptionKey = Buffer.from(this._requireEnv('ENPHASE_TOKEN_ENCRYPTION_KEY'), 'hex');
+    const encryptionKey = Buffer.from(configService.getOrThrow('ENPHASE_TOKEN_ENCRYPTION_KEY', { infer: true }), 'hex');
     if (encryptionKey.length !== 32) {
       throw new Error('ENPHASE_TOKEN_ENCRYPTION_KEY must decode to 32 bytes (a 64-character hex string)');
     }
@@ -183,14 +186,6 @@ export class EnphaseAuthService {
       refreshToken: response.refresh_token,
       expiresAt: new Date(Date.now() + response.expires_in * 1000),
     };
-  }
-
-  private _requireEnv(key: string): string {
-    const value = process.env[key];
-    if (!value) {
-      throw new Error(`Missing required environment variable: ${key}`);
-    }
-    return value;
   }
 
   private _cleanExpiredStates(): void {
