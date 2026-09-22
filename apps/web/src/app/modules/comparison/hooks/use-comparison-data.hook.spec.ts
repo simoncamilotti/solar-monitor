@@ -11,7 +11,7 @@ import { comparisonPeriodColors } from '../constants/comparison-colors';
 import { useComparisonData } from './use-comparison-data.hook';
 
 const entry = (date: string, kwhProduced: number): LifetimeDataDto => ({
-  date: date as unknown as Date,
+  date,
   kwhProduced,
   kwhConsumed: 0,
   kwhImported: 0,

@@ -32,7 +32,7 @@ import type { LifetimeDataResponseDto } from '@/shared-models';
 import { HistoryGrid } from './HistoryGrid';
 
 const mockData: LifetimeDataResponseDto = [
-  { date: new Date('2024-01-01'), kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
+  { date: '2024-01-01', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
 ];
 
 describe('HistoryGrid', () => {

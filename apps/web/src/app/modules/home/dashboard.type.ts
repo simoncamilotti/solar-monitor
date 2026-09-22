@@ -4,8 +4,8 @@ export type DashboardViewMode = 'full' | 'yearly' | 'monthly' | 'custom';
 export type DashboardMetricKey = EnergyMetricKey;
 
 export type DateRange = {
-  min: Date | null;
-  max: Date | null;
+  min: string | null;
+  max: string | null;
 };
 
 export type DashboardFilterState = {

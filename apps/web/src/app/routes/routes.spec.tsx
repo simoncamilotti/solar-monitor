@@ -36,4 +36,12 @@ describe('routes', () => {
     expect(catchAll).toBeDefined();
     expect(catchAll!.loader).toBeDefined();
   });
+
+  it('should define a /forbidden route outside the auth-gated layout', () => {
+    const forbiddenRoute = routes.find(r => r.path === '/forbidden');
+
+    expect(forbiddenRoute).toBeDefined();
+    expect(forbiddenRoute!.element).toBeDefined();
+    expect(forbiddenRoute!.loader).toBeUndefined();
+  });
 });

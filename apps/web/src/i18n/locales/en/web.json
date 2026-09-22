@@ -1,4 +1,9 @@
 {
+  "forbidden": {
+    "title": "Session expired",
+    "description": "Your session has expired or access was denied. Sign in again to continue.",
+    "retry": "Sign in again"
+  },
   "sidebar": {
     "title": "Solar monitoring",
     "nav": {
@@ -39,10 +44,10 @@
       "year": "Year",
       "month": "Month",
       "day": "Day",
-      "produced": "Production (Wh)",
-      "consumed": "Consumption (Wh)",
-      "imported": "Importation (Wh)",
-      "exported": "Exportation (Wh)",
+      "produced": "Production (kWh)",
+      "consumed": "Consumption (kWh)",
+      "imported": "Importation (kWh)",
+      "exported": "Exportation (kWh)",
       "gridDependency": "Dependency (%)"
     }
   },
@@ -83,10 +88,10 @@
     "allMonths": "All months",
     "metricsLabel": "Metrics",
     "metrics": {
-      "produced": "Production (Wh)",
-      "consumed": "Consumption (Wh)",
-      "imported": "Import (Wh)",
-      "exported": "Export (Wh)",
+      "produced": "Production (kWh)",
+      "consumed": "Consumption (kWh)",
+      "imported": "Import (kWh)",
+      "exported": "Export (kWh)",
       "gridDependency": "Dependency (%)"
     },
     "cancel": "Cancel",

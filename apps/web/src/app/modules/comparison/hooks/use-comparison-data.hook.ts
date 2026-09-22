@@ -1,5 +1,5 @@
-import { getISOWeek } from 'date-fns';
-import { useMemo } from 'react';
+import { getISOWeek, parseISO } from 'date-fns';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { LifetimeDataDto, LifetimeDataResponseDto } from '@/shared-models';
@@ -27,7 +27,9 @@ export const useComparisonData = (
   filters: ComparisonFilterState,
 ): ComparisonSeries[] => {
   const { t } = useTranslation('web');
-  const monthName = (i: number) => t(`months.${i}`);
+  // Memoized so the `useMemo` below actually memoizes: an inline arrow here would be a fresh
+  // reference on every render, which was defeating the memoization entirely.
+  const monthName = useCallback((i: number) => t(`months.${i}`), [t]);
 
   return useMemo(() => {
     if (filters.periods.length === 0) return [];
@@ -54,7 +56,7 @@ export const useComparisonData = (
           case 'daily': {
             const categories = Array.from({ length: totalDays }, (_, i) => `${i + 1}`);
             const values = Array.from({ length: totalDays }, (_, d) => {
-              const dayEntries = entries.filter(e => new Date(e.date).getDate() === d + 1);
+              const dayEntries = entries.filter(e => parseISO(e.date).getDate() === d + 1);
               return computeMetric(filters.metric, dayEntries);
             });
             return { label, color, categories, values };
@@ -63,7 +65,7 @@ export const useComparisonData = (
           case 'weekly': {
             const weekMap = new Map<number, LifetimeDataDto[]>();
             for (const e of entries) {
-              const week = getISOWeek(new Date(e.date));
+              const week = getISOWeek(parseISO(e.date));
               const arr = weekMap.get(week) ?? [];
               arr.push(e);
               weekMap.set(week, arr);
@@ -86,7 +88,7 @@ export const useComparisonData = (
           case 'monthly': {
             const categories = Array.from({ length: 12 }, (_, i) => monthName(i));
             const values = Array.from({ length: 12 }, (_, m) => {
-              const monthEntries = entries.filter(e => new Date(e.date).getMonth() === m);
+              const monthEntries = entries.filter(e => parseISO(e.date).getMonth() === m);
               return computeMetric(filters.metric, monthEntries);
             });
             return { label, color, categories, values };
@@ -96,7 +98,7 @@ export const useComparisonData = (
             const categories = ['T1', 'T2', 'T3', 'T4'];
             const values = Array.from({ length: 4 }, (_, q) => {
               const qEntries = entries.filter(e => {
-                const m = new Date(e.date).getMonth();
+                const m = parseISO(e.date).getMonth();
                 return Math.floor(m / 3) === q;
               });
               return computeMetric(filters.metric, qEntries);
@@ -110,7 +112,7 @@ export const useComparisonData = (
             const categories = Array.from({ length: totalDays }, (_, i) => `${i + 1}`);
             const dayMap = new Map<number, LifetimeDataDto[]>();
             for (const e of entries) {
-              const d = new Date(e.date);
+              const d = parseISO(e.date);
               const dayOfYear = Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 0).getTime()) / 86400000);
               const arr = dayMap.get(dayOfYear) ?? [];
               arr.push(e);

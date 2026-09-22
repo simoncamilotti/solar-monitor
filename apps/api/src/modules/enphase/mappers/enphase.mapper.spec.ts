@@ -227,7 +227,7 @@ describe('EnphaseMapper', () => {
 
       expect(result).toEqual([
         {
-          date: new Date('2026-03-10'),
+          date: '2026-03-10',
           kwhProduced: 1,
           kwhConsumed: 0.5,
           kwhImported: 0.1,
@@ -235,7 +235,7 @@ describe('EnphaseMapper', () => {
           gridDependency: 20,
         },
         {
-          date: new Date('2026-03-11'),
+          date: '2026-03-11',
           kwhProduced: 2,
           kwhConsumed: 0.6,
           kwhImported: 0.2,

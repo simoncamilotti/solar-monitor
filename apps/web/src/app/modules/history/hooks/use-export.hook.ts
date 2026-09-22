@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,17 +16,17 @@ export type ExportConfig = {
 
 const METRIC_HEADERS: Record<string, Record<ExportMetric, string>> = {
   fr: {
-    kwhProduced: 'Production (Wh)',
-    kwhConsumed: 'Consommation (Wh)',
-    kwhImported: 'Import (Wh)',
-    kwhExported: 'Export (Wh)',
+    kwhProduced: 'Production (kWh)',
+    kwhConsumed: 'Consommation (kWh)',
+    kwhImported: 'Import (kWh)',
+    kwhExported: 'Export (kWh)',
     gridDependency: 'Dépendance (%)',
   },
   en: {
-    kwhProduced: 'Production (Wh)',
-    kwhConsumed: 'Consumption (Wh)',
-    kwhImported: 'Import (Wh)',
-    kwhExported: 'Export (Wh)',
+    kwhProduced: 'Production (kWh)',
+    kwhConsumed: 'Consumption (kWh)',
+    kwhImported: 'Import (kWh)',
+    kwhExported: 'Export (kWh)',
     gridDependency: 'Dependency (%)',
   },
 };
@@ -65,7 +65,7 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
       if (!data) return [];
 
       return data.filter(row => {
-        const date = new Date(row.date);
+        const date = parseISO(row.date);
         if (config.year !== 'all' && String(date.getFullYear()) !== config.year) return false;
         return !(config.month !== 'all' && String(date.getMonth()) !== config.month);
       });
@@ -75,7 +75,10 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
 
   const buildCsv = useCallback(
     (filteredData: LifetimeDataResponseDto, metrics: ExportMetric[]) => {
-      const locale = i18n.language in METRIC_HEADERS ? i18n.language : 'fr';
+      // `i18n.language` can carry a region ("en-US"): match on the base language only, or an
+      // English browser would silently get French headers instead of falling back to English.
+      const baseLanguage = i18n.language.split('-')[0];
+      const locale = baseLanguage in METRIC_HEADERS ? baseLanguage : 'fr';
       const headers = METRIC_HEADERS[locale];
       const { separator, decimal } = CSV_DIALECTS[locale];
 
@@ -84,10 +87,7 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
         .join(separator);
 
       const lines = filteredData.map(row =>
-        [
-          format(new Date(row.date), 'yyyy-MM-dd'),
-          ...metrics.map(metric => row[metric].toFixed(2).replace('.', decimal)),
-        ]
+        [row.date, ...metrics.map(metric => row[metric].toFixed(2).replace('.', decimal))]
           .map(cell => escapeCell(cell, separator))
           .join(separator),
       );
@@ -111,7 +111,7 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
 
   const getAvailableYears = useCallback((): string[] => {
     if (!data) return [];
-    const years = new Set(data.map(row => String(new Date(row.date).getFullYear())));
+    const years = new Set(data.map(row => String(parseISO(row.date).getFullYear())));
     return Array.from(years).sort();
   }, [data]);
 

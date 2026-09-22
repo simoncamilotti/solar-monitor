@@ -6,7 +6,7 @@ import type { DashboardFilterState } from '../dashboard.type';
 import { useDashboardKpis } from './use-dashboard-kpis.hook';
 
 const entry = (date: string, overrides: Partial<LifetimeDataDto> = {}): LifetimeDataDto => ({
-  date: date as unknown as Date,
+  date,
   kwhProduced: 10,
   kwhConsumed: 8,
   kwhImported: 2,

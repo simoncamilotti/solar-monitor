@@ -1,3 +1,4 @@
+import { parseISO } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { LifetimeDataResponseDto } from '@/shared-models';
@@ -89,14 +90,14 @@ export const useComparisonFilters = (data: LifetimeDataResponseDto) => {
   }, [filters]);
 
   const availableYears = useMemo(
-    () => [...new Set(data.map(d => new Date(d.date).getFullYear()))].sort((a, b) => a - b),
+    () => [...new Set(data.map(d => parseISO(d.date).getFullYear()))].sort((a, b) => a - b),
     [data],
   );
 
   const availableMonths = useMemo(() => {
     const months = new Map<string, { year: number; month: number }>();
     for (const d of data) {
-      const date = new Date(d.date);
+      const date = parseISO(d.date);
       const key = `${date.getFullYear()}-${date.getMonth()}`;
       if (!months.has(key)) {
         months.set(key, { year: date.getFullYear(), month: date.getMonth() });
@@ -105,16 +106,8 @@ export const useComparisonFilters = (data: LifetimeDataResponseDto) => {
     return [...months.values()].sort((a, b) => a.year - b.year || a.month - b.month);
   }, [data]);
 
-  const availableDays = useMemo(
-    () =>
-      data
-        .map(d => {
-          const date = new Date(d.date);
-          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-        })
-        .sort(),
-    [data],
-  );
+  // Already `yyyy-MM-dd`: no need to round-trip through a `Date`.
+  const availableDays = useMemo(() => data.map(d => d.date).sort(), [data]);
 
   const availableResolutions = RESOLUTIONS_BY_GRANULARITY[filters.granularity];
 

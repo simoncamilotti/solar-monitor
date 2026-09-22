@@ -26,9 +26,9 @@ import type { LifetimeDataResponseDto } from '@/shared-models';
 import { ExportModal } from './ExportModal';
 
 const mockData: LifetimeDataResponseDto = [
-  { date: new Date('2024-01-01'), kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
+  { date: '2024-01-01', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
   {
-    date: new Date('2024-06-15'),
+    date: '2024-06-15',
     kwhProduced: 15,
     kwhConsumed: 12,
     kwhImported: 3,

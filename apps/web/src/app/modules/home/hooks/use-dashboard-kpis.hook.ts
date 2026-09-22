@@ -34,7 +34,7 @@ const filterCurrentPeriod = (data: LifetimeDataResponseDto, filters: DashboardFi
 
       const startDate = parse(customStartDate, 'yyyy-MM-dd', new Date());
       const endDate = parse(customEndDate, 'yyyy-MM-dd', new Date());
-      return data.filter(d => isAfter(d.date, startDate) && isBefore(d.date, endDate));
+      return data.filter(d => isAfter(parseISO(d.date), startDate) && isBefore(parseISO(d.date), endDate));
     }
   }
 };
@@ -54,14 +54,12 @@ const filterPreviousPeriod = (data: LifetimeDataResponseDto, filters: DashboardF
       if (!customStartDate || !customEndDate) {
         return [];
       }
-      const start = new Date(customStartDate);
-      const end = new Date(customEndDate);
+      const start = parseISO(customStartDate);
+      const end = parseISO(customEndDate);
       const rangeDays = differenceInCalendarDays(end, start) + 1;
       const prevEnd = subDays(start, 1);
       const prevStart = subDays(prevEnd, rangeDays - 1);
-      const prevStartIso = `${prevStart.getFullYear()}-${String(prevStart.getMonth() + 1).padStart(2, '0')}-${String(prevStart.getDate()).padStart(2, '0')}`;
-      const prevEndIso = `${prevEnd.getFullYear()}-${String(prevEnd.getMonth() + 1).padStart(2, '0')}-${String(prevEnd.getDate()).padStart(2, '0')}`;
-      return data.filter(d => isAfter(d.date, parseISO(prevStartIso)) && isBefore(d.date, parseISO(prevEndIso)));
+      return data.filter(d => isAfter(parseISO(d.date), prevStart) && isBefore(parseISO(d.date), prevEnd));
     }
   }
 };

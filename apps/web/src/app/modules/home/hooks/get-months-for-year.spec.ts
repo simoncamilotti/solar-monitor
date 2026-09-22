@@ -3,7 +3,7 @@ import type { LifetimeDataDto } from '@/shared-models';
 import { getMonthsForYear } from './get-months-for-year';
 
 const entry = (date: string): LifetimeDataDto => ({
-  date: date as unknown as Date,
+  date,
   kwhProduced: 1,
   kwhConsumed: 1,
   kwhImported: 1,

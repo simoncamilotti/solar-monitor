@@ -1,4 +1,4 @@
-import { format, isAfter, isBefore, isEqual, parse } from 'date-fns';
+import { format, isAfter, isBefore, parse, parseISO } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import type { EChartsOption } from 'echarts';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
@@ -25,7 +25,7 @@ export const useDashboardChart = (data: LifetimeDataResponseDto, filters: Dashbo
       case 'full': {
         const yearsMap = new Map<number, number>();
         for (const d of data) {
-          const y = new Date(d.date).getFullYear();
+          const y = parseISO(d.date).getFullYear();
           yearsMap.set(y, (yearsMap.get(y) ?? 0) + d[metricKey]);
         }
         const sortedYears = [...yearsMap.keys()].sort((a, b) => a - b);
@@ -35,10 +35,10 @@ export const useDashboardChart = (data: LifetimeDataResponseDto, filters: Dashbo
       }
 
       case 'yearly': {
-        const yearData = data.filter(d => new Date(d.date).getFullYear() === filters.selectedYear);
+        const yearData = data.filter(d => parseISO(d.date).getFullYear() === filters.selectedYear);
         const monthMap = new Map<number, number>();
         for (const d of yearData) {
-          const m = new Date(d.date).getMonth();
+          const m = parseISO(d.date).getMonth();
           monthMap.set(m, (monthMap.get(m) ?? 0) + d[metricKey]);
         }
         const sortedMonths = [...monthMap.keys()].sort((a, b) => a - b);
@@ -49,11 +49,11 @@ export const useDashboardChart = (data: LifetimeDataResponseDto, filters: Dashbo
 
       case 'monthly': {
         const monthData = data.filter(d => {
-          const date = new Date(d.date);
+          const date = parseISO(d.date);
           return date.getFullYear() === filters.selectedYear && date.getMonth() === filters.selectedMonth;
         });
-        monthData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        categories = monthData.map(d => String(new Date(d.date).getDate()));
+        monthData.sort((a, b) => a.date.localeCompare(b.date));
+        categories = monthData.map(d => String(parseISO(d.date).getDate()));
         values = monthData.map(d => d[metricKey]);
         break;
       }
@@ -67,26 +67,16 @@ export const useDashboardChart = (data: LifetimeDataResponseDto, filters: Dashbo
 
           const customData = data
             .filter(d => {
-              const isoDate = parse(format(d.date, 'yyyy-MM-dd'), 'yyyy-MM-dd', new Date());
+              const isoDate = parseISO(d.date);
 
-              const isAfterOrEqual = isAfter(isoDate, startDate) || isEqual(isoDate, startDate);
-              const isBeforeOrEqual = isEqual(isoDate, endDate) || isBefore(isoDate, endDate);
+              const isAfterOrEqual = isAfter(isoDate, startDate) || isoDate.getTime() === startDate.getTime();
+              const isBeforeOrEqual = isoDate.getTime() === endDate.getTime() || isBefore(isoDate, endDate);
 
               return isAfterOrEqual && isBeforeOrEqual;
             })
-            .sort((a, b) => {
-              if (isEqual(b.date, a.date)) {
-                return 0;
-              }
+            .sort((a, b) => a.date.localeCompare(b.date));
 
-              if (isAfter(b.date, a.date)) {
-                return -1;
-              }
-
-              return 1;
-            });
-
-          categories = customData.map(d => format(new Date(d.date), 'd MMM', { locale: frLocale }));
+          categories = customData.map(d => format(parseISO(d.date), 'd MMM', { locale: frLocale }));
           values = customData.map(d => d[metricKey]);
         }
         break;
