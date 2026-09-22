@@ -114,7 +114,7 @@ test.describe('History page', () => {
     await page.goto('/history');
     await page.locator('button', { hasText: 'Exporter' }).first().click();
     const dialog = page.locator('[role="dialog"]');
-    const label = dialog.locator('label', { hasText: 'Production (Wh)' });
+    const label = dialog.locator('label', { hasText: 'Production (kWh)' });
     const checkbox = label.locator('[role="checkbox"]');
 
     await expect(checkbox).toHaveAttribute('aria-checked', 'true');
