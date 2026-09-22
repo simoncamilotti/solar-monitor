@@ -1,3 +1,4 @@
+import { parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -78,8 +79,8 @@ export const DashboardFilters: FunctionComponent<DashboardFiltersProps> = ({
         <DateRangePicker
           startDate={filters.customStartDate}
           endDate={filters.customEndDate}
-          minDate={dateRange.min}
-          maxDate={dateRange.max}
+          minDate={dateRange.min ? parseISO(dateRange.min) : null}
+          maxDate={dateRange.max ? parseISO(dateRange.max) : null}
           onChange={onCustomRangeChange}
         />
       )}

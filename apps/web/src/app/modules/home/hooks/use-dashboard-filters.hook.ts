@@ -1,4 +1,4 @@
-import { format, parse } from 'date-fns';
+import { format, parse, parseISO } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { LifetimeDataResponseDto } from '@/shared-models';
@@ -23,7 +23,7 @@ const readFromStorage = (): Partial<DashboardFilterState> | null => {
 const buildInitialState = (data: LifetimeDataResponseDto): DashboardFilterState => {
   const stored = readFromStorage();
 
-  const availableYears = [...new Set(data.map(d => new Date(d.date).getFullYear()))].sort((a, b) => a - b);
+  const availableYears = [...new Set(data.map(d => parseISO(d.date).getFullYear()))].sort((a, b) => a - b);
   const latestYear = availableYears[availableYears.length - 1] ?? new Date().getFullYear();
 
   const viewMode = stored?.viewMode && VALID_VIEW_MODES.includes(stored.viewMode) ? stored.viewMode : 'yearly';
@@ -50,14 +50,14 @@ const buildInitialState = (data: LifetimeDataResponseDto): DashboardFilterState 
     const index = key === 'customStartDate' ? 0 : data.length - 1;
 
     if (stored != null && stored[key] != null) {
-      const formatedDate = format(stored[key]!, 'yyyy-MM-dd');
+      const formatedDate = format(parseISO(stored[key]!), 'yyyy-MM-dd');
 
-      const isInData = data.some(d => format(d.date, 'yyyy-MM-dd') === formatedDate);
+      const isInData = data.some(d => d.date === formatedDate);
 
-      return isInData ? formatedDate : (format(data[index]?.date, 'yyyy-MM-dd') ?? null);
+      return isInData ? formatedDate : (data[index]?.date ?? null);
     }
 
-    return format(data[index]?.date, 'yyyy-MM-dd') ?? null;
+    return data[index]?.date ?? null;
   };
 
   const customStartDate = getCustomDate('customStartDate');
@@ -81,7 +81,7 @@ export const useDashboardFilters = (data: LifetimeDataResponseDto) => {
   }, [filters]);
 
   const availableYears = useMemo(
-    () => [...new Set(data.map(d => new Date(d.date).getFullYear()))].sort((a, b) => a - b),
+    () => [...new Set(data.map(d => parseISO(d.date).getFullYear()))].sort((a, b) => a - b),
     [data],
   );
 
@@ -136,7 +136,8 @@ export const useDashboardFilters = (data: LifetimeDataResponseDto) => {
     setFilters(prev => ({ ...prev, customStartDate: startDate, customEndDate: endDate }));
   }, []);
 
-  const dateRange: { min: Date | null; max: Date | null } = useMemo(() => {
+  const dateRange: { min: string | null; max: string | null } = useMemo(() => {
+    // ISO `yyyy-MM-dd` strings sort lexicographically in chronological order — no need for `Date`.
     const dates = data.map(d => d.date).sort();
     return { min: dates[0] ?? null, max: dates[dates.length - 1] ?? null };
   }, [data]);

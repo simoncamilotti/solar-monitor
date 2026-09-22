@@ -12,10 +12,10 @@ import type { ExportConfig } from './use-export.hook';
 import { useExport } from './use-export.hook';
 
 const mockData: LifetimeDataResponseDto = [
-  { date: new Date('2023-03-15'), kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
-  { date: new Date('2024-01-10'), kwhProduced: 12, kwhConsumed: 9, kwhImported: 1, kwhExported: 5, gridDependency: 15 },
+  { date: '2023-03-15', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
+  { date: '2024-01-10', kwhProduced: 12, kwhConsumed: 9, kwhImported: 1, kwhExported: 5, gridDependency: 15 },
   {
-    date: new Date('2024-06-20'),
+    date: '2024-06-20',
     kwhProduced: 15,
     kwhConsumed: 11,
     kwhImported: 3,
@@ -128,7 +128,7 @@ describe('useExport', () => {
 
       expect(await exportedCsv()).toBe(
         [
-          'Date;Production (Wh);Consommation (Wh)',
+          'Date;Production (kWh);Consommation (kWh)',
           '2023-03-15;10,00;8,00',
           '2024-01-10;12,00;9,00',
           '2024-06-20;15,00;11,00',
@@ -141,7 +141,7 @@ describe('useExport', () => {
 
       result.current.exportData({ year: '2023', month: 'all', metrics: ['gridDependency', 'kwhExported'] });
 
-      expect(await exportedCsv()).toBe(['Date;Dépendance (%);Export (Wh)', '2023-03-15;20,00;4,00'].join('\n'));
+      expect(await exportedCsv()).toBe(['Date;Dépendance (%);Export (kWh)', '2023-03-15;20,00;4,00'].join('\n'));
     });
 
     it('should use the anglo-saxon dialect in english', async () => {
@@ -150,7 +150,7 @@ describe('useExport', () => {
 
       result.current.exportData({ year: '2023', month: 'all', metrics: ['kwhProduced'] });
 
-      expect(await exportedCsv()).toBe(['Date,Production (Wh)', '2023-03-15,10.00'].join('\n'));
+      expect(await exportedCsv()).toBe(['Date,Production (kWh)', '2023-03-15,10.00'].join('\n'));
     });
 
     it('should fall back to french for an unknown language', async () => {
@@ -159,7 +159,7 @@ describe('useExport', () => {
 
       result.current.exportData({ year: '2023', month: 'all', metrics: ['kwhProduced'] });
 
-      expect(await exportedCsv()).toBe(['Date;Production (Wh)', '2023-03-15;10,00'].join('\n'));
+      expect(await exportedCsv()).toBe(['Date;Production (kWh)', '2023-03-15;10,00'].join('\n'));
     });
 
     it('should name the file after the export date', () => {

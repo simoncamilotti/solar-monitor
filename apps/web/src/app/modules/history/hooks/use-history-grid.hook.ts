@@ -1,6 +1,6 @@
 import type { ColDef, GridReadyEvent } from 'ag-grid-community';
 import type { AgGridReactProps } from 'ag-grid-react';
-import { format, isAfter, parse } from 'date-fns';
+import { format, isAfter, parse, parseISO } from 'date-fns';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +15,7 @@ export const useHistoryGrid = () => {
         field: 'date',
         headerName: t('history.columns.date'),
         valueGetter: params => {
-          return format(new Date(params.data.date), 'dd-MM-yyyy');
+          return format(parseISO(params.data.date), 'dd-MM-yyyy');
         },
         sortable: true,
         comparator: (valueA, valueB) => {
@@ -43,7 +43,7 @@ export const useHistoryGrid = () => {
       {
         headerName: t('history.columns.year'),
         valueGetter: params => {
-          return Number(format(new Date(params.data.date), 'yyyy'));
+          return Number(format(parseISO(params.data.date), 'yyyy'));
         },
         type: 'solarNumericColumn',
         filter: 'agNumberColumnFilter',
@@ -53,7 +53,7 @@ export const useHistoryGrid = () => {
       {
         headerName: t('history.columns.month'),
         valueGetter: params => {
-          return Number(format(new Date(params.data.date), 'MM'));
+          return Number(format(parseISO(params.data.date), 'MM'));
         },
         type: 'solarNumericColumn',
         filter: 'agNumberColumnFilter',
@@ -63,7 +63,7 @@ export const useHistoryGrid = () => {
       {
         headerName: t('history.columns.day'),
         valueGetter: params => {
-          return Number(format(new Date(params.data.date), 'dd'));
+          return Number(format(parseISO(params.data.date), 'dd'));
         },
         type: 'solarNumericColumn',
         filter: 'agNumberColumnFilter',

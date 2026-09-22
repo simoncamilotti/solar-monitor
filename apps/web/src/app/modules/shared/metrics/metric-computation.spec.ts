@@ -3,7 +3,7 @@ import type { LifetimeDataDto } from '@/shared-models';
 import { aggregateEntries, computeMetric } from './metric-computation';
 
 const entry = (overrides: Partial<LifetimeDataDto>): LifetimeDataDto => ({
-  date: new Date('2026-01-01'),
+  date: '2026-01-01',
   kwhProduced: 0,
   kwhConsumed: 0,
   kwhImported: 0,

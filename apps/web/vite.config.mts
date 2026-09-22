@@ -30,6 +30,16 @@ export default defineConfig(() => ({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      output: {
+        // echarts and ag-grid are each only needed by one route (Home/Compare and History,
+        // respectively): splitting them out keeps them from padding every other page's chunk.
+        manualChunks: {
+          echarts: ['echarts', 'echarts-for-react'],
+          'ag-grid': ['ag-grid-community', 'ag-grid-react'],
+        },
+      },
+    },
   },
   test: {
     name: 'web',

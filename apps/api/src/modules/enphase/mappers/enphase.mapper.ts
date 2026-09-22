@@ -73,7 +73,7 @@ export class EnphaseMapper {
 
   toLifetimeDataResponseDto(lifetimeData: EnphaseLifetimeData[]): LifetimeDataResponseDto {
     return lifetimeData.map(x => ({
-      date: x.date,
+      date: x.date.toISOString().slice(0, 10),
       kwhProduced: new Decimal(x.whProduced).div(1000).toNumber(),
       kwhConsumed: new Decimal(x.whConsumed).div(1000).toNumber(),
       kwhImported: new Decimal(x.whImported).div(1000).toNumber(),

@@ -11,7 +11,7 @@ import { useDashboardFilters } from './use-dashboard-filters.hook';
 const STORAGE_KEY = 'dashboard-filters';
 
 const entry = (date: string, overrides: Partial<LifetimeDataDto> = {}): LifetimeDataDto => ({
-  date: date as unknown as Date,
+  date,
   kwhProduced: 1,
   kwhConsumed: 1,
   kwhImported: 1,

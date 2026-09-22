@@ -36,7 +36,9 @@ export const enphaseBackfillRequestDtoSchema = z
   });
 
 export const lifetimeDataDtoSchema = z.object({
-  date: z.date(),
+  // A calendar date, not a point in time: the API always emits `yyyy-MM-dd`, with no time-of-day
+  // or timezone component to misread.
+  date: z.iso.date(),
   kwhProduced: z.number(),
   kwhConsumed: z.number(),
   kwhImported: z.number(),
