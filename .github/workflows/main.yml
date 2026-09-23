@@ -10,10 +10,17 @@ on:
     types: [published]
   workflow_dispatch:
 
+# A new push on the same PR (or branch) makes the previous run moot: cancel it instead of burning
+# runner time on both. Never cancel a `push`/`release` run mid-flight — that's a deploy in progress.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   actions: read
   contents: read
   packages: write
+  pull-requests: write
 
 jobs:
   check:
@@ -23,6 +30,36 @@ jobs:
       nx_targets: 'lint test typecheck build'
       prisma: true
       env_file: 'DATABASE_URL=postgresql://user:pass@localhost:5432/dummy'
+    secrets: inherit
+
+  # `api-e2e` needs a live Postgres AND Keycloak (with the realm imported) to talk to — wiring both
+  # as job `services:` would need a custom image baking in the realm import, since `services:`
+  # containers start before the checkout step and can't mount repo files. Left running locally only
+  # (`npm run e2e:api`) until that's worth building; see #30.
+  e2e-baseline:
+    if: github.event_name == 'pull_request'
+    needs: check
+    uses: simoncamilotti/shared-workflows/.github/workflows/playwright-e2e.yml@main
+    with:
+      ref: ${{ github.event.pull_request.base.sha }}
+      artifact_name: e2e-baseline
+    secrets: inherit
+
+  e2e-pr:
+    if: github.event_name == 'pull_request'
+    needs: check
+    uses: simoncamilotti/shared-workflows/.github/workflows/playwright-e2e.yml@main
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+      artifact_name: e2e-pr
+    secrets: inherit
+
+  e2e-compare:
+    if: github.event_name == 'pull_request'
+    needs: [e2e-baseline, e2e-pr]
+    uses: simoncamilotti/shared-workflows/.github/workflows/playwright-compare.yml@main
+    with:
+      base_ref_name: ${{ github.event.pull_request.base.ref }}
     secrets: inherit
 
   docker:

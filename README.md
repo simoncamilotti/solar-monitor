@@ -123,7 +123,7 @@ npx nx e2e web-e2e -- --grep "<test name>"
 ```
 
 > `npm run typecheck:all` runs `tsc --noEmit` for `api`, `core`, `shared-models` and `web` against
-> their source tsconfig — it does not cover the specs, which live under `tsconfig.spec.json`.
+> both their source tsconfig and `tsconfig.spec.json`.
 
 ### Database
 
