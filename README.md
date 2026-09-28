@@ -68,15 +68,15 @@ Copy `.env.example` to `.env`, then adjust:
 | `.env`                      | `POSTGRES_DB`              | Database name            |
 | `.env`                      | `DATABASE_URL`             | Full connection string   |
 | `.env`                      | `CORS_ORIGINS`             | Comma-separated origins  |
-| `.env`                      | `KEYCLOAK_CLIENT_ID`       | Keycloak client ID       |
-| `.env`                      | `KEYCLOAK_ISSUER_URL`      | Keycloak realm URL       |
+| `.env`                      | `OIDC_AUDIENCE`            | Expected token audience  |
+| `.env`                      | `OIDC_ISSUER_URL`          | Keycloak realm URL       |
 | `apps/web/public/config.js` | `realm`, `clientId`, `url` | Frontend Keycloak config |
 
 The frontend config is runtime, not build-time: copy `config/web/config.example.js` to
 `apps/web/public/config.js`. In production it is mounted as a volume, which is why nginx serves it
 with `no-store`.
 
-The API validates its environment at startup against a Zod schema (`apps/api/src/env.ts`) and
+The API validates its environment at startup against a Zod schema (`apps/api/src/config/env.ts`) and
 refuses to boot if anything is missing.
 
 ### CI/CD (GitHub Repository Settings)
@@ -98,7 +98,7 @@ Every task runs through Nx: `pnpm nx <target> <project>`.
 pnpm dev                       # Postgres, Keycloak and Mailpit, migrations, then API and web
 ```
 
-API on `http://localhost:3000` (Swagger `/docs` outside production), web on
+API on `http://localhost:3000` (API reference `/api/docs` outside production), web on
 `http://localhost:4200`.
 
 ### Lint, Typecheck, Test, Build
@@ -177,7 +177,9 @@ to recover.
 
 | Endpoint                         | Auth     | Description                                                                          |
 | :------------------------------- | :------- | :----------------------------------------------------------------------------------- |
-| `GET /health`                    | Public   | Health check (database, memory, disk) — outside the `/api` prefix                    |
+| `GET /api/health/live`           | Public   | Liveness: the process runs                                                           |
+| `GET /api/health/ready`          | Public   | Readiness: the database answers                                                      |
+| `GET /api/users/me`              | Required | The caller's account, created or refreshed from the token claims                     |
 | `GET /api/enphase/authorize`     | Public   | Redirects to the Enphase OAuth2 authorization page                                   |
 | `GET /api/enphase/callback`      | Public   | Handles the OAuth2 callback and stores the tokens                                    |
 | `GET /api/enphase/all`           | Required | Returns the full daily history                                                       |
@@ -187,10 +189,15 @@ to recover.
 | `GET /api/enphase/sync-schedule` | Required | Returns the configured daily sync time                                               |
 | `PUT /api/enphase/sync-schedule` | Required | Updates the daily sync time (`{ "syncTime": "HH:mm" }`)                              |
 
-Every route is protected by a global JWT guard; public routes opt out with the `@Public()`
-decorator. Rate limiting is global at 100 requests per 60 s, except `/backfill` which is capped at
-3 requests per hour — each call spends 4 of Enphase's monthly API quota. Swagger UI is served at
-`/docs` outside production.
+Every route requires a valid OIDC access token (signature, issuer, `OIDC_AUDIENCE`, expiry,
+checked with `jose` against the keys found by discovery); public routes opt out with the
+`@Public()` decorator. Errors are Problem Details (RFC 9457, `application/problem+json`). Rate
+limiting is global at 100 requests per 60 s, except `/backfill` which is capped at 3 requests per
+hour — each call spends 4 of Enphase's monthly API quota. The OpenAPI reference (Scalar) is served
+at `/api/docs` outside production; `pnpm nx run api:openapi` writes `apps/api/openapi.json`.
+
+Logs are pino JSON in production, readable in development (`LOG_LEVEL`). OpenTelemetry traces and
+metrics are exported when `OTEL_EXPORTER_OTLP_ENDPOINT` is set (`src/instrumentation.ts`).
 
 ### Verifying the stored history
 

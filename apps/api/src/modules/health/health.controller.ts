@@ -1,29 +1,29 @@
 import { Controller, Get } from '@nestjs/common';
-import {
-  HealthCheck,
-  HealthCheckResult,
-  HealthCheckService,
-  HealthIndicatorResult,
-} from '@nestjs/terminus';
-
+import { HealthCheck, HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
+import { SkipThrottle } from '@nestjs/throttler';
 import { Public } from '../../common/auth/public.decorator.js';
-import { HealthService } from './health.service.js';
+import { PrismaService } from '../../common/database/prisma.service.js';
 
+/** Kubernetes probes: liveness says the process runs, readiness that it can serve traffic. */
 @Public()
-@Controller()
+@SkipThrottle()
+@Controller('health')
 export class HealthController {
   constructor(
-    private readonly _healthCheckService: HealthCheckService,
-    private readonly _healthService: HealthService,
+    private readonly health: HealthCheckService,
+    private readonly prismaHealth: PrismaHealthIndicator,
+    private readonly prisma: PrismaService,
   ) {}
 
-  @Get('health')
+  @Get('live')
   @HealthCheck()
-  ready(): Promise<HealthCheckResult> {
-    return this._healthCheckService.check([
-      (): Promise<HealthIndicatorResult> => this._healthService.database(),
-      (): Promise<HealthIndicatorResult> => this._healthService.memory(),
-      (): Promise<HealthIndicatorResult> => this._healthService.disk(),
-    ]);
+  live() {
+    return this.health.check([]);
+  }
+
+  @Get('ready')
+  @HealthCheck()
+  ready() {
+    return this.health.check([() => this.prismaHealth.pingCheck('database', this.prisma)]);
   }
 }

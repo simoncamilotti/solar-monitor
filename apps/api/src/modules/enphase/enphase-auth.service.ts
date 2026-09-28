@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { PrismaService } from '../../common/database/prisma.service.js';
 
-import type { Env } from '../../env.js';
+import type { Env } from '../../config/env.js';
 import type { EnphaseTokenResponse, EnphaseTokens } from './enphase.types.js';
 
 const ENPHASE_AUTH_URL = 'https://api.enphaseenergy.com/oauth/authorize';

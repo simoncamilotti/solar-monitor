@@ -41,6 +41,35 @@
           "prisma-generate"
         ]
       },
+      "start": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "node --import ./dist/instrumentation.js dist/main.js",
+          "cwd": "{projectRoot}"
+        },
+        "continuous": true,
+        "dependsOn": [
+          "build"
+        ]
+      },
+      "openapi": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "node dist/generate-openapi.js openapi.json",
+          "cwd": "{projectRoot}"
+        },
+        "cache": true,
+        "dependsOn": [
+          "build"
+        ],
+        "inputs": [
+          "production",
+          "^production"
+        ],
+        "outputs": [
+          "{projectRoot}/openapi.json"
+        ]
+      },
       "prisma-generate": {
         "executor": "nx:run-commands",
         "options": {
@@ -118,23 +147,32 @@
     "@nestjs/common": "catalog:",
     "@nestjs/config": "catalog:",
     "@nestjs/core": "catalog:",
-    "@nestjs/passport": "catalog:",
     "@nestjs/platform-express": "catalog:",
     "@nestjs/schedule": "catalog:",
     "@nestjs/swagger": "catalog:",
     "@nestjs/terminus": "catalog:",
     "@nestjs/throttler": "catalog:",
+    "@opentelemetry/exporter-metrics-otlp-http": "catalog:",
+    "@opentelemetry/exporter-trace-otlp-http": "catalog:",
+    "@opentelemetry/instrumentation": "catalog:",
+    "@opentelemetry/instrumentation-http": "catalog:",
+    "@opentelemetry/instrumentation-pg": "catalog:",
+    "@opentelemetry/instrumentation-pino": "catalog:",
+    "@opentelemetry/sdk-metrics": "catalog:",
+    "@opentelemetry/sdk-node": "catalog:",
     "@prisma/adapter-pg": "catalog:",
     "@prisma/client": "catalog:",
+    "@prisma/instrumentation": "catalog:",
     "@repo/contracts": "workspace:*",
+    "@scalar/nestjs-api-reference": "catalog:",
+    "@standard-schema/spec": "catalog:",
     "axios": "catalog:",
     "cron": "catalog:",
     "decimal.js": "catalog:",
     "helmet": "catalog:",
-    "jwks-rsa": "catalog:",
+    "jose": "catalog:",
     "nestjs-pino": "catalog:",
     "nestjs-zod": "catalog:",
-    "passport-jwt": "catalog:",
     "pino": "catalog:",
     "pino-http": "catalog:",
     "pino-pretty": "catalog:",
@@ -150,7 +188,6 @@
     "@swc/core": "catalog:",
     "@types/express": "catalog:",
     "@types/node": "catalog:",
-    "@types/passport-jwt": "catalog:",
     "tsx": "catalog:",
     "unplugin-swc": "catalog:",
     "vitest": "catalog:"

@@ -12,7 +12,7 @@
       "ignore": ["config/web/config.example.js"]
     },
     "apps/api": {
-      "entry": ["src/main.ts", "scripts/*.ts"],
+      "entry": ["src/main.ts", "src/instrumentation.ts", "src/generate-openapi.ts", "scripts/*.ts"],
       "ignoreDependencies": ["pino-pretty"]
     },
     "apps/web": {
