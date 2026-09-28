@@ -60,7 +60,9 @@ describe('EnphaseController', () => {
 
   describe('authorize', () => {
     it('should redirect to authorization URL', () => {
-      mockAuthService.getAuthorizationUrl.mockReturnValue('https://enphase.com/oauth?client_id=test');
+      mockAuthService.getAuthorizationUrl.mockReturnValue(
+        'https://enphase.com/oauth?client_id=test',
+      );
       const res = createMockResponse();
 
       controller.authorize(res as any);
@@ -73,9 +75,9 @@ describe('EnphaseController', () => {
     it('should throw BadRequestException when code is missing', async () => {
       const res = createMockResponse();
 
-      await expect(controller.callback(undefined as unknown as string, 'valid-state', res as any)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        controller.callback(undefined as unknown as string, 'valid-state', res as any),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should validate state parameter', async () => {
@@ -84,9 +86,9 @@ describe('EnphaseController', () => {
       });
       const res = createMockResponse();
 
-      await expect(controller.callback('code-123', undefined as unknown as string, res as any)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        controller.callback('code-123', undefined as unknown as string, res as any),
+      ).rejects.toThrow(BadRequestException);
       expect(mockAuthService.validateState).toHaveBeenCalled();
     });
 
@@ -98,13 +100,17 @@ describe('EnphaseController', () => {
 
       await controller.callback('code-123', 'valid-state', res as any);
 
-      expect(res.json).toHaveBeenCalledWith({ message: 'No systems found on this Enphase account' });
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'No systems found on this Enphase account',
+      });
       expect(mockAuthService.storeTokens).not.toHaveBeenCalled();
     });
 
     it('should store tokens and return mapped systems', async () => {
       const tokens = { accessToken: 'token', refreshToken: 'refresh', expiresAt: new Date() };
-      const rawSystems = [{ system_id: 1, name: 'Solar A', timezone: 'Europe/Paris', status: 'normal' }];
+      const rawSystems = [
+        { system_id: 1, name: 'Solar A', timezone: 'Europe/Paris', status: 'normal' },
+      ];
       const mappedSystems = [{ id: 1, name: 'Solar A', timezone: 'Europe/Paris' }];
 
       mockAuthService.exchangeCodeForTokens.mockResolvedValue(tokens);
@@ -130,7 +136,13 @@ describe('EnphaseController', () => {
   describe('getAll', () => {
     it('should return all lifetime data', async () => {
       const data = [
-        { date: new Date('2026-03-10'), whProduced: 1000, whConsumed: 500, whImported: 100, whExported: 400 },
+        {
+          date: new Date('2026-03-10'),
+          whProduced: 1000,
+          whConsumed: 500,
+          whImported: 100,
+          whExported: 400,
+        },
       ];
       mockEnphaseService.getAllLifetimeData.mockResolvedValue(data);
 
@@ -172,10 +184,18 @@ describe('EnphaseController', () => {
     it('should delegate to sync service and return count', async () => {
       mockSyncService.backfillLifetimeData.mockResolvedValue(30);
 
-      const result = await controller.backfill({ systemId: 42, startDate: '2026-01-01', endDate: '2026-01-31' });
+      const result = await controller.backfill({
+        systemId: 42,
+        startDate: '2026-01-01',
+        endDate: '2026-01-31',
+      });
 
       expect(result).toEqual({ message: 'Backfill completed', daysBackfilled: 30 });
-      expect(mockSyncService.backfillLifetimeData).toHaveBeenCalledWith(42, '2026-01-01', '2026-01-31');
+      expect(mockSyncService.backfillLifetimeData).toHaveBeenCalledWith(
+        42,
+        '2026-01-01',
+        '2026-01-31',
+      );
     });
 
     it('should propagate errors from sync service', async () => {

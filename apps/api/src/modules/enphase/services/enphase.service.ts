@@ -37,8 +37,8 @@ export class EnphaseService {
       },
     });
 
-    return tokens.map(token => {
-      const dates = token.lifetimeData.map(entry => entry.date);
+    return tokens.map((token) => {
+      const dates = token.lifetimeData.map((entry) => entry.date);
 
       return {
         systemId: token.systemId,
@@ -70,7 +70,8 @@ export class EnphaseService {
     const gaps: SyncGapDto[] = [];
 
     for (let index = 1; index < dates.length; index++) {
-      const missing = Math.round((dates[index].getTime() - dates[index - 1].getTime()) / DAY_MS) - 1;
+      const missing =
+        Math.round((dates[index].getTime() - dates[index - 1].getTime()) / DAY_MS) - 1;
 
       if (missing > 0) {
         gaps.push({

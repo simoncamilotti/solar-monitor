@@ -42,7 +42,11 @@ export class EnphaseApiService {
     return data;
   }
 
-  async getLifetimeData(systemId: number, startDate?: string, endDate?: string): Promise<LifetimeData> {
+  async getLifetimeData(
+    systemId: number,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<LifetimeData> {
     const [production, consumption, imported, exported] = await Promise.all([
       this.getEnergyLifetime(systemId, startDate, endDate),
       this.getConsumptionLifetime(systemId, startDate, endDate),
@@ -60,9 +64,17 @@ export class EnphaseApiService {
     };
   }
 
-  async getEnergyLifetime(systemId: number, startDate?: string, endDate?: string): Promise<ProductionLifetimeResponse> {
+  async getEnergyLifetime(
+    systemId: number,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<ProductionLifetimeResponse> {
     const params = this._buildDateParams(startDate, endDate);
-    return this._request<ProductionLifetimeResponse>(systemId, `/systems/${systemId}/energy_lifetime`, params);
+    return this._request<ProductionLifetimeResponse>(
+      systemId,
+      `/systems/${systemId}/energy_lifetime`,
+      params,
+    );
   }
 
   async getConsumptionLifetime(
@@ -71,20 +83,44 @@ export class EnphaseApiService {
     endDate?: string,
   ): Promise<ConsumptionLifetimeResponse> {
     const params = this._buildDateParams(startDate, endDate);
-    return this._request<ConsumptionLifetimeResponse>(systemId, `/systems/${systemId}/consumption_lifetime`, params);
+    return this._request<ConsumptionLifetimeResponse>(
+      systemId,
+      `/systems/${systemId}/consumption_lifetime`,
+      params,
+    );
   }
 
-  async getExportLifetime(systemId: number, startDate?: string, endDate?: string): Promise<ExportLifetimeResponse> {
+  async getExportLifetime(
+    systemId: number,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<ExportLifetimeResponse> {
     const params = this._buildDateParams(startDate, endDate);
-    return this._request<ExportLifetimeResponse>(systemId, `/systems/${systemId}/energy_export_lifetime`, params);
+    return this._request<ExportLifetimeResponse>(
+      systemId,
+      `/systems/${systemId}/energy_export_lifetime`,
+      params,
+    );
   }
 
-  async getImportLifetime(systemId: number, startDate?: string, endDate?: string): Promise<ImportLifetimeResponse> {
+  async getImportLifetime(
+    systemId: number,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<ImportLifetimeResponse> {
     const params = this._buildDateParams(startDate, endDate);
-    return this._request<ImportLifetimeResponse>(systemId, `/systems/${systemId}/energy_import_lifetime`, params);
+    return this._request<ImportLifetimeResponse>(
+      systemId,
+      `/systems/${systemId}/energy_import_lifetime`,
+      params,
+    );
   }
 
-  private async _request<T>(systemId: number, path: string, params: Record<string, string> = {}): Promise<T> {
+  private async _request<T>(
+    systemId: number,
+    path: string,
+    params: Record<string, string> = {},
+  ): Promise<T> {
     const accessToken = await this._authService.getValidAccessToken(systemId);
 
     const queryParams = new URLSearchParams({ key: this._apiKey, ...params });

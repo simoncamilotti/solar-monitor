@@ -16,7 +16,10 @@
     "paths": {
       "@/core": ["libs/api/core/src/index.ts"],
       "@/shared-models": ["libs/shared-models/src/index.ts"]
-    }
+    },
+    "noUncheckedSideEffectImports": false,
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
   },
   "exclude": ["node_modules", "tmp"]
 }

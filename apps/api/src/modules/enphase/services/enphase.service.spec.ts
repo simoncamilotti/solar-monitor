@@ -51,7 +51,13 @@ describe('EnphaseService', () => {
         },
       ];
       const mappedData = [
-        { date: new Date('2026-03-10'), whProduced: 1000, whConsumed: 500, whImported: 100, whExported: 400 },
+        {
+          date: new Date('2026-03-10'),
+          whProduced: 1000,
+          whConsumed: 500,
+          whImported: 100,
+          whExported: 400,
+        },
       ];
       mockPrismaService.enphaseLifetimeData.findMany.mockResolvedValue(dbData);
       mockEnphaseMapper.toLifetimeDataResponseDto.mockReturnValue(mappedData);
@@ -74,7 +80,8 @@ describe('EnphaseService', () => {
   });
 
   describe('getSyncStatus', () => {
-    const days = (...isoDays: string[]) => isoDays.map(isoDay => ({ date: new Date(`${isoDay}T00:00:00.000Z`) }));
+    const days = (...isoDays: string[]) =>
+      isoDays.map((isoDay) => ({ date: new Date(`${isoDay}T00:00:00.000Z`) }));
 
     it('should return sync status for each system', async () => {
       mockPrismaService.enphaseToken.findMany.mockResolvedValue([
@@ -84,16 +91,26 @@ describe('EnphaseService', () => {
       const result = await service.getSyncStatus();
 
       expect(result).toEqual([
-        { systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 2, expectedRecords: 2, gaps: [] },
+        {
+          systemId: 123,
+          lastSyncDate: '2026-04-02',
+          totalRecords: 2,
+          expectedRecords: 2,
+          gaps: [],
+        },
       ]);
     });
 
     it('should return null lastSyncDate when no data exists', async () => {
-      mockPrismaService.enphaseToken.findMany.mockResolvedValue([{ systemId: 456, lifetimeData: [] }]);
+      mockPrismaService.enphaseToken.findMany.mockResolvedValue([
+        { systemId: 456, lifetimeData: [] },
+      ]);
 
       const result = await service.getSyncStatus();
 
-      expect(result).toEqual([{ systemId: 456, lastSyncDate: null, totalRecords: 0, expectedRecords: 0, gaps: [] }]);
+      expect(result).toEqual([
+        { systemId: 456, lastSyncDate: null, totalRecords: 0, expectedRecords: 0, gaps: [] },
+      ]);
     });
 
     it('should return empty array when no systems configured', async () => {
@@ -156,7 +173,9 @@ describe('EnphaseService', () => {
     });
 
     it('should handle a single stored day', async () => {
-      mockPrismaService.enphaseToken.findMany.mockResolvedValue([{ systemId: 1, lifetimeData: days('2026-05-05') }]);
+      mockPrismaService.enphaseToken.findMany.mockResolvedValue([
+        { systemId: 1, lifetimeData: days('2026-05-05') },
+      ]);
 
       const [status] = await service.getSyncStatus();
 

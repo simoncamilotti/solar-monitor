@@ -9,7 +9,9 @@ import { DashboardChart } from './DashboardChart';
 import { DashboardFilters } from './DashboardFilters';
 import { DashboardKPIGrid } from './DashboardKPIGrid';
 
-export const DashboardContent: FunctionComponent<{ data: LifetimeDataResponseDto }> = ({ data }) => {
+export const DashboardContent: FunctionComponent<{ data: LifetimeDataResponseDto }> = ({
+  data,
+}) => {
   const {
     filters,
     availableYears,
@@ -38,7 +40,11 @@ export const DashboardContent: FunctionComponent<{ data: LifetimeDataResponseDto
         onCustomRangeChange={setCustomRange}
       />
       <DashboardKPIGrid kpis={kpis} />
-      <DashboardChart chartOptions={chartOptions} selectedMetric={filters.selectedMetric} onMetricChange={setMetric} />
+      <DashboardChart
+        chartOptions={chartOptions}
+        selectedMetric={filters.selectedMetric}
+        onMetricChange={setMetric}
+      />
     </div>
   );
 };

@@ -19,14 +19,21 @@ const encryptForTest = (plaintext: string): string => {
   const iv = randomBytes(12);
   const cipher = createCipheriv('aes-256-gcm', Buffer.from(TEST_ENCRYPTION_KEY, 'hex'), iv);
   const ciphertext = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
-  return [iv, cipher.getAuthTag(), ciphertext].map(buffer => buffer.toString('hex')).join(':');
+  return [iv, cipher.getAuthTag(), ciphertext].map((buffer) => buffer.toString('hex')).join(':');
 };
 
 const decryptForTest = (stored: string): string => {
   const [ivHex, authTagHex, ciphertextHex] = stored.split(':');
-  const decipher = createDecipheriv('aes-256-gcm', Buffer.from(TEST_ENCRYPTION_KEY, 'hex'), Buffer.from(ivHex, 'hex'));
+  const decipher = createDecipheriv(
+    'aes-256-gcm',
+    Buffer.from(TEST_ENCRYPTION_KEY, 'hex'),
+    Buffer.from(ivHex, 'hex'),
+  );
   decipher.setAuthTag(Buffer.from(authTagHex, 'hex'));
-  return Buffer.concat([decipher.update(Buffer.from(ciphertextHex, 'hex')), decipher.final()]).toString('utf8');
+  return Buffer.concat([
+    decipher.update(Buffer.from(ciphertextHex, 'hex')),
+    decipher.final(),
+  ]).toString('utf8');
 };
 
 const mockPrismaService = {
@@ -88,7 +95,9 @@ describe('EnphaseAuthService', () => {
       expect(url).toContain('https://api.enphaseenergy.com/oauth/authorize');
       expect(url).toContain('response_type=code');
       expect(url).toContain('client_id=test-client-id');
-      expect(url).toContain(`redirect_uri=${encodeURIComponent('http://localhost:3000/enphase/callback')}`);
+      expect(url).toContain(
+        `redirect_uri=${encodeURIComponent('http://localhost:3000/enphase/callback')}`,
+      );
       expect(url).toContain('state=');
     });
   });
@@ -102,7 +111,9 @@ describe('EnphaseAuthService', () => {
     });
 
     it('should reject an unknown state', () => {
-      expect(() => service.validateState('unknown-state')).toThrow('Invalid or missing OAuth state parameter');
+      expect(() => service.validateState('unknown-state')).toThrow(
+        'Invalid or missing OAuth state parameter',
+      );
     });
 
     it('should reject undefined state', () => {
@@ -116,7 +127,9 @@ describe('EnphaseAuthService', () => {
       const state = new URL(url).searchParams.get('state')!;
 
       service.validateState(state);
-      expect(() => service.validateState(state)).toThrow('Invalid or missing OAuth state parameter');
+      expect(() => service.validateState(state)).toThrow(
+        'Invalid or missing OAuth state parameter',
+      );
     });
   });
 
@@ -188,7 +201,9 @@ describe('EnphaseAuthService', () => {
     it('should throw if no token exists for system', async () => {
       mockPrismaService.enphaseToken.findUnique.mockResolvedValue(null);
 
-      await expect(service.refreshAccessToken(999)).rejects.toThrow('No Enphase token found for system 999');
+      await expect(service.refreshAccessToken(999)).rejects.toThrow(
+        'No Enphase token found for system 999',
+      );
     });
   });
 
@@ -260,9 +275,12 @@ describe('EnphaseAuthService', () => {
         throw new Error('enphase is down');
       });
 
-      const outcomes = await Promise.allSettled([service.refreshAccessToken(1), service.refreshAccessToken(1)]);
+      const outcomes = await Promise.allSettled([
+        service.refreshAccessToken(1),
+        service.refreshAccessToken(1),
+      ]);
 
-      expect(outcomes.every(o => o.status === 'rejected')).toBe(true);
+      expect(outcomes.every((o) => o.status === 'rejected')).toBe(true);
       expect(mockHttpService.post).toHaveBeenCalledTimes(1);
 
       // The in-flight refresh map must have been cleared: a later call starts over rather than
@@ -310,7 +328,9 @@ describe('EnphaseAuthService', () => {
     it('should throw if no token exists for system', async () => {
       mockPrismaService.enphaseToken.findUnique.mockResolvedValue(null);
 
-      await expect(service.getValidAccessToken(999)).rejects.toThrow('No Enphase token found for system 999');
+      await expect(service.getValidAccessToken(999)).rejects.toThrow(
+        'No Enphase token found for system 999',
+      );
     });
   });
 

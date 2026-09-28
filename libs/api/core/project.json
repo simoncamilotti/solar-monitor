@@ -3,7 +3,17 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/api/core/src",
   "projectType": "library",
-  "tags": ["scope:api", "type:lib"],
-  "// targets": "to see all targets run: nx show project core --web",
-  "targets": {}
+  "tags": ["type:lib", "platform:node"],
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^default"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": ["tsc --noEmit -p tsconfig.lib.json", "tsc --noEmit -p tsconfig.spec.json"],
+        "parallel": false
+      }
+    }
+  }
 }

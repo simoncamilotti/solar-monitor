@@ -4,7 +4,14 @@ import { mockApi } from './api-mock';
 import { mockKeycloak } from './keycloak-mock';
 
 const mockHistoryData = [
-  { date: '2024-01-15', kwhProduced: 12.5, kwhConsumed: 8.3, kwhImported: 2.1, kwhExported: 6.3, gridDependency: 25.3 },
+  {
+    date: '2024-01-15',
+    kwhProduced: 12.5,
+    kwhConsumed: 8.3,
+    kwhImported: 2.1,
+    kwhExported: 6.3,
+    gridDependency: 25.3,
+  },
   {
     date: '2024-02-20',
     kwhProduced: 15.0,
@@ -24,7 +31,7 @@ const mockHistoryData = [
 ];
 
 async function mockHistoryApi(page: Page) {
-  await page.route('**/api/enphase/all', route =>
+  await page.route('**/api/enphase/all', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -114,7 +121,7 @@ test.describe('History page', () => {
     await page.goto('/history');
     await page.locator('button', { hasText: 'Exporter' }).first().click();
     const dialog = page.locator('[role="dialog"]');
-    const label = dialog.locator('label', { hasText: 'Production (Wh)' });
+    const label = dialog.locator('label', { hasText: 'Production (kWh)' });
     const checkbox = label.locator('[role="checkbox"]');
 
     await expect(checkbox).toHaveAttribute('aria-checked', 'true');
@@ -129,8 +136,12 @@ test.describe('History page - error state', () => {
   test.beforeEach(async ({ page, browserName }) => {
     await mockKeycloak(page, browserName);
     await mockApi(page);
-    await page.route('**/api/enphase/all', route =>
-      route.fulfill({ status: 500, contentType: 'application/json', body: '{"error":"Internal Server Error"}' }),
+    await page.route('**/api/enphase/all', (route) =>
+      route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: '{"error":"Internal Server Error"}',
+      }),
     );
   });
 

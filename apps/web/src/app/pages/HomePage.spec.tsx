@@ -1,3 +1,7 @@
+import { render, screen } from '@testing-library/react';
+
+import { HomePage } from './HomePage';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
@@ -5,10 +9,6 @@ vi.mock('react-i18next', () => ({
 vi.mock('../modules/history/hooks/use-history-data.hook', () => ({
   useHistoryData: () => ({ data: undefined, isPending: true, isError: false }),
 }));
-
-import { render, screen } from '@testing-library/react';
-
-import { HomePage } from './HomePage';
 
 describe('HomePage', () => {
   beforeEach(() => {

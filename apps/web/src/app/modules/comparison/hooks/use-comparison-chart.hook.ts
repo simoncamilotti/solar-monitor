@@ -22,9 +22,9 @@ export const useComparisonChart = (
     const isDays = filters.granularity === 'days';
 
     if (isDays) {
-      const categories = series.map(s => s.label);
-      const values = series.map(s => s.values[0] ?? 0);
-      const colors = series.map(s => s.color);
+      const categories = series.map((s) => s.label);
+      const values = series.map((s) => s.values[0] ?? 0);
+      const colors = series.map((s) => s.color);
 
       return {
         grid: { top: 10, left: 55, right: 20, bottom: 30, containLabel: false },
@@ -66,7 +66,7 @@ export const useComparisonChart = (
       grid: { top: 40, left: 55, right: 20, bottom: 30, containLabel: false },
       legend: {
         top: 0,
-        data: series.map(s => ({
+        data: series.map((s) => ({
           name: s.label,
           itemStyle: { color: s.color },
         })),
@@ -95,7 +95,7 @@ export const useComparisonChart = (
           return [title, ...lines].join('<br>');
         },
       },
-      series: series.map(s => ({
+      series: series.map((s) => ({
         name: s.label,
         type: isLine ? 'line' : 'bar',
         data: s.values,

@@ -1,3 +1,7 @@
+import { render, screen } from '@testing-library/react';
+
+import { SidebarLogo } from './SidebarLogo';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -12,10 +16,6 @@ vi.mock('../../auth/auth', () => ({
 vi.mock('../../ui/Braces', () => ({
   Braces: () => <svg data-testid="braces-icon" />,
 }));
-
-import { render, screen } from '@testing-library/react';
-
-import { SidebarLogo } from './SidebarLogo';
 
 describe('SidebarLogo', () => {
   beforeEach(() => {

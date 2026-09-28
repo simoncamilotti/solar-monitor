@@ -11,7 +11,9 @@ describe('PageHeader', () => {
   });
 
   it('should render icon when provided', () => {
-    render(<PageHeader title="Title" description="Desc" icon={<span data-testid="icon">icon</span>} />);
+    render(
+      <PageHeader title="Title" description="Desc" icon={<span data-testid="icon">icon</span>} />,
+    );
 
     expect(screen.getByTestId('icon')).toBeDefined();
   });
@@ -28,7 +30,11 @@ describe('PageHeader', () => {
 
   it('should disable action button when disabled is true', () => {
     render(
-      <PageHeader title="Title" description="Desc" action={{ label: 'Export', onClick: vi.fn(), disabled: true }} />,
+      <PageHeader
+        title="Title"
+        description="Desc"
+        action={{ label: 'Export', onClick: vi.fn(), disabled: true }}
+      />,
     );
 
     const button = screen.getByRole('button', { name: /Export/ });
@@ -48,7 +54,13 @@ describe('PageHeader', () => {
   });
 
   it('should render trailing content', () => {
-    render(<PageHeader title="Title" description="Desc" trailing={<span data-testid="trailing">trailing</span>} />);
+    render(
+      <PageHeader
+        title="Title"
+        description="Desc"
+        trailing={<span data-testid="trailing">trailing</span>}
+      />,
+    );
 
     expect(screen.getByTestId('trailing')).toBeDefined();
   });

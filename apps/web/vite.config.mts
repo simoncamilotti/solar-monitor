@@ -5,7 +5,7 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig(() => ({
-  root: __dirname,
+  root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/apps/web',
   server: {
     port: 4200,
@@ -30,13 +30,15 @@ export default defineConfig(() => ({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         // echarts and ag-grid are each only needed by one route (Home/Compare and History,
         // respectively): splitting them out keeps them from padding every other page's chunk.
-        manualChunks: {
-          echarts: ['echarts', 'echarts-for-react'],
-          'ag-grid': ['ag-grid-community', 'ag-grid-react'],
+        codeSplitting: {
+          groups: [
+            { name: 'echarts', test: /node_modules[\\/](echarts|echarts-for-react|zrender)[\\/]/ },
+            { name: 'ag-grid', test: /node_modules[\\/](ag-grid-community|ag-grid-react)[\\/]/ },
+          ],
         },
       },
     },

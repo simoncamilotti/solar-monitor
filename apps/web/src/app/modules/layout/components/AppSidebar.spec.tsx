@@ -1,3 +1,7 @@
+import { render, screen } from '@testing-library/react';
+
+import { AppSidebar } from './AppSidebar';
+
 vi.mock('./SidebarLogo', () => ({
   SidebarLogo: () => <div data-testid="sidebar-logo" />,
 }));
@@ -17,10 +21,6 @@ vi.mock('./SidebarThemeToggle', () => ({
 vi.mock('./SidebarFooter', () => ({
   SidebarFooter: () => <div data-testid="sidebar-footer" />,
 }));
-
-import { render, screen } from '@testing-library/react';
-
-import { AppSidebar } from './AppSidebar';
 
 describe('AppSidebar', () => {
   beforeEach(() => {

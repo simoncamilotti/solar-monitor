@@ -14,7 +14,13 @@ type ExportModalProps = {
   data: LifetimeDataResponseDto;
 };
 
-const ALL_METRICS: ExportMetric[] = ['kwhProduced', 'kwhConsumed', 'kwhImported', 'kwhExported', 'gridDependency'];
+const ALL_METRICS: ExportMetric[] = [
+  'kwhProduced',
+  'kwhConsumed',
+  'kwhImported',
+  'kwhExported',
+  'gridDependency',
+];
 
 export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose, data }) => {
   const { t } = useTranslation('web');
@@ -33,7 +39,9 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
   }, [year, month, metrics, getFilteredData]);
 
   const toggleMetric = (metric: ExportMetric) => {
-    setMetrics(prev => (prev.includes(metric) ? prev.filter(m => m !== metric) : [...prev, metric]));
+    setMetrics((prev) =>
+      prev.includes(metric) ? prev.filter((m) => m !== metric) : [...prev, metric],
+    );
   };
 
   const handleExport = () => {
@@ -87,7 +95,10 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
           >
             {/* Header */}
             <div className="p-6 pb-2">
-              <h2 id="export-dialog-title" className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <h2
+                id="export-dialog-title"
+                className="text-lg font-semibold text-foreground flex items-center gap-2"
+              >
                 <Download className="w-5 h-5 text-primary" />
                 {t('export.title')}
               </h2>
@@ -127,11 +138,11 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
                   </span>
                   <select
                     value={year}
-                    onChange={e => setYear(e.target.value)}
+                    onChange={(e) => setYear(e.target.value)}
                     className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
                   >
                     <option value="all">{t('export.allYears')}</option>
-                    {years.map(y => (
+                    {years.map((y) => (
                       <option key={y} value={y}>
                         {y}
                       </option>
@@ -144,11 +155,11 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
                   </span>
                   <select
                     value={month}
-                    onChange={e => setMonth(e.target.value)}
+                    onChange={(e) => setMonth(e.target.value)}
                     className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
                   >
                     <option value="all">{t('export.allMonths')}</option>
-                    {months.map(m => (
+                    {months.map((m) => (
                       <option key={m.value} value={m.value}>
                         {m.label}
                       </option>
@@ -163,10 +174,13 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
                   {t('export.metricsLabel')}
                 </span>
                 <div className="mt-2 grid grid-cols-2 gap-2">
-                  {ALL_METRICS.map(metric => {
+                  {ALL_METRICS.map((metric) => {
                     const checked = metrics.includes(metric);
                     return (
-                      <label key={metric} className="flex items-center gap-2 cursor-pointer text-sm text-foreground">
+                      <label
+                        key={metric}
+                        className="flex items-center gap-2 cursor-pointer text-sm text-foreground"
+                      >
                         <button
                           type="button"
                           role="checkbox"

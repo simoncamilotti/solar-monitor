@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { defineConfig, env } from '@prisma/config';
+import { defineConfig, env } from 'prisma/config';
 
 const basePath = 'libs/api/core/src/prisma';
 

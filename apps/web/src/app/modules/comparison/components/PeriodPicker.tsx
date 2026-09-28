@@ -13,10 +13,16 @@ type PeriodPickerProps = {
   onAdd: (period: ComparisonPeriod) => void;
 };
 
-export const PeriodPicker: FunctionComponent<PeriodPickerProps> = ({ granularity, availableYears, onAdd }) => {
+export const PeriodPicker: FunctionComponent<PeriodPickerProps> = ({
+  granularity,
+  availableYears,
+  onAdd,
+}) => {
   const { t } = useTranslation('web');
   const minDate = availableYears.length ? new Date(availableYears[0], 0, 1) : undefined;
-  const maxDate = availableYears.length ? new Date(availableYears[availableYears.length - 1], 11, 31) : undefined;
+  const maxDate = availableYears.length
+    ? new Date(availableYears[availableYears.length - 1], 11, 31)
+    : undefined;
 
   const label = t('compare.periods.add');
 

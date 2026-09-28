@@ -10,10 +10,16 @@ import { RoutePaths } from './paths.const';
 
 // Each page pulls its own heavy dependencies (echarts, ag-grid...): loading them on demand, per
 // route, keeps the first paint from paying for every page's dependencies at once.
-const ComparePage = lazy(() => import('../pages/ComparePage').then(m => ({ default: m.ComparePage })));
-const HistoryPage = lazy(() => import('../pages/HistoryPage').then(m => ({ default: m.HistoryPage })));
-const HomePage = lazy(() => import('../pages/HomePage').then(m => ({ default: m.HomePage })));
-const SettingsPage = lazy(() => import('../pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const ComparePage = lazy(() =>
+  import('../pages/ComparePage').then((m) => ({ default: m.ComparePage })),
+);
+const HistoryPage = lazy(() =>
+  import('../pages/HistoryPage').then((m) => ({ default: m.HistoryPage })),
+);
+const HomePage = lazy(() => import('../pages/HomePage').then((m) => ({ default: m.HomePage })));
+const SettingsPage = lazy(() =>
+  import('../pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+);
 
 const withSuspense = (element: ReactElement): ReactElement => (
   <Suspense fallback={<div>Loading...</div>}>{element}</Suspense>

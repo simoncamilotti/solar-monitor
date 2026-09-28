@@ -20,7 +20,9 @@ export const MonthPicker: FunctionComponent<MonthPickerProps> = ({
   onChange,
 }) => {
   const min = availableYears.length ? new Date(availableYears[0], 0, 1) : undefined;
-  const max = availableYears.length ? new Date(availableYears[availableYears.length - 1], 11, 31) : undefined;
+  const max = availableYears.length
+    ? new Date(availableYears[availableYears.length - 1], 11, 31)
+    : undefined;
   const current = new Date(inputYear, inputMonth, 1);
 
   return (

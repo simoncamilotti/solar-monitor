@@ -16,7 +16,7 @@ describe('routes', () => {
 
   it('should define the home route as a child', () => {
     const children = routes[0].children!;
-    const homeRoute = children.find(r => r.path === '/');
+    const homeRoute = children.find((r) => r.path === '/');
 
     expect(homeRoute).toBeDefined();
     expect(homeRoute!.element).toBeDefined();
@@ -24,21 +24,21 @@ describe('routes', () => {
 
   it('should define the settings route as a child', () => {
     const children = routes[0].children!;
-    const settingsRoute = children.find(r => r.path?.includes('settings'));
+    const settingsRoute = children.find((r) => r.path?.includes('settings'));
 
     expect(settingsRoute).toBeDefined();
     expect(settingsRoute!.element).toBeDefined();
   });
 
   it('should define a catch-all redirect route', () => {
-    const catchAll = routes.find(r => r.path === '*');
+    const catchAll = routes.find((r) => r.path === '*');
 
     expect(catchAll).toBeDefined();
     expect(catchAll!.loader).toBeDefined();
   });
 
   it('should define a /forbidden route outside the auth-gated layout', () => {
-    const forbiddenRoute = routes.find(r => r.path === '/forbidden');
+    const forbiddenRoute = routes.find((r) => r.path === '/forbidden');
 
     expect(forbiddenRoute).toBeDefined();
     expect(forbiddenRoute!.element).toBeDefined();

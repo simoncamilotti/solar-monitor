@@ -1,21 +1,17 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
-      "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/eslint.config.mjs",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
       "!{projectRoot}/vitest.config.[jt]s",
-      "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/test-setup.[jt]s"
+      "!{projectRoot}/eslint.config.mjs",
+      "!{projectRoot}/src/test-setup.[jt]s"
     ],
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/main.yml"]
-  },
-  "tui": {
-    "enabled": false
+    "sharedGlobals": ["{workspaceRoot}/.nvmrc", "{workspaceRoot}/tsconfig.base.json"]
   },
   "plugins": [
     {
@@ -36,10 +32,16 @@
       }
     },
     {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "test"
+      },
+      "exclude": ["apps/api-e2e/**/*"]
+    },
+    {
       "plugin": "@nx/vite/plugin",
       "options": {
         "buildTargetName": "build",
-        "testTargetName": "test",
         "serveTargetName": "serve",
         "devTargetName": "dev",
         "previewTargetName": "preview",
@@ -49,45 +51,7 @@
         "watchDepsTargetName": "watch-deps"
       },
       "exclude": ["apps/api-e2e/**/*"]
-    },
-    {
-      "plugin": "@nx/vitest",
-      "options": {
-        "testTargetName": "test",
-        "ciTargetName": "test-ci",
-        "testMode": "watch"
-      },
-      "exclude": ["apps/api-e2e/**/*"]
-    },
-    {
-      "plugin": "@nx/playwright/plugin",
-      "options": {
-        "targetName": "e2e"
-      }
     }
   ],
-  "generators": {
-    "@nx/react": {
-      "application": {
-        "babel": true,
-        "style": "tailwind",
-        "linter": "eslint",
-        "bundler": "vite"
-      },
-      "component": {
-        "style": "tailwind"
-      },
-      "library": {
-        "style": "tailwind",
-        "linter": "eslint"
-      }
-    }
-  },
-  "targetDefaults": {
-    "@nx/js:tsc": {
-      "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
-    }
-  }
+  "analytics": false
 }

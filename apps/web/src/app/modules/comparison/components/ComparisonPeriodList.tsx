@@ -55,7 +55,11 @@ export const ComparisonPeriodList: FunctionComponent<ComparisonPeriodListProps> 
             }}
           >
             {label}
-            <button type="button" onClick={() => onRemove(period)} className="hover:opacity-70 transition-smooth">
+            <button
+              type="button"
+              onClick={() => onRemove(period)}
+              className="hover:opacity-70 transition-smooth"
+            >
               <X className="w-3 h-3" />
             </button>
           </span>
@@ -64,7 +68,9 @@ export const ComparisonPeriodList: FunctionComponent<ComparisonPeriodListProps> 
 
       <PeriodPicker granularity={granularity} availableYears={availableYears} onAdd={onAdd} />
 
-      {periods.length < 2 && <span className="text-xs text-muted-foreground">{t('compare.periods.empty')}</span>}
+      {periods.length < 2 && (
+        <span className="text-xs text-muted-foreground">{t('compare.periods.empty')}</span>
+      )}
     </div>
   );
 };

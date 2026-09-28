@@ -4,7 +4,9 @@ import type { ReactNode } from 'react';
 import { ThemeProvider } from '../providers/ThemeProvider';
 import { useTheme } from './use-theme.hook';
 
-const wrapper = ({ children }: { children: ReactNode }) => <ThemeProvider>{children}</ThemeProvider>;
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <ThemeProvider>{children}</ThemeProvider>
+);
 
 describe('useTheme', () => {
   beforeEach(() => {

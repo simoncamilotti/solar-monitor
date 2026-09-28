@@ -1,3 +1,7 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import { SyncScheduleCard } from './SyncScheduleCard';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
@@ -19,10 +23,6 @@ vi.mock('../hooks/use-update-sync-schedule-mutation.hook', () => ({
   }),
 }));
 
-import { fireEvent, render, screen } from '@testing-library/react';
-
-import { SyncScheduleCard } from './SyncScheduleCard';
-
 describe('SyncScheduleCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -43,7 +43,11 @@ describe('SyncScheduleCard', () => {
   });
 
   it('should render title and description', () => {
-    mockUseSyncSchedule.mockReturnValue({ data: { syncTime: '02:00' }, isPending: false, isError: false });
+    mockUseSyncSchedule.mockReturnValue({
+      data: { syncTime: '02:00' },
+      isPending: false,
+      isError: false,
+    });
     render(<SyncScheduleCard />);
 
     expect(screen.getByText('syncSchedule.title')).toBeDefined();
@@ -51,7 +55,11 @@ describe('SyncScheduleCard', () => {
   });
 
   it('should render time input with current value', () => {
-    mockUseSyncSchedule.mockReturnValue({ data: { syncTime: '03:30' }, isPending: false, isError: false });
+    mockUseSyncSchedule.mockReturnValue({
+      data: { syncTime: '03:30' },
+      isPending: false,
+      isError: false,
+    });
     render(<SyncScheduleCard />);
 
     const input = screen.getByLabelText('syncSchedule.time') as HTMLInputElement;
@@ -59,7 +67,11 @@ describe('SyncScheduleCard', () => {
   });
 
   it('should disable save button when value unchanged', () => {
-    mockUseSyncSchedule.mockReturnValue({ data: { syncTime: '02:00' }, isPending: false, isError: false });
+    mockUseSyncSchedule.mockReturnValue({
+      data: { syncTime: '02:00' },
+      isPending: false,
+      isError: false,
+    });
     render(<SyncScheduleCard />);
 
     const saveButton = screen.getByText('syncSchedule.save').closest('button')!;
@@ -67,7 +79,11 @@ describe('SyncScheduleCard', () => {
   });
 
   it('should call mutate when save is clicked after change', () => {
-    mockUseSyncSchedule.mockReturnValue({ data: { syncTime: '02:00' }, isPending: false, isError: false });
+    mockUseSyncSchedule.mockReturnValue({
+      data: { syncTime: '02:00' },
+      isPending: false,
+      isError: false,
+    });
     render(<SyncScheduleCard />);
 
     const input = screen.getByLabelText('syncSchedule.time');
@@ -76,6 +92,9 @@ describe('SyncScheduleCard', () => {
     const saveButton = screen.getByText('syncSchedule.save').closest('button')!;
     fireEvent.click(saveButton);
 
-    expect(mockMutate).toHaveBeenCalledWith('05:00', expect.objectContaining({ onSuccess: expect.any(Function) }));
+    expect(mockMutate).toHaveBeenCalledWith(
+      '05:00',
+      expect.objectContaining({ onSuccess: expect.any(Function) }),
+    );
   });
 });

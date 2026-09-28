@@ -20,7 +20,7 @@ const syncSchedule = { syncTime: '02:00' };
  * Must be called before any page navigation.
  */
 export async function mockApi(page: Page): Promise<void> {
-  await page.route('**/api/enphase/sync-status', route =>
+  await page.route('**/api/enphase/sync-status', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -28,7 +28,7 @@ export async function mockApi(page: Page): Promise<void> {
     }),
   );
 
-  await page.route('**/api/enphase/sync-schedule', route => {
+  await page.route('**/api/enphase/sync-schedule', (route) => {
     const method = route.request().method();
 
     if (method === 'GET') {
@@ -51,7 +51,7 @@ export async function mockApi(page: Page): Promise<void> {
     return route.continue();
   });
 
-  await page.route('**/api/enphase/sync', route =>
+  await page.route('**/api/enphase/sync', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -59,7 +59,7 @@ export async function mockApi(page: Page): Promise<void> {
     }),
   );
 
-  await page.route('**/api/enphase/backfill', route =>
+  await page.route('**/api/enphase/backfill', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',

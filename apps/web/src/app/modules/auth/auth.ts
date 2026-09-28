@@ -43,7 +43,11 @@ export const removeRedirectUrl = () => {
   window.sessionStorage.removeItem(getRedirectUrlStorageKey());
 };
 
-export const initAuth: (options: InitAuthOptions) => Promise<boolean> = ({ realm, clientId, url }) => {
+export const initAuth: (options: InitAuthOptions) => Promise<boolean> = ({
+  realm,
+  clientId,
+  url,
+}) => {
   if (keycloak != null) {
     throw new Error('Keycloak client is already initialized');
   }

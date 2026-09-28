@@ -30,12 +30,16 @@ export const PickerDropdown: FunctionComponent<PickerDropdownProps> = ({ label, 
 
   return (
     <div ref={containerRef} className="relative">
-      <button type="button" onClick={() => setOpen(prev => !prev)} className={triggerClasses}>
+      <button type="button" onClick={() => setOpen((prev) => !prev)} className={triggerClasses}>
         <Calendar className="w-4 h-4 text-muted-foreground" />
         <span>{label}</span>
       </button>
 
-      {open && <div className="absolute top-full left-0 mt-2 z-50">{children({ close: () => setOpen(false) })}</div>}
+      {open && (
+        <div className="absolute top-full left-0 mt-2 z-50">
+          {children({ close: () => setOpen(false) })}
+        </div>
+      )}
     </div>
   );
 };

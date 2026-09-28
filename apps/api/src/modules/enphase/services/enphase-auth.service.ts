@@ -59,9 +59,14 @@ export class EnphaseAuthService {
     this._clientSecret = configService.getOrThrow('ENPHASE_CLIENT_SECRET', { infer: true });
     this._redirectUri = configService.getOrThrow('ENPHASE_REDIRECT_URI', { infer: true });
 
-    const encryptionKey = Buffer.from(configService.getOrThrow('ENPHASE_TOKEN_ENCRYPTION_KEY', { infer: true }), 'hex');
+    const encryptionKey = Buffer.from(
+      configService.getOrThrow('ENPHASE_TOKEN_ENCRYPTION_KEY', { infer: true }),
+      'hex',
+    );
     if (encryptionKey.length !== 32) {
-      throw new Error('ENPHASE_TOKEN_ENCRYPTION_KEY must decode to 32 bytes (a 64-character hex string)');
+      throw new Error(
+        'ENPHASE_TOKEN_ENCRYPTION_KEY must decode to 32 bytes (a 64-character hex string)',
+      );
     }
     this._encryptionKey = encryptionKey;
   }
@@ -113,7 +118,9 @@ export class EnphaseAuthService {
       return inFlight;
     }
 
-    const refresh = this._refreshAccessToken(systemId).finally(() => this._refreshesInFlight.delete(systemId));
+    const refresh = this._refreshAccessToken(systemId).finally(() =>
+      this._refreshesInFlight.delete(systemId),
+    );
     this._refreshesInFlight.set(systemId, refresh);
 
     return refresh;
@@ -172,9 +179,13 @@ export class EnphaseAuthService {
     const basicAuth = Buffer.from(`${this._clientId}:${this._clientSecret}`).toString('base64');
 
     const { data } = await firstValueFrom(
-      this._httpService.post<EnphaseTokenResponse>(`${ENPHASE_TOKEN_URL}?${params.toString()}`, null, {
-        headers: { Authorization: `Basic ${basicAuth}` },
-      }),
+      this._httpService.post<EnphaseTokenResponse>(
+        `${ENPHASE_TOKEN_URL}?${params.toString()}`,
+        null,
+        {
+          headers: { Authorization: `Basic ${basicAuth}` },
+        },
+      ),
     );
 
     return data;
@@ -216,14 +227,21 @@ export class EnphaseAuthService {
     const cipher = createCipheriv(ENCRYPTION_ALGORITHM, this._encryptionKey, iv);
     const ciphertext = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
 
-    return [iv, cipher.getAuthTag(), ciphertext].map(buffer => buffer.toString('hex')).join(':');
+    return [iv, cipher.getAuthTag(), ciphertext].map((buffer) => buffer.toString('hex')).join(':');
   }
 
   private _decrypt(stored: string): string {
     const [ivHex, authTagHex, ciphertextHex] = stored.split(':');
-    const decipher = createDecipheriv(ENCRYPTION_ALGORITHM, this._encryptionKey, Buffer.from(ivHex, 'hex'));
+    const decipher = createDecipheriv(
+      ENCRYPTION_ALGORITHM,
+      this._encryptionKey,
+      Buffer.from(ivHex, 'hex'),
+    );
     decipher.setAuthTag(Buffer.from(authTagHex, 'hex'));
 
-    return Buffer.concat([decipher.update(Buffer.from(ciphertextHex, 'hex')), decipher.final()]).toString('utf8');
+    return Buffer.concat([
+      decipher.update(Buffer.from(ciphertextHex, 'hex')),
+      decipher.final(),
+    ]).toString('utf8');
   }
 }

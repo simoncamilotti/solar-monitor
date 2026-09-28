@@ -11,14 +11,20 @@ const entry = (date: string): LifetimeDataDto => ({
   gridDependency: 0,
 });
 
-const DATA = [entry('2025-01-15'), entry('2025-06-30'), entry('2025-06-01'), entry('2026-06-15'), entry('2026-12-31')];
+const DATA = [
+  entry('2025-01-15'),
+  entry('2025-06-30'),
+  entry('2025-06-01'),
+  entry('2026-06-15'),
+  entry('2026-12-31'),
+];
 
 describe('filterByYear', () => {
   it('should return only entries matching the given year', () => {
     const result = filterByYear(DATA, 2025);
 
     expect(result).toHaveLength(3);
-    expect(result.every(d => new Date(d.date).getFullYear() === 2025)).toBe(true);
+    expect(result.every((d) => new Date(d.date).getFullYear() === 2025)).toBe(true);
   });
 
   it('should return an empty array when no entry matches', () => {

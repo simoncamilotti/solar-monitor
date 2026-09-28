@@ -13,7 +13,12 @@ const entry = (date: string): LifetimeDataDto => ({
 
 describe('getMonthsForYear', () => {
   it('should return the distinct months present for the given year', () => {
-    const data = [entry('2026-01-05'), entry('2026-01-20'), entry('2026-03-10'), entry('2026-06-01')];
+    const data = [
+      entry('2026-01-05'),
+      entry('2026-01-20'),
+      entry('2026-03-10'),
+      entry('2026-06-01'),
+    ];
 
     expect(getMonthsForYear(data, 2026)).toEqual([0, 2, 5]);
   });

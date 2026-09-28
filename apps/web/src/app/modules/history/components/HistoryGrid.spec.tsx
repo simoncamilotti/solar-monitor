@@ -1,3 +1,9 @@
+import { render, screen } from '@testing-library/react';
+
+import type { LifetimeDataResponseDto } from '@/shared-models';
+
+import { HistoryGrid } from './HistoryGrid';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key, i18n: { language: 'fr' } }),
 }));
@@ -25,14 +31,15 @@ vi.mock('../../ui/constants/ag-grid-theme', () => ({
   agThemeLight: 'light-theme',
 }));
 
-import { render, screen } from '@testing-library/react';
-
-import type { LifetimeDataResponseDto } from '@/shared-models';
-
-import { HistoryGrid } from './HistoryGrid';
-
 const mockData: LifetimeDataResponseDto = [
-  { date: '2024-01-01', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
+  {
+    date: '2024-01-01',
+    kwhProduced: 10,
+    kwhConsumed: 8,
+    kwhImported: 2,
+    kwhExported: 4,
+    gridDependency: 20,
+  },
 ];
 
 describe('HistoryGrid', () => {

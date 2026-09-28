@@ -10,9 +10,15 @@ type YearPickerProps = {
   onChange: (year: number | null) => void;
 };
 
-export const YearPicker: FunctionComponent<YearPickerProps> = ({ inputYear, availableYears, onChange }) => {
+export const YearPicker: FunctionComponent<YearPickerProps> = ({
+  inputYear,
+  availableYears,
+  onChange,
+}) => {
   const min = availableYears?.length ? new Date(availableYears[0], 0, 1) : undefined;
-  const max = availableYears?.length ? new Date(availableYears[availableYears.length - 1], 0, 1) : undefined;
+  const max = availableYears?.length
+    ? new Date(availableYears[availableYears.length - 1], 0, 1)
+    : undefined;
   const current = new Date(inputYear, 0, 1);
 
   return (

@@ -13,7 +13,7 @@ export const SidebarNav: FunctionComponent = () => {
 
   return (
     <nav className="flex-1 px-3 mt-4 space-y-1">
-      {navItems.map(item => (
+      {navItems.map((item) => (
         <NavLink
           key={item.label}
           to={item.to}

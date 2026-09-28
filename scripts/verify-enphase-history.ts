@@ -24,7 +24,10 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
 import { EnphaseMapper } from '../apps/api/src/modules/enphase/mappers/enphase.mapper';
-import type { LifetimeData, LifetimeDataRecord } from '../apps/api/src/modules/enphase/types/enphase.types';
+import type {
+  LifetimeData,
+  LifetimeDataRecord,
+} from '../apps/api/src/modules/enphase/types/enphase.types';
 
 const ENPHASE_API_BASE = 'https://api.enphaseenergy.com/api/v4';
 const ENPHASE_TOKEN_URL = 'https://api.enphaseenergy.com/oauth/token';
@@ -64,17 +67,24 @@ export const shiftDay = (isoDay: string, days: number): string => {
   return day(date);
 };
 
-export const sameReadings = (a: StoredRecord | LifetimeDataRecord, b: StoredRecord | LifetimeDataRecord): boolean =>
+export const sameReadings = (
+  a: StoredRecord | LifetimeDataRecord,
+  b: StoredRecord | LifetimeDataRecord,
+): boolean =>
   a.whProduced === b.whProduced &&
   a.whConsumed === b.whConsumed &&
   a.whImported === b.whImported &&
   a.whExported === b.whExported;
 
 /** Mirrors EnphaseAuthService: same endpoint, same Basic auth, same rotation. */
-const refreshAccessToken = async (prisma: PrismaClient, systemId: number, refreshToken: string): Promise<string> => {
-  const basicAuth = Buffer.from(`${requireEnv('ENPHASE_CLIENT_ID')}:${requireEnv('ENPHASE_CLIENT_SECRET')}`).toString(
-    'base64',
-  );
+const refreshAccessToken = async (
+  prisma: PrismaClient,
+  systemId: number,
+  refreshToken: string,
+): Promise<string> => {
+  const basicAuth = Buffer.from(
+    `${requireEnv('ENPHASE_CLIENT_ID')}:${requireEnv('ENPHASE_CLIENT_SECRET')}`,
+  ).toString('base64');
   const params = new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refreshToken });
 
   const response = await fetch(`${ENPHASE_TOKEN_URL}?${params.toString()}`, {
@@ -83,10 +93,16 @@ const refreshAccessToken = async (prisma: PrismaClient, systemId: number, refres
   });
 
   if (!response.ok) {
-    throw new Error(`Token refresh failed for system ${systemId}: ${response.status} ${await response.text()}`);
+    throw new Error(
+      `Token refresh failed for system ${systemId}: ${response.status} ${await response.text()}`,
+    );
   }
 
-  const body = (await response.json()) as { access_token: string; refresh_token: string; expires_in: number };
+  const body = (await response.json()) as {
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+  };
 
   await prisma.enphaseToken.update({
     where: { systemId },
@@ -107,13 +123,22 @@ const fetchSeries = async (
   from: string,
   to: string,
 ): Promise<{ start_date: string } & Record<string, unknown>> => {
-  const params = new URLSearchParams({ key: requireEnv('ENPHASE_API_KEY'), start_date: from, end_date: to });
-  const response = await fetch(`${ENPHASE_API_BASE}/systems/${systemId}${path}?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
+  const params = new URLSearchParams({
+    key: requireEnv('ENPHASE_API_KEY'),
+    start_date: from,
+    end_date: to,
   });
+  const response = await fetch(
+    `${ENPHASE_API_BASE}/systems/${systemId}${path}?${params.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
 
   if (!response.ok) {
-    throw new Error(`GET ${path} failed for system ${systemId}: ${response.status} ${await response.text()}`);
+    throw new Error(
+      `GET ${path} failed for system ${systemId}: ${response.status} ${await response.text()}`,
+    );
   }
 
   return response.json() as Promise<{ start_date: string } & Record<string, unknown>>;
@@ -134,7 +159,10 @@ const fetchLifetimeData = async (
 
   return {
     whProduced: { startDate: production.start_date, values: production['production'] as number[] },
-    whConsumed: { startDate: consumption.start_date, values: consumption['consumption'] as number[] },
+    whConsumed: {
+      startDate: consumption.start_date,
+      values: consumption['consumption'] as number[],
+    },
     whImported: { startDate: imported.start_date, values: imported['import'] as number[] },
     whExported: { startDate: exported.start_date, values: exported['export'] as number[] },
   };
@@ -213,11 +241,13 @@ const verifySystem = async (
   );
 
   if (lifetimeData.whProduced.startDate !== from) {
-    console.log(`  ⚠ Enphase served ${lifetimeData.whProduced.startDate} for a request starting ${from}.`);
+    console.log(
+      `  ⚠ Enphase served ${lifetimeData.whProduced.startDate} for a request starting ${from}.`,
+    );
   }
 
-  const stored = new Map(storedRows.map(row => [day(row.date), row]));
-  const api = new Map(apiRecords.map(record => [day(record.date), record]));
+  const stored = new Map(storedRows.map((row) => [day(row.date), row]));
+  const api = new Map(apiRecords.map((record) => [day(record.date), record]));
 
   const divergences: Divergence[] = [];
   const missingFromApi: string[] = [];
@@ -235,14 +265,14 @@ const verifySystem = async (
     }
   }
 
-  const missingFromDb = [...api.keys()].filter(isoDay => !stored.has(isoDay));
+  const missingFromDb = [...api.keys()].filter((isoDay) => !stored.has(isoDay));
   const identical = [...stored].filter(([isoDay, record]) => {
     const counterpart = api.get(isoDay);
     return counterpart && sameReadings(record, counterpart);
   }).length;
 
   console.log(`  Identical days      : ${identical}/${stored.size}`);
-  console.log(`  Diverging values    : ${new Set(divergences.map(d => d.day)).size} days`);
+  console.log(`  Diverging values    : ${new Set(divergences.map((d) => d.day)).size} days`);
   console.log(`  Missing from API    : ${missingFromApi.length} days`);
   console.log(`  Missing from DB     : ${missingFromDb.length} days`);
 
@@ -256,7 +286,9 @@ const verifySystem = async (
     console.log(
       `    Remediation: POST /api/enphase/backfill?system_id=${tokenRow.systemId}&start_date=${from}&end_date=${to}`,
     );
-    console.log('    The backfill upserts on (date, token), so re-running it rewrites the affected days in place.');
+    console.log(
+      '    The backfill upserts on (date, token), so re-running it rewrites the affected days in place.',
+    );
   } else if (divergences.length > 0) {
     console.log(
       `\n  No constant shift found (best offset ${shift}) — the differences look like value changes, not a date shift.`,
@@ -274,11 +306,16 @@ const verifySystem = async (
   }
 
   if (missingFromDb.length > 0) {
-    console.log(`\n  Days the API has but the database does not: ${missingFromDb.slice(0, 10).join(', ')}`);
+    console.log(
+      `\n  Days the API has but the database does not: ${missingFromDb.slice(0, 10).join(', ')}`,
+    );
   }
 
-  const clean = divergences.length === 0 && missingFromApi.length === 0 && missingFromDb.length === 0;
-  console.log(clean ? '\n  ✓ Stored history matches the API.' : '\n  ✗ Stored history diverges from the API.');
+  const clean =
+    divergences.length === 0 && missingFromApi.length === 0 && missingFromDb.length === 0;
+  console.log(
+    clean ? '\n  ✓ Stored history matches the API.' : '\n  ✗ Stored history diverges from the API.',
+  );
 
   return clean;
 };
@@ -286,7 +323,9 @@ const verifySystem = async (
 const main = async (): Promise<void> => {
   requireEnv('ENPHASE_API_KEY');
 
-  const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: requireEnv('DATABASE_URL') }) });
+  const prisma = new PrismaClient({
+    adapter: new PrismaPg({ connectionString: requireEnv('DATABASE_URL') }),
+  });
 
   try {
     const tokens = await prisma.enphaseToken.findMany({ orderBy: { systemId: 'asc' } });

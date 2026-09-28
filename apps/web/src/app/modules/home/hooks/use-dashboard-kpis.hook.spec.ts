@@ -26,9 +26,14 @@ const baseFilters: DashboardFilterState = {
 
 describe('useDashboardKpis', () => {
   it('should report zero deltas in full mode, since current and previous periods are the same data', () => {
-    const data = [entry('2025-01-01', { kwhProduced: 10 }), entry('2026-01-01', { kwhProduced: 20 })];
+    const data = [
+      entry('2025-01-01', { kwhProduced: 10 }),
+      entry('2026-01-01', { kwhProduced: 20 }),
+    ];
 
-    const { result } = renderHook(() => useDashboardKpis(data, { ...baseFilters, viewMode: 'full' }));
+    const { result } = renderHook(() =>
+      useDashboardKpis(data, { ...baseFilters, viewMode: 'full' }),
+    );
 
     expect(result.current.production).toBe(30);
     expect(result.current.productionDelta).toBe(0);
@@ -81,7 +86,12 @@ describe('useDashboardKpis', () => {
     ];
 
     const { result } = renderHook(() =>
-      useDashboardKpis(data, { ...baseFilters, viewMode: 'monthly', selectedYear: 2026, selectedMonth: 0 }),
+      useDashboardKpis(data, {
+        ...baseFilters,
+        viewMode: 'monthly',
+        selectedYear: 2026,
+        selectedMonth: 0,
+      }),
     );
 
     expect(result.current.production).toBe(15);

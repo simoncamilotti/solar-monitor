@@ -1,3 +1,8 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import { logout } from '../../auth/auth';
+import { SidebarFooter } from './SidebarFooter';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -16,11 +21,6 @@ vi.mock('react-router', () => ({
 vi.mock('../../auth/auth', () => ({
   logout: vi.fn(),
 }));
-
-import { fireEvent, render, screen } from '@testing-library/react';
-
-import { logout } from '../../auth/auth';
-import { SidebarFooter } from './SidebarFooter';
 
 describe('SidebarFooter', () => {
   beforeEach(() => {

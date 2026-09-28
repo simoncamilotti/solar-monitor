@@ -5,13 +5,26 @@
     "apps/web/src/main.tsx",
     "libs/*/src/index.ts",
     "libs/*/*/src/index.ts",
+    "scripts/*.ts",
     "**/*.spec.{ts,tsx}",
     "**/vitest.config.ts",
     "**/playwright.config.ts",
     "**/test-setup.ts",
     "**/support/global-setup.ts"
   ],
-  "project": ["apps/**/*.{ts,tsx}", "libs/**/*.{ts,tsx}", "*.ts"],
+  "project": ["apps/**/*.{ts,tsx}", "libs/**/*.{ts,tsx}", "scripts/*.ts", "*.ts"],
   "ignore": ["apps/web/types/window.d.ts"],
-  "ignoreDependencies": ["pg", "pino-pretty"]
+  "ignoreDependencies": [
+    "eslint-plugin-import",
+    "eslint-plugin-jsx-a11y",
+    "eslint-plugin-playwright",
+    "eslint-plugin-react",
+    "eslint-plugin-react-hooks",
+    "typescript-eslint",
+    "pino-pretty",
+    "@vitejs/plugin-react",
+    "autoprefixer",
+    "postcss",
+    "tailwindcss"
+  ]
 }

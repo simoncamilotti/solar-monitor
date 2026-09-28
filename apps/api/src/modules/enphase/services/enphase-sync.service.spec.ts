@@ -77,7 +77,13 @@ describe('EnphaseSyncService', () => {
       mockApiService.getLifetimeData.mockResolvedValue(LIFETIME_DATA);
       mockPrismaService.enphaseToken.findUniqueOrThrow.mockResolvedValue(TOKEN_RECORD);
       const mappedRecords = [
-        { date: new Date('2026-03-15'), whProduced: 1000, whConsumed: 500, whImported: 100, whExported: 400 },
+        {
+          date: new Date('2026-03-15'),
+          whProduced: 1000,
+          whConsumed: 500,
+          whImported: 100,
+          whExported: 400,
+        },
       ];
       mockMapper.toLifetimeDataRecords.mockReturnValue(mappedRecords);
       mockPrismaService.enphaseLifetimeData.upsert.mockResolvedValue({});
@@ -85,7 +91,9 @@ describe('EnphaseSyncService', () => {
       await service.syncLifetimeData(42);
 
       expect(mockApiService.getLifetimeData).toHaveBeenCalledWith(42, expect.any(String));
-      expect(mockPrismaService.enphaseToken.findUniqueOrThrow).toHaveBeenCalledWith({ where: { systemId: 42 } });
+      expect(mockPrismaService.enphaseToken.findUniqueOrThrow).toHaveBeenCalledWith({
+        where: { systemId: 42 },
+      });
       expect(mockPrismaService.enphaseLifetimeData.upsert).toHaveBeenCalledWith({
         where: {
           date_enphaseTokenId: {
@@ -104,8 +112,20 @@ describe('EnphaseSyncService', () => {
       mockApiService.getLifetimeData.mockResolvedValue(LIFETIME_DATA);
       mockPrismaService.enphaseToken.findUniqueOrThrow.mockResolvedValue(TOKEN_RECORD);
       const mappedRecords = [
-        { date: new Date('2026-03-10'), whProduced: 1000, whConsumed: 500, whImported: 100, whExported: 400 },
-        { date: new Date('2026-03-11'), whProduced: 2000, whConsumed: 600, whImported: 200, whExported: 500 },
+        {
+          date: new Date('2026-03-10'),
+          whProduced: 1000,
+          whConsumed: 500,
+          whImported: 100,
+          whExported: 400,
+        },
+        {
+          date: new Date('2026-03-11'),
+          whProduced: 2000,
+          whConsumed: 600,
+          whImported: 200,
+          whExported: 500,
+        },
       ];
       mockMapper.toLifetimeDataRecords.mockReturnValue(mappedRecords);
       mockPrismaService.enphaseLifetimeData.upsert.mockResolvedValue({});
@@ -181,7 +201,9 @@ describe('EnphaseSyncService', () => {
 
     it('should continue syncing other systems if one fails', async () => {
       mockPrismaService.enphaseToken.findMany.mockResolvedValue([{ systemId: 1 }, { systemId: 2 }]);
-      mockApiService.getLifetimeData.mockRejectedValueOnce(new Error('API error')).mockResolvedValueOnce(LIFETIME_DATA);
+      mockApiService.getLifetimeData
+        .mockRejectedValueOnce(new Error('API error'))
+        .mockResolvedValueOnce(LIFETIME_DATA);
       mockPrismaService.enphaseToken.findUniqueOrThrow.mockResolvedValue(TOKEN_RECORD);
       mockMapper.toLifetimeDataRecords.mockReturnValue([]);
 

@@ -40,7 +40,8 @@
     --radius: 0.75rem;
 
     --card-shadow:
-      0 0 0 1px rgba(120, 0, 200, 0.04), 0 2px 4px rgba(120, 0, 200, 0.03), 0 8px 16px rgba(120, 0, 200, 0.03);
+      0 0 0 1px rgba(120, 0, 200, 0.04), 0 2px 4px rgba(120, 0, 200, 0.03),
+      0 8px 16px rgba(120, 0, 200, 0.03);
 
     --sidebar-background: 270 50% 8%;
     --sidebar-foreground: 270 15% 92%;
@@ -91,7 +92,8 @@
     --input: 270 35% 14%;
     --ring: 280 80% 60%;
 
-    --card-shadow: 0 0 0 1px rgba(160, 0, 255, 0.06), 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+    --card-shadow:
+      0 0 0 1px rgba(160, 0, 255, 0.06), 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
 
     --sidebar-background: 270 50% 4%;
     --sidebar-foreground: 270 15% 92%;
@@ -203,7 +205,8 @@
     color: hsl(var(--primary-foreground)) !important;
   }
 
-  .helios-calendar .react-datepicker__day--in-selecting-range:not(.react-datepicker__day--in-range) {
+  .helios-calendar
+    .react-datepicker__day--in-selecting-range:not(.react-datepicker__day--in-range) {
     background-color: hsl(var(--primary) / 0.3) !important;
     color: hsl(var(--foreground)) !important;
   }

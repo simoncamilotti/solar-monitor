@@ -8,8 +8,15 @@ export const useBackfillMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ systemId, startDate, endDate }: { systemId: number; startDate: string; endDate: string }) =>
-      SyncService.triggerBackfill(systemId, startDate, endDate),
+    mutationFn: ({
+      systemId,
+      startDate,
+      endDate,
+    }: {
+      systemId: number;
+      startDate: string;
+      endDate: string;
+    }) => SyncService.triggerBackfill(systemId, startDate, endDate),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: syncKey.status });
       queryClient.invalidateQueries({ queryKey: historyKey.getAll });

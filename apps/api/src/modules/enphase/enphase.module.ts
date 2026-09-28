@@ -11,6 +11,12 @@ import { EnphaseSyncService } from './services/enphase-sync.service';
 @Module({
   imports: [HttpModule.register({ timeout: 30_000 })],
   controllers: [EnphaseController],
-  providers: [EnphaseAuthService, EnphaseApiService, EnphaseSyncService, EnphaseService, EnphaseMapper],
+  providers: [
+    EnphaseAuthService,
+    EnphaseApiService,
+    EnphaseSyncService,
+    EnphaseService,
+    EnphaseMapper,
+  ],
 })
 export class EnphaseModule {}

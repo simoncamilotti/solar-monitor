@@ -1,3 +1,7 @@
+import { renderHook } from '@testing-library/react';
+
+import { useHistoryGrid } from './use-history-grid.hook';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -8,10 +12,6 @@ vi.mock('react-i18next', () => ({
 vi.mock('../../ui/constants/ag-grid-default-options', () => ({
   DEFAULT_GRID_OPTIONS: {},
 }));
-
-import { renderHook } from '@testing-library/react';
-
-import { useHistoryGrid } from './use-history-grid.hook';
 
 describe('useHistoryGrid', () => {
   it('should return column definitions', () => {
@@ -33,7 +33,7 @@ describe('useHistoryGrid', () => {
 
     const metricColumns = result.current.columnDefs.slice(4);
     expect(metricColumns).toHaveLength(5);
-    metricColumns.forEach(col => {
+    metricColumns.forEach((col) => {
       expect(col.type).toBe('solarNumericColumn');
     });
   });
@@ -54,7 +54,7 @@ describe('useHistoryGrid', () => {
   it('should have expected metric fields', () => {
     const { result } = renderHook(() => useHistoryGrid());
 
-    const fields = result.current.columnDefs.map(c => c.field).filter(Boolean);
+    const fields = result.current.columnDefs.map((c) => c.field).filter(Boolean);
     expect(fields).toContain('kwhProduced');
     expect(fields).toContain('kwhConsumed');
     expect(fields).toContain('kwhImported');

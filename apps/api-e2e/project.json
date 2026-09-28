@@ -2,16 +2,27 @@
   "name": "api-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "tags": ["scope:api", "type:e2e"],
+  "tags": ["type:e2e", "platform:node"],
   "implicitDependencies": ["api"],
   "targets": {
-    "e2e": {
+    "e2e-local": {
       "executor": "@nx/vitest:test",
       "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
       "options": {
         "configFile": "apps/api-e2e/vitest.config.ts"
       },
       "dependsOn": ["api:build", "api:serve"]
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^default"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": ["tsc --noEmit -p tsconfig.spec.json"],
+        "parallel": false
+      }
     }
-  }
+  },
+  "// targets": "e2e-local needs a local Keycloak with a test user, so it stays out of the CI e2e job until the suite moves to a fake OIDC issuer."
 }

@@ -1,4 +1,14 @@
-import { BadRequestException, Body, Controller, Get, Logger, Post, Put, Query, Res } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Post,
+  Put,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
@@ -13,7 +23,11 @@ import type {
   SyncScheduleDto,
   SyncStatusResponseDto,
 } from '../dtos/enphase.dto';
-import { EnphaseBackfillRequestDto, EnphaseSyncRequestDto, UpdateSyncScheduleRequestDto } from '../dtos/enphase.dto';
+import {
+  EnphaseBackfillRequestDto,
+  EnphaseSyncRequestDto,
+  UpdateSyncScheduleRequestDto,
+} from '../dtos/enphase.dto';
 import { EnphaseMapper } from '../mappers/enphase.mapper';
 import { EnphaseService } from '../services/enphase.service';
 import { EnphaseApiService } from '../services/enphase-api.service';
@@ -48,7 +62,11 @@ export class EnphaseController {
   @ApiOperation({ summary: 'Handle Enphase OAuth2 callback' })
   @ApiResponse({ status: 200, description: 'Enphase account linked successfully' })
   @ApiResponse({ status: 400, description: 'Missing code or invalid state' })
-  async callback(@Query('code') code: string, @Query('state') state: string, @Res() res: Response): Promise<void> {
+  async callback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ): Promise<void> {
     this._enphaseAuthService.validateState(state);
 
     if (!code) {
@@ -107,9 +125,16 @@ export class EnphaseController {
   @ApiBody({ type: EnphaseBackfillRequestDto })
   @ApiResponse({ status: 200, description: 'Backfill completed' })
   @ApiResponse({ status: 400, description: 'Invalid parameters' })
-  @ApiResponse({ status: 429, description: 'Too many backfill requests — Enphase quota is monthly' })
+  @ApiResponse({
+    status: 429,
+    description: 'Too many backfill requests — Enphase quota is monthly',
+  })
   async backfill(@Body() dto: EnphaseBackfillRequestDto): Promise<EnphaseBackfillResponseDto> {
-    const count = await this._enphaseSyncService.backfillLifetimeData(dto.systemId, dto.startDate, dto.endDate);
+    const count = await this._enphaseSyncService.backfillLifetimeData(
+      dto.systemId,
+      dto.startDate,
+      dto.endDate,
+    );
     return { message: 'Backfill completed', daysBackfilled: count };
   }
 

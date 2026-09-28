@@ -1,12 +1,12 @@
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key, i18n: { language: 'fr' } }),
-}));
-
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import type { SyncStatusDto } from '@/shared-models';
 
 import { SyncSystemItem } from './SyncSystemItem';
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (key: string) => key, i18n: { language: 'fr' } }),
+}));
 
 const defaultProps = {
   onSync: vi.fn(),
@@ -103,14 +103,14 @@ describe('SyncSystemItem', () => {
     render(<SyncSystemItem {...defaultProps} system={systemWithoutRecords} isSyncing />);
 
     const buttons = screen.getAllByRole('button');
-    buttons.forEach(btn => expect((btn as HTMLButtonElement).disabled).toBe(true));
+    buttons.forEach((btn) => expect((btn as HTMLButtonElement).disabled).toBe(true));
   });
 
   it('should disable buttons when isBackfilling', () => {
     render(<SyncSystemItem {...defaultProps} system={systemWithoutRecords} isBackfilling />);
 
     const buttons = screen.getAllByRole('button');
-    buttons.forEach(btn => expect((btn as HTMLButtonElement).disabled).toBe(true));
+    buttons.forEach((btn) => expect((btn as HTMLButtonElement).disabled).toBe(true));
   });
 
   it('should display never when lastSyncDate is null', () => {
@@ -163,7 +163,10 @@ describe('SyncSystemItem', () => {
 
       fireEvent.click(screen.getAllByText('sync.fillGap')[0]);
 
-      expect(defaultProps.onBackfill).toHaveBeenCalledWith(7, { startDate: '2026-03-16', endDate: '2026-04-01' });
+      expect(defaultProps.onBackfill).toHaveBeenCalledWith(7, {
+        startDate: '2026-03-16',
+        endDate: '2026-04-01',
+      });
     });
 
     it('should disable the fill buttons while a sync is running', () => {

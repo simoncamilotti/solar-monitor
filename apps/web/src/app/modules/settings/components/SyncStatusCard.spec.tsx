@@ -1,3 +1,7 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import { SyncStatusCard } from './SyncStatusCard';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key, i18n: { language: 'fr' } }),
 }));
@@ -29,10 +33,6 @@ vi.mock('../hooks/use-backfill-mutation.hook', () => ({
   }),
 }));
 
-import { fireEvent, render, screen } from '@testing-library/react';
-
-import { SyncStatusCard } from './SyncStatusCard';
-
 describe('SyncStatusCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -61,7 +61,15 @@ describe('SyncStatusCard', () => {
 
   it('should render system info when data loaded', () => {
     mockUseSyncStatus.mockReturnValue({
-      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42, expectedRecords: 42, gaps: [] }],
+      data: [
+        {
+          systemId: 123,
+          lastSyncDate: '2026-04-02',
+          totalRecords: 42,
+          expectedRecords: 42,
+          gaps: [],
+        },
+      ],
       isPending: false,
       isError: false,
     });
@@ -82,7 +90,15 @@ describe('SyncStatusCard', () => {
 
   it('should call mutate when sync button is clicked', () => {
     mockUseSyncStatus.mockReturnValue({
-      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42, expectedRecords: 42, gaps: [] }],
+      data: [
+        {
+          systemId: 123,
+          lastSyncDate: '2026-04-02',
+          totalRecords: 42,
+          expectedRecords: 42,
+          gaps: [],
+        },
+      ],
       isPending: false,
       isError: false,
     });
@@ -90,7 +106,10 @@ describe('SyncStatusCard', () => {
 
     fireEvent.click(screen.getByText('sync.trigger'));
 
-    expect(mockMutate).toHaveBeenCalledWith(123, expect.objectContaining({ onSuccess: expect.any(Function) }));
+    expect(mockMutate).toHaveBeenCalledWith(
+      123,
+      expect.objectContaining({ onSuccess: expect.any(Function) }),
+    );
   });
 
   it('should display never when lastSyncDate is null', () => {
@@ -117,7 +136,15 @@ describe('SyncStatusCard', () => {
 
   it('should not show split button for system with records', () => {
     mockUseSyncStatus.mockReturnValue({
-      data: [{ systemId: 123, lastSyncDate: '2026-04-02', totalRecords: 42, expectedRecords: 42, gaps: [] }],
+      data: [
+        {
+          systemId: 123,
+          lastSyncDate: '2026-04-02',
+          totalRecords: 42,
+          expectedRecords: 42,
+          gaps: [],
+        },
+      ],
       isPending: false,
       isError: false,
     });

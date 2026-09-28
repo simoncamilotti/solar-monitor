@@ -1,12 +1,12 @@
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
-}));
-
 import { act, renderHook } from '@testing-library/react';
 
 import type { LifetimeDataDto } from '@/shared-models';
 
 import { useDashboardFilters } from './use-dashboard-filters.hook';
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+}));
 
 const STORAGE_KEY = 'dashboard-filters';
 
@@ -54,7 +54,12 @@ describe('useDashboardFilters', () => {
   it('should restore a valid state from localStorage', () => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ viewMode: 'monthly', selectedYear: 2025, selectedMonth: 10, selectedMetric: 'kwhProduced' }),
+      JSON.stringify({
+        viewMode: 'monthly',
+        selectedYear: 2025,
+        selectedMonth: 10,
+        selectedMetric: 'kwhProduced',
+      }),
     );
 
     const { result } = renderHook(() => useDashboardFilters(DATA));

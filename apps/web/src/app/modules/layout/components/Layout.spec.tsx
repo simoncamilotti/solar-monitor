@@ -1,3 +1,7 @@
+import { render, screen } from '@testing-library/react';
+
+import { Layout } from './Layout';
+
 vi.mock('react-router', () => ({
   Outlet: () => <div data-testid="outlet" />,
 }));
@@ -5,10 +9,6 @@ vi.mock('react-router', () => ({
 vi.mock('./AppSidebar', () => ({
   AppSidebar: () => <aside data-testid="app-sidebar" />,
 }));
-
-import { render, screen } from '@testing-library/react';
-
-import { Layout } from './Layout';
 
 describe('Layout', () => {
   beforeEach(() => {

@@ -1,3 +1,7 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import { SidebarLanguageSwitcher } from './SidebarLanguageSwitcher';
+
 const mockChangeLanguage = vi.fn();
 
 vi.mock('react-i18next', () => ({
@@ -6,10 +10,6 @@ vi.mock('react-i18next', () => ({
     i18n: { language: 'fr', changeLanguage: mockChangeLanguage },
   }),
 }));
-
-import { fireEvent, render, screen } from '@testing-library/react';
-
-import { SidebarLanguageSwitcher } from './SidebarLanguageSwitcher';
 
 describe('SidebarLanguageSwitcher', () => {
   beforeEach(() => {
