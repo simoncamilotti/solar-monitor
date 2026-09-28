@@ -30,7 +30,7 @@ const mockEnphaseService = {
 };
 
 const mockMapper = {
-  toSystemDtoList: vi.fn(),
+  toSystemList: vi.fn(),
 };
 
 const createMockResponse = () => ({
@@ -73,10 +73,8 @@ describe('EnphaseController', () => {
 
   describe('callback', () => {
     it('should throw BadRequestException when code is missing', async () => {
-      const res = createMockResponse();
-
       await expect(
-        controller.callback(undefined as unknown as string, 'valid-state', res as any),
+        controller.callback(undefined as unknown as string, 'valid-state'),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -84,11 +82,9 @@ describe('EnphaseController', () => {
       mockAuthService.validateState.mockImplementation(() => {
         throw new BadRequestException('Invalid or missing OAuth state parameter');
       });
-      const res = createMockResponse();
-
-      await expect(
-        controller.callback('code-123', undefined as unknown as string, res as any),
-      ).rejects.toThrow(BadRequestException);
+      await expect(controller.callback('code-123', undefined as unknown as string)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(mockAuthService.validateState).toHaveBeenCalled();
     });
 
@@ -96,12 +92,9 @@ describe('EnphaseController', () => {
       const tokens = { accessToken: 'token', refreshToken: 'refresh', expiresAt: new Date() };
       mockAuthService.exchangeCodeForTokens.mockResolvedValue(tokens);
       mockApiService.getSystems.mockResolvedValue({ systems: [] });
-      const res = createMockResponse();
-
-      await controller.callback('code-123', 'valid-state', res as any);
-
-      expect(res.json).toHaveBeenCalledWith({
+      await expect(controller.callback('code-123', 'valid-state')).resolves.toEqual({
         message: 'No systems found on this Enphase account',
+        systems: [],
       });
       expect(mockAuthService.storeTokens).not.toHaveBeenCalled();
     });
@@ -115,18 +108,16 @@ describe('EnphaseController', () => {
 
       mockAuthService.exchangeCodeForTokens.mockResolvedValue(tokens);
       mockApiService.getSystems.mockResolvedValue({ systems: rawSystems });
-      mockMapper.toSystemDtoList.mockReturnValue(mappedSystems);
+      mockMapper.toSystemList.mockReturnValue(mappedSystems);
       mockAuthService.storeTokens.mockResolvedValue(undefined);
-      const res = createMockResponse();
-
-      await controller.callback('code-123', 'valid-state', res as any);
+      const result = await controller.callback('code-123', 'valid-state');
 
       expect(mockAuthService.validateState).toHaveBeenCalledWith('valid-state');
       expect(mockAuthService.exchangeCodeForTokens).toHaveBeenCalledWith('code-123');
       expect(mockApiService.getSystems).toHaveBeenCalledWith('token');
       expect(mockAuthService.storeTokens).toHaveBeenCalledWith(1, tokens);
-      expect(mockMapper.toSystemDtoList).toHaveBeenCalledWith(rawSystems);
-      expect(res.json).toHaveBeenCalledWith({
+      expect(mockMapper.toSystemList).toHaveBeenCalledWith(rawSystems);
+      expect(result).toEqual({
         message: 'Enphase account linked successfully',
         systems: mappedSystems,
       });
@@ -178,7 +169,7 @@ describe('EnphaseController', () => {
     });
   });
 
-  // Date format and start-before-end validation live in enphaseBackfillRequestDtoSchema (see
+  // Date format and start-before-end validation live in enphaseBackfillRequestSchema (see
   // libs/shared-models), enforced by ZodValidationPipe before the controller method runs.
   describe('backfill', () => {
     it('should delegate to sync service and return count', async () => {

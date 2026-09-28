@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 
-import type { LifetimeDataDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { useDashboardFilters } from './use-dashboard-filters.hook.js';
 
@@ -10,7 +10,7 @@ vi.mock('react-i18next', () => ({
 
 const STORAGE_KEY = 'dashboard-filters';
 
-const entry = (date: string, overrides: Partial<LifetimeDataDto> = {}): LifetimeDataDto => ({
+const entry = (date: string, overrides: Partial<LifetimeDay> = {}): LifetimeDay => ({
   date,
   kwhProduced: 1,
   kwhConsumed: 1,

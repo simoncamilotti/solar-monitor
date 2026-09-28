@@ -1,0 +1,14 @@
+{
+  "generators": {
+    "lib": {
+      "factory": "./src/generators/lib/lib#libGenerator",
+      "schema": "./src/generators/lib/schema.json",
+      "description": "Creates a library in libs/<scope>/<name>, package @repo/<name>, with its tags."
+    },
+    "api-module": {
+      "factory": "./src/generators/api-module/api-module#apiModuleGenerator",
+      "schema": "./src/generators/api-module/schema.json",
+      "description": "Creates a domain module in the API: contract, controller, service and test."
+    }
+  }
+}

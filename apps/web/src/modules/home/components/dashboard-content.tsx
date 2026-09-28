@@ -1,6 +1,6 @@
 import type { FunctionComponent } from 'react';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { useDashboardChart } from '../hooks/use-dashboard-chart.hook.js';
 import { useDashboardFilters } from '../hooks/use-dashboard-filters.hook.js';
@@ -9,9 +9,7 @@ import { DashboardChart } from './dashboard-chart.js';
 import { DashboardFilters } from './dashboard-filters.js';
 import { DashboardKPIGrid } from './dashboard-kpi-grid.js';
 
-export const DashboardContent: FunctionComponent<{ data: LifetimeDataResponseDto }> = ({
-  data,
-}) => {
+export const DashboardContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ data }) => {
   const {
     filters,
     availableYears,

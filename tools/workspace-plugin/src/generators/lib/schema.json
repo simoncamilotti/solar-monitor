@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "WorkspacePluginLib",
+  "title": "Library",
+  "description": "Creates a library with the location, tags and package name the boundaries expect (ADR 0005 of the starter).",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Library name in kebab-case; the package is @repo/<name>.",
+      "$default": { "$source": "argv", "index": 0 },
+      "x-prompt": "Library name (kebab-case)?"
+    },
+    "scope": {
+      "type": "string",
+      "description": "Where the code runs: shared (anywhere), web (browser) or api (Node).",
+      "enum": ["shared", "web", "api"],
+      "x-prompt": {
+        "message": "Where does the code run?",
+        "type": "list",
+        "items": [
+          { "value": "shared", "label": "shared: anywhere (browser, Node, mobile)" },
+          { "value": "web", "label": "web: browser (React)" },
+          { "value": "api", "label": "api: Node" }
+        ]
+      }
+    }
+  },
+  "required": ["name", "scope"]
+}

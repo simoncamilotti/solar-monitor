@@ -1,8 +1,8 @@
-import type { LifetimeDataDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { getMonthsForYear } from './get-months-for-year.js';
 
-const entry = (date: string): LifetimeDataDto => ({
+const entry = (date: string): LifetimeDay => ({
   date,
   kwhProduced: 1,
   kwhConsumed: 1,

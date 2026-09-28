@@ -1,6 +1,6 @@
 import type { FunctionComponent } from 'react';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { useComparisonChart } from '../hooks/use-comparison-chart.hook.js';
 import { useComparisonData } from '../hooks/use-comparison-data.hook.js';
@@ -8,9 +8,7 @@ import { useComparisonFilters } from '../hooks/use-comparison-filters.hook.js';
 import { ComparisonChart } from './comparison-chart.js';
 import { ComparisonFilters } from './comparison-filters.js';
 
-export const ComparisonContent: FunctionComponent<{ data: LifetimeDataResponseDto }> = ({
-  data,
-}) => {
+export const ComparisonContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ data }) => {
   const {
     filters,
     availableYears,

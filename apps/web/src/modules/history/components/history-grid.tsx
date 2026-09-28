@@ -2,14 +2,14 @@ import { AgGridReact } from 'ag-grid-react';
 import { motion } from 'framer-motion';
 import type { FunctionComponent } from 'react';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { useTheme } from '../../layout/hooks/use-theme.hook.js';
 import { agThemeDark, agThemeLight } from '../../ui/constants/ag-grid-theme.js';
 import { useHistoryGrid } from '../hooks/use-history-grid.hook.js';
 
 type HistoryGridProps = {
-  data: LifetimeDataResponseDto;
+  data: LifetimeDay[];
 };
 
 export const HistoryGrid: FunctionComponent<HistoryGridProps> = ({ data }) => {

@@ -9,25 +9,34 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 
-import { Public } from '../../common/auth/public.decorator.js';
-
-import type {
-  EnphaseBackfillResponseDto,
-  EnphaseCallbackResponseDto,
-  EnphaseSyncResponseDto,
-  LifetimeDataResponseDto,
-  SyncScheduleDto,
-  SyncStatusResponseDto,
-} from './enphase.dto.js';
 import {
-  EnphaseBackfillRequestDto,
-  EnphaseSyncRequestDto,
-  UpdateSyncScheduleRequestDto,
-} from './enphase.dto.js';
+  type EnphaseBackfillRequest,
+  enphaseBackfillRequestSchema,
+  type EnphaseBackfillResult,
+  enphaseBackfillResultSchema,
+  type EnphaseLinkResult,
+  enphaseLinkResultSchema,
+  type EnphaseSyncRequest,
+  enphaseSyncRequestSchema,
+  type EnphaseSyncResult,
+  enphaseSyncResultSchema,
+  type LifetimeDay,
+  lifetimeDaySchema,
+  type SyncSchedule,
+  syncScheduleSchema,
+  type SyncStatus,
+  syncStatusSchema,
+} from '@repo/contracts';
+import { Public } from '../../common/auth/public.decorator.js';
+import {
+  ResponseListSchema,
+  ResponseSchema,
+} from '../../common/serialization/response-schema.decorator.js';
+
 import { EnphaseMapper } from './enphase.mapper.js';
 import { EnphaseService } from './enphase.service.js';
 import { EnphaseApiService } from './enphase-api.service.js';
@@ -60,13 +69,12 @@ export class EnphaseController {
   @Public()
   @Get('callback')
   @ApiOperation({ summary: 'Handle Enphase OAuth2 callback' })
-  @ApiResponse({ status: 200, description: 'Enphase account linked successfully' })
+  @ResponseSchema(enphaseLinkResultSchema)
   @ApiResponse({ status: 400, description: 'Missing code or invalid state' })
   async callback(
     @Query('code') code: string,
     @Query('state') state: string,
-    @Res() res: Response,
-  ): Promise<void> {
+  ): Promise<EnphaseLinkResult> {
     this._enphaseAuthService.validateState(state);
 
     if (!code) {
@@ -81,41 +89,38 @@ export class EnphaseController {
     const [system] = systems;
 
     if (!system) {
-      res.json({ message: 'No systems found on this Enphase account' });
-      return;
+      return { message: 'No systems found on this Enphase account', systems: [] };
     }
 
     await this._enphaseAuthService.storeTokens(system.system_id, tokens);
     this._logger.log(`Linked Enphase system: ${system.name} (ID: ${system.system_id})`);
 
-    const response: EnphaseCallbackResponseDto = {
+    return {
       message: 'Enphase account linked successfully',
-      systems: this._enphaseMapper.toSystemDtoList(systems),
+      systems: this._enphaseMapper.toSystemList(systems),
     };
-
-    res.json(response);
   }
 
   @Get('all')
   @ApiOperation({ summary: 'Expose all lifetime data' })
-  @ApiResponse({ status: 200, description: 'Returns all lifetime data' })
-  async getAll(): Promise<LifetimeDataResponseDto> {
+  @ResponseListSchema(lifetimeDaySchema)
+  async getAll(): Promise<LifetimeDay[]> {
     return this._enphaseService.getAllLifetimeData();
   }
 
   @Get('sync-status')
   @ApiOperation({ summary: 'Get sync status for all systems' })
-  @ApiResponse({ status: 200, description: 'Returns sync status per system' })
-  async getSyncStatus(): Promise<SyncStatusResponseDto> {
+  @ResponseListSchema(syncStatusSchema)
+  async getSyncStatus(): Promise<SyncStatus[]> {
     return this._enphaseService.getSyncStatus();
   }
 
   @Post('sync')
   @ApiOperation({ summary: 'Trigger manual sync for a system' })
-  @ApiBody({ type: EnphaseSyncRequestDto })
-  @ApiResponse({ status: 200, description: 'Sync completed' })
-  @ApiResponse({ status: 400, description: 'Invalid systemId' })
-  async triggerSync(@Body() dto: EnphaseSyncRequestDto): Promise<EnphaseSyncResponseDto> {
+  @ResponseSchema(enphaseSyncResultSchema)
+  async triggerSync(
+    @Body({ schema: enphaseSyncRequestSchema }) dto: EnphaseSyncRequest,
+  ): Promise<EnphaseSyncResult> {
     await this._enphaseSyncService.syncLifetimeData(dto.systemId);
     return { message: `Sync completed for system ${dto.systemId}` };
   }
@@ -123,14 +128,14 @@ export class EnphaseController {
   @Post('backfill')
   @Throttle({ default: { limit: 3, ttl: 60 * 60 * 1000 } })
   @ApiOperation({ summary: 'Backfill historical production data' })
-  @ApiBody({ type: EnphaseBackfillRequestDto })
-  @ApiResponse({ status: 200, description: 'Backfill completed' })
-  @ApiResponse({ status: 400, description: 'Invalid parameters' })
+  @ResponseSchema(enphaseBackfillResultSchema)
   @ApiResponse({
     status: 429,
     description: 'Too many backfill requests — Enphase quota is monthly',
   })
-  async backfill(@Body() dto: EnphaseBackfillRequestDto): Promise<EnphaseBackfillResponseDto> {
+  async backfill(
+    @Body({ schema: enphaseBackfillRequestSchema }) dto: EnphaseBackfillRequest,
+  ): Promise<EnphaseBackfillResult> {
     const count = await this._enphaseSyncService.backfillLifetimeData(
       dto.systemId,
       dto.startDate,
@@ -141,16 +146,17 @@ export class EnphaseController {
 
   @Get('sync-schedule')
   @ApiOperation({ summary: 'Get current sync schedule' })
-  @ApiResponse({ status: 200, description: 'Returns the current sync schedule' })
-  async getSyncSchedule(): Promise<SyncScheduleDto> {
+  @ResponseSchema(syncScheduleSchema)
+  async getSyncSchedule(): Promise<SyncSchedule> {
     return this._enphaseSyncService.getSyncSchedule();
   }
 
   @Put('sync-schedule')
   @ApiOperation({ summary: 'Update sync schedule' })
-  @ApiBody({ type: UpdateSyncScheduleRequestDto })
-  @ApiResponse({ status: 200, description: 'Schedule updated' })
-  async updateSyncSchedule(@Body() dto: UpdateSyncScheduleRequestDto): Promise<SyncScheduleDto> {
+  @ResponseSchema(syncScheduleSchema)
+  async updateSyncSchedule(
+    @Body({ schema: syncScheduleSchema }) dto: SyncSchedule,
+  ): Promise<SyncSchedule> {
     await this._enphaseSyncService.updateSyncTime(dto.syncTime);
     return { syncTime: dto.syncTime };
   }

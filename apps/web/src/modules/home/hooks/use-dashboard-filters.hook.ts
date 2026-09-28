@@ -1,7 +1,7 @@
 import { format, parse, parseISO } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { ENERGY_METRICS } from '../../shared/metrics/index.js';
 import type {
@@ -24,7 +24,7 @@ const readFromStorage = (): Partial<DashboardFilterState> | null => {
   }
 };
 
-const buildInitialState = (data: LifetimeDataResponseDto): DashboardFilterState => {
+const buildInitialState = (data: LifetimeDay[]): DashboardFilterState => {
   const stored = readFromStorage();
 
   const availableYears = [...new Set(data.map((d) => parseISO(d.date).getFullYear()))].sort(
@@ -84,7 +84,7 @@ const buildInitialState = (data: LifetimeDataResponseDto): DashboardFilterState 
   };
 };
 
-export const useDashboardFilters = (data: LifetimeDataResponseDto) => {
+export const useDashboardFilters = (data: LifetimeDay[]) => {
   const [filters, setFilters] = useState<DashboardFilterState>(() => buildInitialState(data));
 
   useEffect(() => {

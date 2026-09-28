@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 
-import type { LifetimeDataDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import type { ComparisonFilterState } from '../comparison.type.js';
 import { comparisonPeriodColors } from '../constants/comparison-colors.js';
@@ -10,7 +10,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-const entry = (date: string, kwhProduced: number): LifetimeDataDto => ({
+const entry = (date: string, kwhProduced: number): LifetimeDay => ({
   date,
   kwhProduced,
   kwhConsumed: 0,

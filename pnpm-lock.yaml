@@ -203,6 +203,9 @@ catalogs:
     '@nestjs/throttler':
       specifier: 6.7.0
       version: 6.7.0
+    '@nx/devkit':
+      specifier: 23.2.1
+      version: 23.2.1
     '@nx/eslint':
       specifier: 23.2.1
       version: 23.2.1
@@ -383,9 +386,6 @@ catalogs:
     nestjs-pino:
       specifier: 5.2.0
       version: 5.2.0
-    nestjs-zod:
-      specifier: 5.5.0
-      version: 5.5.0
     nx:
       specifier: 23.2.1
       version: 23.2.1
@@ -484,6 +484,9 @@ importers:
       '@nx/vitest':
         specifier: 'catalog:'
         version: 23.2.1(@babel/traverse@7.29.8(supports-color@8.1.1))(@nx/eslint@23.2.1(bbb008e4fcbac2e5363d6f4655df42c2))(@swc-node/register@1.12.1(@swc/core@1.16.2(@swc/helpers@0.5.23))(@swc/types@0.1.28)(supports-color@8.1.1)(typescript@6.0.3))(@swc/cli@0.8.1(@swc/core@1.16.2(@swc/helpers@0.5.23))(chokidar@5.0.0)(supports-color@8.1.1))(@swc/core@1.16.2(@swc/helpers@0.5.23))(nx@23.2.1(@swc-node/register@1.12.1(@swc/core@1.16.2(@swc/helpers@0.5.23))(@swc/types@0.1.28)(supports-color@8.1.1)(typescript@6.0.3))(@swc/core@1.16.2(@swc/helpers@0.5.23)))(supports-color@8.1.1)(typescript@6.0.3)(vite@8.3.0(@types/node@24.13.6)(esbuild@0.27.7)(jiti@2.4.2)(less@4.8.1(supports-color@8.1.1))(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2)(tsx@4.21.0)(yaml@2.9.1))(vitest@4.1.11)
+      '@repo/workspace-plugin':
+        specifier: workspace:*
+        version: link:tools/workspace-plugin
       '@swc-node/register':
         specifier: 'catalog:'
         version: 1.12.1(@swc/core@1.16.2(@swc/helpers@0.5.23))(@swc/types@0.1.28)(supports-color@8.1.1)(typescript@6.0.3)
@@ -634,9 +637,6 @@ importers:
       nestjs-pino:
         specifier: 'catalog:'
         version: 5.2.0(@nestjs/common@12.0.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.0.3)(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
-      nestjs-zod:
-        specifier: 'catalog:'
-        version: 5.5.0(@nestjs/common@12.0.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/swagger@12.0.1(@nestjs/common@12.0.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.0.3)(reflect-metadata@0.2.2))(rxjs@7.8.2)(zod@4.6.5)
       pino:
         specifier: 'catalog:'
         version: 10.3.1
@@ -810,6 +810,12 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 4.6.5
+
+  tools/workspace-plugin:
+    dependencies:
+      '@nx/devkit':
+        specifier: 'catalog:'
+        version: 23.2.1(nx@23.2.1(@swc-node/register@1.12.1(@swc/core@1.16.2(@swc/helpers@0.5.23))(@swc/types@0.1.28)(supports-color@8.1.1)(typescript@6.0.3))(@swc/core@1.16.2(@swc/helpers@0.5.23)))
 
 packages:
 
@@ -7690,17 +7696,6 @@ packages:
       pino: ^10.0.0
       pino-http: ^11.0.0
       rxjs: ^7.1.0
-
-  nestjs-zod@5.5.0:
-    resolution: {integrity: sha512-V0WMtmICygYE2RoMKk8ExEeoetkC7PoUmUlZNP4JNk1YgrnUnG1vgkRn2DBNqsDi+Obv3c9AOssmXe/k/AvBOg==}
-    peerDependencies:
-      '@nestjs/common': ^10.0.0 || ^11.0.0
-      '@nestjs/swagger': ^7.4.2 || ^8.0.0 || ^11.0.0
-      rxjs: ^7.0.0
-      zod: ^3.25.0 || ^4.0.0
-    peerDependenciesMeta:
-      '@nestjs/swagger':
-        optional: true
 
   node-abort-controller@3.1.1:
     resolution: {integrity: sha512-AGK2yQKIjRuqnc6VkX2Xj5d+QW8xZ87pa1UK6yA6ouUyuxfHuMP6umE5QK7UmTeOAymo+Zx1Fxiuw9rVx8taHQ==}
@@ -17601,15 +17596,6 @@ snapshots:
       pino: 10.3.1
       pino-http: 11.0.0
       rxjs: 7.8.2
-
-  nestjs-zod@5.5.0(@nestjs/common@12.0.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/swagger@12.0.1(@nestjs/common@12.0.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.0.3)(reflect-metadata@0.2.2))(rxjs@7.8.2)(zod@4.6.5):
-    dependencies:
-      '@nestjs/common': 12.0.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      deepmerge: 4.3.1
-      rxjs: 7.8.2
-      zod: 4.6.5
-    optionalDependencies:
-      '@nestjs/swagger': 12.0.1(@nestjs/common@12.0.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.0.3)(reflect-metadata@0.2.2)
 
   node-abort-controller@3.1.1:
     optional: true
