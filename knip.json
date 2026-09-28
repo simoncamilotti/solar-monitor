@@ -9,15 +9,11 @@
         "eslint-plugin-react-hooks",
         "typescript-eslint",
         "@repo/workspace-plugin"
-      ],
-      "ignore": ["config/web/config.example.js"]
+      ]
     },
     "apps/api": {
       "entry": ["src/main.ts", "src/instrumentation.ts", "src/generate-openapi.ts", "scripts/*.ts"],
       "ignoreDependencies": ["pino-pretty"]
-    },
-    "apps/web": {
-      "ignore": ["src/window.d.ts"]
     },
     "apps/web-e2e": {
       "playwright": false,
@@ -28,6 +24,10 @@
     },
     "tools/workspace-plugin": {
       "entry": ["src/generators/*/*.ts"]
+    },
+    "libs/shared/api-client": {
+      "entry": ["scripts/index-mocks.mjs"],
+      "ignoreDependencies": ["@tanstack/react-query", "@faker-js/faker", "msw"]
     }
   }
 }

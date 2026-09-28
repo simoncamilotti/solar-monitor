@@ -3,7 +3,7 @@ import { lazy, Suspense } from 'react';
 import type { RouteObject } from 'react-router';
 import { redirect } from 'react-router';
 
-import { isAuthenticated, login } from '../modules/auth/auth.js';
+import { RequireAuth } from '../auth/require-auth.js';
 import { Layout } from '../modules/layout/components/layout.js';
 import { ForbiddenPage } from '../pages/forbidden-page.js';
 import { RoutePaths } from './paths.const.js';
@@ -27,15 +27,11 @@ const withSuspense = (element: ReactElement): ReactElement => (
 
 export const routes: RouteObject[] = [
   {
-    element: <Layout />,
-    hydrateFallbackElement: <div>Loading...</div>,
-    loader: async ({ request }) => {
-      if (!isAuthenticated()) {
-        await login(request.url);
-      }
-
-      return null;
-    },
+    element: (
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    ),
     children: [
       {
         path: RoutePaths.HOME,
@@ -55,9 +51,9 @@ export const routes: RouteObject[] = [
       },
     ],
   },
-  // Deliberately outside the `Layout` route above: it carries the auth-gate loader that redirects
-  // to Keycloak when unauthenticated, which would bounce a session-expired visitor straight back
-  // into a login loop instead of letting them see why they landed here.
+  // Deliberately outside the `Layout` route above: its auth gate redirects to the identity
+  // provider when unauthenticated, which would bounce a rejected visitor straight back into a
+  // login loop instead of letting them see why they landed here.
   {
     path: RoutePaths.ERROR_FORBIDDEN,
     element: <ForbiddenPage />,

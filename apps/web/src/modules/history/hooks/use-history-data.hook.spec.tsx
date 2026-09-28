@@ -1,39 +1,21 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, waitFor } from '@testing-library/react';
-import type { ReactNode } from 'react';
+import { getEnphaseGetAllMockHandler } from '@repo/api-client/mocks';
+import { waitFor } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
 
-import { HistoryService } from '../history.service.js';
+import { renderHookWithProviders } from '../../../test/render.js';
+import { server } from '../../../test/setup.js';
 import { useHistoryData } from './use-history-data.hook.js';
-
-vi.mock('../history.service.js', () => ({
-  HistoryService: {
-    getAll: vi.fn().mockResolvedValue([]),
-  },
-}));
-
-vi.mock('../history.key.js', () => ({
-  historyKey: { getAll: ['history', 'getAll'] },
-}));
-
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
 
 describe('useHistoryData', () => {
   it('should return loading state initially', () => {
-    const { result } = renderHook(() => useHistoryData(), { wrapper: createWrapper() });
+    const { result } = renderHookWithProviders(() => useHistoryData());
 
     expect(result.current.isPending).toBe(true);
     expect(result.current.data).toBeUndefined();
   });
 
   it('should return data after fetch', async () => {
-    const mockResponse = [
+    const days = [
       {
         date: '2024-01-01',
         kwhProduced: 10,
@@ -43,20 +25,27 @@ describe('useHistoryData', () => {
         gridDependency: 20,
       },
     ];
-    vi.mocked(HistoryService.getAll).mockResolvedValueOnce(mockResponse);
+    server.use(getEnphaseGetAllMockHandler(days));
 
-    const { result } = renderHook(() => useHistoryData(), { wrapper: createWrapper() });
+    const { result } = renderHookWithProviders(() => useHistoryData());
 
     await waitFor(() => expect(result.current.isPending).toBe(false));
 
-    expect(result.current.data).toEqual(mockResponse);
+    expect(result.current.data).toEqual(days);
     expect(result.current.isError).toBe(false);
   });
 
   it('should return error state on failure', async () => {
-    vi.mocked(HistoryService.getAll).mockRejectedValueOnce(new Error('Network error'));
+    server.use(
+      http.get('*/api/enphase/all', () =>
+        HttpResponse.json(
+          { type: 'about:blank', title: 'Internal Server Error', status: 500 },
+          { status: 500 },
+        ),
+      ),
+    );
 
-    const { result } = renderHook(() => useHistoryData(), { wrapper: createWrapper() });
+    const { result } = renderHookWithProviders(() => useHistoryData());
 
     await waitFor(() => expect(result.current.isError).toBe(true));
 

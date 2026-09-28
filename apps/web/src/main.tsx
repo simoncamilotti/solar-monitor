@@ -2,31 +2,36 @@ import './styles.css';
 import './i18n/init-i18n.js';
 import './modules/charts/init-echarts.js';
 
-import ReactDOM from 'react-dom/client';
-import { createBrowserRouter } from 'react-router';
+import { configureApiClient } from '@repo/api-client';
+import { createRoot } from 'react-dom/client';
+import { AuthProvider } from 'react-oidc-context';
 
 import { App } from './app.js';
-import { initAuth } from './modules/auth/auth.js';
-import { routes } from './routes/routes.js';
+import { createUserManager, type SigninState } from './auth/user-manager.js';
+import { loadConfig } from './config/config.js';
 
-if (!window.config?.auth) {
-  throw new Error(
-    'Missing config: public/config.js is not loaded. Copy config/web/config.example.js to apps/web/public/config.js and fill in the values.',
-  );
+const config = loadConfig();
+const userManager = createUserManager(config);
+
+configureApiClient({
+  baseUrl: config.apiUrl,
+  getAccessToken: async () => (await userManager.getUser())?.access_token,
+});
+
+const root = document.getElementById('root');
+if (!root) {
+  throw new Error('Missing #root element');
 }
 
-initAuth({
-  realm: window.config.auth.realm,
-  clientId: window.config.auth.clientId,
-  url: window.config.auth.url,
-})
-  .then(() => {
-    const router = createBrowserRouter(routes);
-
-    ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-      <App router={router} />,
-    );
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+createRoot(root).render(
+  <AuthProvider
+    userManager={userManager}
+    onSigninCallback={(user) => {
+      // Removes the OIDC parameters from the URL and goes back to the requested page.
+      const state = user?.state as SigninState | undefined;
+      window.history.replaceState(null, '', state?.returnTo ?? '/');
+    }}
+  >
+    <App />
+  </AuthProvider>,
+);

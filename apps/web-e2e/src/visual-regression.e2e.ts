@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { mockApi } from './api-mock.js';
-import { mockKeycloak } from './keycloak-mock.js';
+import { mockOidc } from './oidc-mock.js';
 
 const mockHistoryData = [
   {
@@ -88,8 +88,8 @@ test.describe('Visual regression', () => {
   // The charts skip their animations: a screenshot never catches the bars mid-growth.
   test.use({ reducedMotion: 'reduce' });
 
-  test.beforeEach(async ({ page, browserName }) => {
-    await mockKeycloak(page, browserName);
+  test.beforeEach(async ({ page }) => {
+    await mockOidc(page);
     await mockApi(page);
     await mockHistoryApi(page);
   });

@@ -10,11 +10,11 @@
   },
   "include": [
     "vite.config.ts",
+    "runtime-config.plugin.ts",
     "src/**/*.spec.ts",
     "src/**/*.spec.tsx",
     "src/test/**/*.ts",
     "src/test/**/*.tsx",
-    "src/window.d.ts",
     "src/**/*.json"
   ],
   "references": [

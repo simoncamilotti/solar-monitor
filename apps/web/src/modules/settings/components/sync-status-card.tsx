@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { useBackfillMutation } from '../hooks/use-backfill-mutation.hook.js';
-import { useSyncStatus } from '../hooks/use-sync-status.hook.js';
+import { useEnphaseGetSyncStatus } from '@repo/api-client';
 import { useTriggerSyncMutation } from '../hooks/use-trigger-sync-mutation.hook.js';
 import { SyncStatusSkeleton } from './sync-status-skeleton.js';
 import type { BackfillRange } from './sync-system-item.js';
@@ -14,15 +14,18 @@ const BACKFILL_START_DATE = '2015-01-01';
 
 export const SyncStatusCard: FunctionComponent = () => {
   const { t } = useTranslation('web');
-  const { data: systems, isPending, isError } = useSyncStatus();
+  const { data: systems, isPending, isError } = useEnphaseGetSyncStatus();
   const syncMutation = useTriggerSyncMutation();
   const backfillMutation = useBackfillMutation();
 
   const handleSync = (systemId: number) => {
-    syncMutation.mutate(systemId, {
-      onSuccess: () => toast.success(t('sync.success')),
-      onError: () => toast.error(t('sync.error')),
-    });
+    syncMutation.mutate(
+      { data: { systemId } },
+      {
+        onSuccess: () => toast.success(t('sync.success')),
+        onError: () => toast.error(t('sync.error')),
+      },
+    );
   };
 
   // With no range we import the whole history. With one, we fill a specific gap spotted by
@@ -31,7 +34,7 @@ export const SyncStatusCard: FunctionComponent = () => {
     const startDate = range?.startDate ?? BACKFILL_START_DATE;
     const endDate = range?.endDate ?? format(subDays(new Date(), 1), 'yyyy-MM-dd');
     backfillMutation.mutate(
-      { systemId, startDate, endDate },
+      { data: { systemId, startDate, endDate } },
       {
         onSuccess: (data) =>
           toast.success(t('sync.backfillSuccess', { count: data.daysBackfilled })),
@@ -64,11 +67,13 @@ export const SyncStatusCard: FunctionComponent = () => {
               key={system.systemId}
               system={system}
               onSync={handleSync}
-              isSyncing={syncMutation.isPending && syncMutation.variables === system.systemId}
+              isSyncing={
+                syncMutation.isPending && syncMutation.variables?.data.systemId === system.systemId
+              }
               onBackfill={handleBackfill}
               isBackfilling={
                 backfillMutation.isPending &&
-                backfillMutation.variables?.systemId === system.systemId
+                backfillMutation.variables?.data.systemId === system.systemId
               }
             />
           ))}

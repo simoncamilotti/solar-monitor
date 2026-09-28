@@ -1,12 +1,12 @@
 import { LogOut, Settings } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 import { NavLink } from 'react-router';
-
-import { logout } from '../../auth/auth.js';
 
 export const SidebarFooter: FunctionComponent = () => {
   const { t } = useTranslation('web');
+  const auth = useAuth();
 
   return (
     <div className="px-3 pb-4 space-y-1">
@@ -24,7 +24,7 @@ export const SidebarFooter: FunctionComponent = () => {
         {t('sidebar.nav.settings')}
       </NavLink>
       <button
-        onClick={() => logout()}
+        onClick={() => void auth.signoutRedirect()}
         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-smooth w-full"
       >
         <LogOut className="w-4 h-4" />

@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 import { mockApi } from './api-mock.js';
-import { mockKeycloak } from './keycloak-mock.js';
+import { mockOidc } from './oidc-mock.js';
 
 const mockHistoryData = [
   {
@@ -41,8 +41,8 @@ async function mockHistoryApi(page: Page) {
 }
 
 test.describe('History page', () => {
-  test.beforeEach(async ({ page, browserName }) => {
-    await mockKeycloak(page, browserName);
+  test.beforeEach(async ({ page }) => {
+    await mockOidc(page);
     await mockApi(page);
     await mockHistoryApi(page);
   });
@@ -133,8 +133,8 @@ test.describe('History page', () => {
 });
 
 test.describe('History page - error state', () => {
-  test.beforeEach(async ({ page, browserName }) => {
-    await mockKeycloak(page, browserName);
+  test.beforeEach(async ({ page }) => {
+    await mockOidc(page);
     await mockApi(page);
     await page.route('**/api/enphase/all', (route) =>
       route.fulfill({

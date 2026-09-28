@@ -11,25 +11,27 @@
     ]
   },
   "dependencies": {
+    "@repo/api-client": "workspace:*",
     "@repo/contracts": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "ag-grid-community": "catalog:",
     "ag-grid-react": "catalog:",
-    "axios": "catalog:",
     "date-fns": "catalog:",
     "echarts": "catalog:",
     "echarts-for-react": "catalog:",
     "framer-motion": "catalog:",
     "i18next": "catalog:",
     "i18next-browser-languagedetector": "catalog:",
-    "keycloak-js": "catalog:",
     "lucide-react": "catalog:",
+    "oidc-client-ts": "catalog:",
     "react": "catalog:",
     "react-datepicker": "catalog:",
     "react-dom": "catalog:",
     "react-i18next": "catalog:",
+    "react-oidc-context": "catalog:",
     "react-router": "catalog:",
-    "sonner": "catalog:"
+    "sonner": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@testing-library/dom": "catalog:",
@@ -39,6 +41,7 @@
     "@vitejs/plugin-react": "catalog:",
     "autoprefixer": "catalog:",
     "jsdom": "catalog:",
+    "msw": "catalog:",
     "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "vite": "catalog:",

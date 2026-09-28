@@ -1,12 +1,13 @@
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
 
-import { getAuthenticatedUsername } from '../../auth/auth.js';
 import { Braces } from '../../ui/braces.js';
 
 export const SidebarLogo: FunctionComponent = () => {
   const { t } = useTranslation('web');
-  const username = getAuthenticatedUsername();
+  const profile = useAuth().user?.profile;
+  const username = `${profile?.given_name ?? ''} ${profile?.family_name ?? ''}`;
 
   return (
     <div className="p-6 flex items-center gap-3">

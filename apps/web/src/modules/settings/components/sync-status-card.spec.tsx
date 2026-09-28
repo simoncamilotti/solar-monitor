@@ -11,8 +11,8 @@ vi.mock('sonner', () => ({
 }));
 
 const mockUseSyncStatus = vi.fn();
-vi.mock('../hooks/use-sync-status.hook.js', () => ({
-  useSyncStatus: () => mockUseSyncStatus(),
+vi.mock('@repo/api-client', () => ({
+  useEnphaseGetSyncStatus: () => mockUseSyncStatus(),
 }));
 
 const mockMutate = vi.fn();
@@ -107,7 +107,7 @@ describe('SyncStatusCard', () => {
     fireEvent.click(screen.getByText('sync.trigger'));
 
     expect(mockMutate).toHaveBeenCalledWith(
-      123,
+      { data: { systemId: 123 } },
       expect.objectContaining({ onSuccess: expect.any(Function) }),
     );
   });
@@ -165,11 +165,13 @@ describe('SyncStatusCard', () => {
     fireEvent.click(screen.getByText('sync.backfill'));
 
     expect(mockBackfillMutate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        systemId: 789,
-        startDate: '2015-01-01',
-        endDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
-      }),
+      {
+        data: {
+          systemId: 789,
+          startDate: '2015-01-01',
+          endDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+        },
+      },
       expect.objectContaining({ onSuccess: expect.any(Function), onError: expect.any(Function) }),
     );
   });

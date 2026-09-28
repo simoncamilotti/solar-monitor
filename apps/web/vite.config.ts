@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react';
 import { defaultClientConditions } from 'vite';
 import { defineConfig } from 'vitest/config';
+import { runtimeConfig } from './runtime-config.plugin.js';
 
 export default defineConfig({
   root: import.meta.dirname,
@@ -9,15 +10,9 @@ export default defineConfig({
     // Workspace libs are read from their sources.
     conditions: ['@repo/source', ...defaultClientConditions],
   },
-  server: {
-    port: 4200,
-    host: 'localhost',
-    proxy: {
-      '/api': 'http://localhost:3000',
-    },
-  },
+  server: { port: 4200, strictPort: true, host: 'localhost' },
   preview: { port: 4200, host: 'localhost' },
-  plugins: [react()],
+  plugins: [react(), runtimeConfig()],
   build: {
     outDir: './dist',
     emptyOutDir: true,

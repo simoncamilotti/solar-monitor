@@ -11,8 +11,8 @@ vi.mock('sonner', () => ({
 }));
 
 const mockUseSyncSchedule = vi.fn();
-vi.mock('../hooks/use-sync-schedule.hook.js', () => ({
-  useSyncSchedule: () => mockUseSyncSchedule(),
+vi.mock('@repo/api-client', () => ({
+  useEnphaseGetSyncSchedule: () => mockUseSyncSchedule(),
 }));
 
 const mockMutate = vi.fn();
@@ -93,7 +93,7 @@ describe('SyncScheduleCard', () => {
     fireEvent.click(saveButton);
 
     expect(mockMutate).toHaveBeenCalledWith(
-      '05:00',
+      { data: { syncTime: '05:00' } },
       expect.objectContaining({ onSuccess: expect.any(Function) }),
     );
   });

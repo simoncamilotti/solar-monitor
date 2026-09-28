@@ -1,6 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { logout } from '../../auth/auth.js';
 import { SidebarFooter } from './sidebar-footer.js';
 
 vi.mock('react-i18next', () => ({
@@ -18,8 +17,9 @@ vi.mock('react-router', () => ({
   ),
 }));
 
-vi.mock('../../auth/auth.js', () => ({
-  logout: vi.fn(),
+const mockAuth = { signoutRedirect: vi.fn() };
+vi.mock('react-oidc-context', () => ({
+  useAuth: () => mockAuth,
 }));
 
 describe('SidebarFooter', () => {
@@ -46,6 +46,6 @@ describe('SidebarFooter', () => {
     const logoutButton = screen.getByText('sidebar.nav.logout');
     fireEvent.click(logoutButton);
 
-    expect(logout).toHaveBeenCalled();
+    expect(mockAuth.signoutRedirect).toHaveBeenCalled();
   });
 });

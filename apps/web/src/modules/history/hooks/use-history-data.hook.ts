@@ -1,13 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
-
-import { historyKey } from '../history.key.js';
-import { HistoryService } from '../history.service.js';
+import { useEnphaseGetAll } from '@repo/api-client';
 
 export const useHistoryData = () => {
-  const { data, isPending, isError } = useQuery({
-    queryKey: historyKey.getAll,
-    queryFn: HistoryService.getAll,
-    staleTime: 1000 * 60 * 60, // 1 hour
+  const { data, isPending, isError } = useEnphaseGetAll({
+    query: { staleTime: 1000 * 60 * 60 }, // 1 hour
   });
 
   return {

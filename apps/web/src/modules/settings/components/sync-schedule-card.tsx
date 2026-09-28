@@ -3,22 +3,25 @@ import { type FunctionComponent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
-import { useSyncSchedule } from '../hooks/use-sync-schedule.hook.js';
+import { useEnphaseGetSyncSchedule } from '@repo/api-client';
 import { useUpdateSyncScheduleMutation } from '../hooks/use-update-sync-schedule-mutation.hook.js';
 
 export const SyncScheduleCard: FunctionComponent = () => {
   const { t } = useTranslation('web');
-  const { data, isPending, isError } = useSyncSchedule();
+  const { data, isPending, isError } = useEnphaseGetSyncSchedule();
   const mutation = useUpdateSyncScheduleMutation();
   // The stored time until the user edits it.
   const [draft, setDraft] = useState<string | null>(null);
   const syncTime = draft ?? data?.syncTime ?? '02:00';
 
   const handleSave = () => {
-    mutation.mutate(syncTime, {
-      onSuccess: () => toast.success(t('syncSchedule.success')),
-      onError: () => toast.error(t('syncSchedule.error')),
-    });
+    mutation.mutate(
+      { data: { syncTime } },
+      {
+        onSuccess: () => toast.success(t('syncSchedule.success')),
+        onError: () => toast.error(t('syncSchedule.error')),
+      },
+    );
   };
 
   const hasChanged = data?.syncTime !== syncTime;
