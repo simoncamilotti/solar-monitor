@@ -1,0 +1,9 @@
+// Runtime configuration: generated when the container starts, so one image serves every
+// environment (ADR 0008). Validated by `src/config/config.ts`.
+window.__APP_CONFIG__ = {
+  apiUrl: '${WEB_API_URL}',
+  oidc: {
+    authority: '${WEB_OIDC_AUTHORITY}',
+    clientId: '${WEB_OIDC_CLIENT_ID}',
+  },
+};

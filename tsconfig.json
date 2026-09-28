@@ -7,6 +7,9 @@
       "path": "./libs/shared/contracts"
     },
     {
+      "path": "./libs/shared/api-client"
+    },
+    {
       "path": "./apps/api"
     },
     {

@@ -64,8 +64,6 @@ libs/shared/api-client/src/generated
 # Playwright
 playwright-report
 
-# Web runtime configuration, local copy of config/web/config.example.js
-/apps/web/public/config.js
 
 # Keycloak development database
 config/keycloak/data/*.mv.db

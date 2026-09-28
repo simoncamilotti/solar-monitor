@@ -1,25 +1,19 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-
-import { historyKey } from '../../history/history.key.js';
-import { syncKey } from '../sync.key.js';
-import { SyncService } from '../sync.service.js';
+import {
+  getEnphaseGetAllQueryKey,
+  getEnphaseGetSyncStatusQueryKey,
+  useEnphaseBackfill,
+} from '@repo/api-client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useBackfillMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({
-      systemId,
-      startDate,
-      endDate,
-    }: {
-      systemId: number;
-      startDate: string;
-      endDate: string;
-    }) => SyncService.triggerBackfill(systemId, startDate, endDate),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: syncKey.status });
-      queryClient.invalidateQueries({ queryKey: historyKey.getAll });
+  return useEnphaseBackfill({
+    mutation: {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: getEnphaseGetSyncStatusQueryKey() });
+        void queryClient.invalidateQueries({ queryKey: getEnphaseGetAllQueryKey() });
+      },
     },
   });
 };

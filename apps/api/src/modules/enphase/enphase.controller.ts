@@ -9,7 +9,7 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 
@@ -56,10 +56,10 @@ export class EnphaseController {
     private readonly _enphaseMapper: EnphaseMapper,
   ) {}
 
+  // Browser navigations of the OAuth2 flow, not API calls: kept out of the generated client.
   @Public()
   @Get('authorize')
-  @ApiOperation({ summary: 'Redirect to Enphase OAuth2 authorization page' })
-  @ApiResponse({ status: 302, description: 'Redirects to Enphase authorization page' })
+  @ApiExcludeEndpoint()
   authorize(@Res() res: Response): void {
     const url = this._enphaseAuthService.getAuthorizationUrl();
     this._logger.log('Redirecting to Enphase authorization page');
@@ -68,9 +68,8 @@ export class EnphaseController {
 
   @Public()
   @Get('callback')
-  @ApiOperation({ summary: 'Handle Enphase OAuth2 callback' })
+  @ApiExcludeEndpoint()
   @ResponseSchema(enphaseLinkResultSchema)
-  @ApiResponse({ status: 400, description: 'Missing code or invalid state' })
   async callback(
     @Query('code') code: string,
     @Query('state') state: string,

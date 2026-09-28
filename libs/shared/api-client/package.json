@@ -1,0 +1,75 @@
+{
+  "name": "@repo/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@repo/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./mocks": {
+      "@repo/source": "./src/mocks.ts",
+      "types": "./dist/mocks.d.ts",
+      "import": "./dist/mocks.js",
+      "default": "./dist/mocks.js"
+    }
+  },
+  "nx": {
+    "tags": [
+      "type:lib",
+      "platform:universal"
+    ],
+    "targets": {
+      "codegen": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "orval --config orval.config.ts",
+          "cwd": "{projectRoot}"
+        },
+        "cache": true,
+        "dependsOn": [
+          "api:openapi"
+        ],
+        "inputs": [
+          "{workspaceRoot}/apps/api/openapi.json",
+          "{projectRoot}/orval.config.ts"
+        ],
+        "outputs": [
+          "{projectRoot}/src/generated"
+        ]
+      },
+      "build": {
+        "dependsOn": [
+          "^build",
+          "codegen"
+        ]
+      },
+      "typecheck": {
+        "dependsOn": [
+          "^build",
+          "codegen"
+        ]
+      },
+      "lint": {
+        "dependsOn": [
+          "codegen"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "@tanstack/react-query": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "catalog:",
+    "msw": "catalog:",
+    "orval": "catalog:"
+  }
+}

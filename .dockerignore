@@ -12,6 +12,5 @@ apps/api/openapi.json
 !.env.example
 .claude
 
-# Local only: the Keycloak H2 files of the former setup, the runtime configuration of the web.
+# Local only: the Keycloak H2 files of the former setup.
 config/keycloak/data
-apps/web/public/config.js

@@ -9,8 +9,9 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('../../auth/auth.js', () => ({
-  getAuthenticatedUsername: vi.fn().mockReturnValue('John Doe'),
+const mockAuth = { user: { profile: { given_name: 'John', family_name: 'Doe' } } };
+vi.mock('react-oidc-context', () => ({
+  useAuth: () => mockAuth,
 }));
 
 vi.mock('../../ui/braces.js', () => ({

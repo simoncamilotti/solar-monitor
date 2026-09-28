@@ -1,15 +1,14 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-
-import { syncKey } from '../sync.key.js';
-import { SyncService } from '../sync.service.js';
+import { getEnphaseGetSyncScheduleQueryKey, useEnphaseUpdateSyncSchedule } from '@repo/api-client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useUpdateSyncScheduleMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (syncTime: string) => SyncService.updateSchedule(syncTime),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: syncKey.schedule });
+  return useEnphaseUpdateSyncSchedule({
+    mutation: {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({ queryKey: getEnphaseGetSyncScheduleQueryKey() });
+      },
     },
   });
 };
