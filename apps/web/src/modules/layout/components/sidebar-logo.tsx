@@ -5,7 +5,7 @@ import { useAuth } from 'react-oidc-context';
 import { Braces } from '../../ui/braces.js';
 
 export const SidebarLogo: FunctionComponent = () => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const profile = useAuth().user?.profile;
   const username = `${profile?.given_name ?? ''} ${profile?.family_name ?? ''}`;
 

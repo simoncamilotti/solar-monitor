@@ -13,7 +13,7 @@ import { SyncSystemItem } from './sync-system-item.js';
 const BACKFILL_START_DATE = '2015-01-01';
 
 export const SyncStatusCard: FunctionComponent = () => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const { data: systems, isPending, isError } = useEnphaseGetSyncStatus();
   const syncMutation = useTriggerSyncMutation();
   const backfillMutation = useBackfillMutation();

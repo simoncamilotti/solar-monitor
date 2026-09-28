@@ -28,6 +28,10 @@
     "libs/shared/api-client": {
       "entry": ["scripts/index-mocks.mjs"],
       "ignoreDependencies": ["@tanstack/react-query", "@faker-js/faker", "msw"]
+    },
+    "apps/web": {
+      "entry": ["src/routes/**/*.tsx"]
     }
-  }
+  },
+  "ignore": ["apps/web/src/route-tree.gen.ts"]
 }

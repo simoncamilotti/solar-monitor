@@ -1,17 +1,17 @@
-import '../modules/ui/ag-grid-setup.js';
+import '../ui/ag-grid-setup.js';
 
 import { Calendar, Download } from 'lucide-react';
 import { type FunctionComponent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ExportModal } from '../modules/history/components/export-modal.js';
-import { GridSkeleton } from '../modules/history/components/grid-skeleton.js';
-import { HistoryGrid } from '../modules/history/components/history-grid.js';
-import { useHistoryData } from '../modules/history/hooks/use-history-data.hook.js';
-import { PageHeader } from '../modules/layout/components/page-header.js';
+import { ExportModal } from './components/export-modal.js';
+import { GridSkeleton } from './components/grid-skeleton.js';
+import { HistoryGrid } from './components/history-grid.js';
+import { useHistoryData } from './hooks/use-history-data.hook.js';
+import { PageHeader } from '../layout/components/page-header.js';
 
 export const HistoryPage: FunctionComponent = () => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const { data, isPending, isError } = useHistoryData();
   const [exportOpen, setExportOpen] = useState(false);
 

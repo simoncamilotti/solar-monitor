@@ -7,17 +7,17 @@ vi.mock('react-i18next', () => ({
 }));
 
 const mockHistoryData = vi.fn();
-vi.mock('../modules/history/hooks/use-history-data.hook.js', () => ({
+vi.mock('./hooks/use-history-data.hook.js', () => ({
   useHistoryData: () => mockHistoryData(),
 }));
 
-vi.mock('../modules/history/components/history-grid.js', () => ({
+vi.mock('./components/history-grid.js', () => ({
   HistoryGrid: ({ data }: { data: unknown[] }) => (
     <div data-testid="history-grid">{data.length} rows</div>
   ),
 }));
 
-vi.mock('../modules/history/components/export-modal.js', () => ({
+vi.mock('./components/export-modal.js', () => ({
   ExportModal: ({ open, onClose }: { open: boolean; onClose: () => void }) =>
     open ? (
       <div data-testid="export-modal">
@@ -26,7 +26,7 @@ vi.mock('../modules/history/components/export-modal.js', () => ({
     ) : null,
 }));
 
-vi.mock('../modules/history/components/grid-skeleton.js', () => ({
+vi.mock('./components/grid-skeleton.js', () => ({
   GridSkeleton: () => <div data-testid="grid-skeleton" />,
 }));
 

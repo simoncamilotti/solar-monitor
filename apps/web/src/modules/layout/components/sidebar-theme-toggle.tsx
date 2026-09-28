@@ -6,7 +6,7 @@ import { useTheme } from '../hooks/use-theme.hook.js';
 
 export const SidebarThemeToggle: FunctionComponent = () => {
   const { theme, toggleTheme } = useTheme();
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
 
   return (
     <div className="px-3 mb-2">

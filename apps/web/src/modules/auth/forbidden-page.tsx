@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 
 export const ForbiddenPage: FunctionComponent = () => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const auth = useAuth();
 
   return (

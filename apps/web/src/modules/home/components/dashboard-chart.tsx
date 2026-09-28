@@ -5,9 +5,12 @@ import { useTranslation } from 'react-i18next';
 
 import { Chart } from '../../charts/components/chart.js';
 import { metricColors } from '../../shared/metrics/metric-colors.js';
+import type { Translations } from '../../../i18n/locales/fr.js';
 import type { DashboardMetricKey } from '../dashboard.type.js';
 
-export const METRICS_MAPPING: Array<{ key: DashboardMetricKey; labelKey: string }> = [
+type ChartLabelKey = `home.chart.${Extract<keyof Translations['home']['chart'], string>}`;
+
+export const METRICS_MAPPING: Array<{ key: DashboardMetricKey; labelKey: ChartLabelKey }> = [
   { key: 'kwhConsumed', labelKey: 'home.chart.consumption' },
   { key: 'kwhProduced', labelKey: 'home.chart.production' },
   { key: 'kwhImported', labelKey: 'home.chart.import' },
@@ -25,7 +28,7 @@ export const DashboardChart: FunctionComponent<DashboardChartProps> = ({
   selectedMetric,
   onMetricChange,
 }) => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
 
   return (
     <motion.div
@@ -37,9 +40,8 @@ export const DashboardChart: FunctionComponent<DashboardChartProps> = ({
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-foreground">
           {t(
-            `home.chart.${METRICS_MAPPING.find((m) => m.key === selectedMetric)
-              ?.labelKey.split('.')
-              .pop()}`,
+            METRICS_MAPPING.find((m) => m.key === selectedMetric)?.labelKey ??
+              'home.chart.consumption',
           )}
         </h3>
         <div className="flex flex-wrap gap-1.5">

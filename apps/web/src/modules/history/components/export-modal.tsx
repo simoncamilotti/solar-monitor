@@ -3,6 +3,8 @@ import { Check, Download, FileText, X } from 'lucide-react';
 import { type FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { monthKey } from '../../../i18n/keys.js';
+
 import type { LifetimeDay } from '@repo/contracts';
 
 import type { ExportConfig, ExportMetric } from '../hooks/use-export.hook.js';
@@ -23,7 +25,7 @@ const ALL_METRICS: ExportMetric[] = [
 ];
 
 export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose, data }) => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const { exportData, getFilteredData, getAvailableYears } = useExport(data);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -68,7 +70,7 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
 
   const months = Array.from({ length: 12 }, (_, i) => ({
     value: String(i),
-    label: t(`months.${i}`),
+    label: t(monthKey(i)),
   }));
 
   return (

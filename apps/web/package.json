@@ -14,6 +14,7 @@
     "@repo/api-client": "workspace:*",
     "@repo/contracts": "workspace:*",
     "@tanstack/react-query": "catalog:",
+    "@tanstack/react-router": "catalog:",
     "ag-grid-community": "catalog:",
     "ag-grid-react": "catalog:",
     "date-fns": "catalog:",
@@ -29,11 +30,11 @@
     "react-dom": "catalog:",
     "react-i18next": "catalog:",
     "react-oidc-context": "catalog:",
-    "react-router": "catalog:",
     "sonner": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@tanstack/router-plugin": "catalog:",
     "@testing-library/dom": "catalog:",
     "@testing-library/react": "catalog:",
     "@types/react": "catalog:",

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { DEFAULT_GRID_OPTIONS } from '../../ui/constants/ag-grid-default-options.js';
 
 export const useHistoryGrid = () => {
-  const { t, i18n } = useTranslation('web');
+  const { t, i18n } = useTranslation();
 
   const columnDefs = useMemo<ColDef[]>(
     () => [

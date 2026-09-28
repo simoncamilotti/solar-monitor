@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import { Outlet } from 'react-router';
+import { Outlet } from '@tanstack/react-router';
 
 import { AppSidebar } from './app-sidebar.js';
 

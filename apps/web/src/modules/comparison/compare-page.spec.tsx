@@ -7,17 +7,17 @@ vi.mock('react-i18next', () => ({
 }));
 
 const mockHistoryData = vi.fn();
-vi.mock('../modules/history/hooks/use-history-data.hook.js', () => ({
+vi.mock('../history/hooks/use-history-data.hook.js', () => ({
   useHistoryData: () => mockHistoryData(),
 }));
 
-vi.mock('../modules/comparison/components/comparison-content.js', () => ({
+vi.mock('./components/comparison-content.js', () => ({
   ComparisonContent: ({ data }: { data: unknown[] }) => (
     <div data-testid="comparison-content">{data.length} entries</div>
   ),
 }));
 
-vi.mock('../modules/comparison/components/comparison-page-skeleton.js', () => ({
+vi.mock('./components/comparison-page-skeleton.js', () => ({
   ComparisonPageSkeleton: () => <div data-testid="comparison-skeleton" />,
 }));
 

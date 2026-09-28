@@ -50,6 +50,8 @@ catalog:
   '@swc/core': 1.16.2
   '@swc/helpers': 0.5.23
   '@tanstack/react-query': 5.103.1
+  '@tanstack/react-router': 1.170.38
+  '@tanstack/router-plugin': 1.168.40
   '@testing-library/dom': 10.4.2
   '@testing-library/react': 16.3.3
   '@types/express': 5.0.6
@@ -99,7 +101,6 @@ catalog:
   react-dom: 19.3.0
   react-i18next: 17.0.14
   react-oidc-context: 3.3.1
-  react-router: 7.18.4
   reflect-metadata: 0.2.2
   rxjs: 7.8.2
   sonner: 2.0.8
