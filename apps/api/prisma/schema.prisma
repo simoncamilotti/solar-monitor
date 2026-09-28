@@ -9,13 +9,17 @@ datasource db {
   provider = "postgresql"
 }
 
+/// A person known by the identity provider, created at their first authenticated request.
 model User {
-  id         String   @id @default(uuid())
-  keycloakId String   @unique
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([keycloakId], name: "user_kc_index")
+  id        String   @id @default(uuid())
+  /// `sub` claim of the OIDC token: stable identifier at the identity provider.
+  subject   String   @unique
+  email     String
+  name      String
+  /// BCP 47 language tag, e.g. `fr` or `en`.
+  locale    String   @default("fr")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model SyncSchedule {

@@ -34,9 +34,9 @@ describe('Authentication', () => {
     });
   });
 
-  describe('Public route (GET /health)', () => {
+  describe('Public route (GET /api/health/live)', () => {
     it('should return 200 without a token', async () => {
-      const res = await axios.get('/health');
+      const res = await axios.get('/api/health/live');
 
       expect(res.status).toBe(200);
       expect(res.data).toEqual(

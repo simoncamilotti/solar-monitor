@@ -1,12 +1,10 @@
-import { Module } from '@nestjs/common';
-import { PassportModule } from '@nestjs/passport';
+import { Global, Module } from '@nestjs/common';
+import { jwksProvider } from './jwks.provider.js';
+import { TokenVerifier } from './token-verifier.service.js';
 
-import { AuthService } from './auth.service.js';
-import { JwtStrategy } from './jwt.strategy.js';
-
+@Global()
 @Module({
-  imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
-  providers: [JwtStrategy, AuthService],
-  exports: [PassportModule],
+  providers: [jwksProvider, TokenVerifier],
+  exports: [TokenVerifier],
 })
 export class AuthModule {}

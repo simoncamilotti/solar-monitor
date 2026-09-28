@@ -10,12 +10,6 @@
     },
     "typeCheck": false,
     "deleteOutDir": true,
-    "tsConfigPath": "tsconfig.build.json",
-    "assets": [
-      {
-        "include": "swagger/**/*",
-        "outDir": "dist"
-      }
-    ]
+    "tsConfigPath": "tsconfig.build.json"
   }
 }
