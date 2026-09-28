@@ -1,30 +1,29 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": [
-    "apps/api/src/main.ts",
-    "apps/web/src/main.tsx",
-    "libs/*/src/index.ts",
-    "libs/*/*/src/index.ts",
-    "scripts/*.ts",
-    "**/*.spec.{ts,tsx}",
-    "**/vitest.config.ts",
-    "**/playwright.config.ts",
-    "**/test-setup.ts",
-    "**/support/global-setup.ts"
-  ],
-  "project": ["apps/**/*.{ts,tsx}", "libs/**/*.{ts,tsx}", "scripts/*.ts", "*.ts"],
-  "ignore": ["apps/web/types/window.d.ts"],
-  "ignoreDependencies": [
-    "eslint-plugin-import",
-    "eslint-plugin-jsx-a11y",
-    "eslint-plugin-playwright",
-    "eslint-plugin-react",
-    "eslint-plugin-react-hooks",
-    "typescript-eslint",
-    "pino-pretty",
-    "@vitejs/plugin-react",
-    "autoprefixer",
-    "postcss",
-    "tailwindcss"
-  ]
+  "workspaces": {
+    ".": {
+      "ignoreDependencies": [
+        "eslint-plugin-import",
+        "eslint-plugin-jsx-a11y",
+        "eslint-plugin-react",
+        "eslint-plugin-react-hooks",
+        "typescript-eslint"
+      ],
+      "ignore": ["config/web/config.example.js"]
+    },
+    "apps/api": {
+      "entry": ["src/main.ts", "scripts/*.ts"],
+      "ignoreDependencies": ["pino-pretty"]
+    },
+    "apps/web": {
+      "ignore": ["src/window.d.ts"]
+    },
+    "apps/web-e2e": {
+      "playwright": false,
+      "entry": ["playwright.config.ts", "src/**/*.e2e.ts"]
+    },
+    "apps/api-e2e": {
+      "entry": ["src/**/*.spec.ts", "src/support/*.ts"]
+    }
+  }
 }

@@ -1,0 +1,356 @@
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
+
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+import { of } from 'rxjs';
+
+import { PrismaService } from '../../common/database/prisma.service.js';
+
+import type { EnphaseTokenResponse } from './enphase.types.js';
+import { EnphaseAuthService } from './enphase-auth.service.js';
+
+const TEST_ENCRYPTION_KEY = 'ab'.repeat(32);
+
+// Mirrors the service's own AES-256-GCM scheme, so tests can produce fixtures that decrypt
+// correctly and read back what the service actually wrote — without reaching into its privates.
+const encryptForTest = (plaintext: string): string => {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv('aes-256-gcm', Buffer.from(TEST_ENCRYPTION_KEY, 'hex'), iv);
+  const ciphertext = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+  return [iv, cipher.getAuthTag(), ciphertext].map((buffer) => buffer.toString('hex')).join(':');
+};
+
+const decryptForTest = (stored: string): string => {
+  const [ivHex = '', authTagHex = '', ciphertextHex = ''] = stored.split(':');
+  const decipher = createDecipheriv(
+    'aes-256-gcm',
+    Buffer.from(TEST_ENCRYPTION_KEY, 'hex'),
+    Buffer.from(ivHex, 'hex'),
+  );
+  decipher.setAuthTag(Buffer.from(authTagHex, 'hex'));
+  return Buffer.concat([
+    decipher.update(Buffer.from(ciphertextHex, 'hex')),
+    decipher.final(),
+  ]).toString('utf8');
+};
+
+const mockPrismaService = {
+  enphaseToken: {
+    findUnique: vi.fn(),
+    update: vi.fn(),
+    upsert: vi.fn(),
+  },
+};
+
+const mockHttpService = {
+  post: vi.fn(),
+};
+
+const mockConfigService = {
+  getOrThrow: (key: string): string => {
+    const value = process.env[key];
+    if (!value) {
+      throw new Error(`Missing required environment variable: ${key}`);
+    }
+    return value;
+  },
+};
+
+const TOKEN_RESPONSE: EnphaseTokenResponse = {
+  access_token: 'new-access-token',
+  refresh_token: 'new-refresh-token',
+  expires_in: 86400,
+  token_type: 'Bearer',
+};
+
+describe('EnphaseAuthService', () => {
+  let service: EnphaseAuthService;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    process.env['ENPHASE_CLIENT_ID'] = 'test-client-id';
+    process.env['ENPHASE_CLIENT_SECRET'] = 'test-client-secret';
+    process.env['ENPHASE_REDIRECT_URI'] = 'http://localhost:3000/enphase/callback';
+    process.env['ENPHASE_TOKEN_ENCRYPTION_KEY'] = TEST_ENCRYPTION_KEY;
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        EnphaseAuthService,
+        { provide: PrismaService, useValue: mockPrismaService },
+        { provide: HttpService, useValue: mockHttpService },
+        { provide: ConfigService, useValue: mockConfigService },
+      ],
+    }).compile();
+
+    service = module.get<EnphaseAuthService>(EnphaseAuthService);
+  });
+
+  describe('getAuthorizationUrl', () => {
+    it('should return a valid authorization URL with required params including state', () => {
+      const url = service.getAuthorizationUrl();
+
+      expect(url).toContain('https://api.enphaseenergy.com/oauth/authorize');
+      expect(url).toContain('response_type=code');
+      expect(url).toContain('client_id=test-client-id');
+      expect(url).toContain(
+        `redirect_uri=${encodeURIComponent('http://localhost:3000/enphase/callback')}`,
+      );
+      expect(url).toContain('state=');
+    });
+  });
+
+  describe('validateState', () => {
+    it('should accept a valid state that was generated', () => {
+      const url = service.getAuthorizationUrl();
+      const state = new URL(url).searchParams.get('state')!;
+
+      expect(() => service.validateState(state)).not.toThrow();
+    });
+
+    it('should reject an unknown state', () => {
+      expect(() => service.validateState('unknown-state')).toThrow(
+        'Invalid or missing OAuth state parameter',
+      );
+    });
+
+    it('should reject undefined state', () => {
+      expect(() => service.validateState(undefined as unknown as string)).toThrow(
+        'Invalid or missing OAuth state parameter',
+      );
+    });
+
+    it('should reject a state used twice', () => {
+      const url = service.getAuthorizationUrl();
+      const state = new URL(url).searchParams.get('state')!;
+
+      service.validateState(state);
+      expect(() => service.validateState(state)).toThrow(
+        'Invalid or missing OAuth state parameter',
+      );
+    });
+  });
+
+  describe('exchangeCodeForTokens', () => {
+    it('should exchange code and return mapped tokens', async () => {
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+
+      const result = await service.exchangeCodeForTokens('auth-code-123');
+
+      expect(result.accessToken).toBe('new-access-token');
+      expect(result.refreshToken).toBe('new-refresh-token');
+      expect(result.expiresAt).toBeInstanceOf(Date);
+      expect(mockHttpService.post).toHaveBeenCalledWith(
+        expect.stringContaining('grant_type=authorization_code'),
+        null,
+        expect.objectContaining({
+          headers: { Authorization: expect.stringContaining('Basic ') },
+        }),
+      );
+    });
+
+    it('should include authorization code in request params', async () => {
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+
+      await service.exchangeCodeForTokens('my-code');
+
+      const calledUrl = mockHttpService.post.mock.calls[0]![0] as string;
+      expect(calledUrl).toContain('code=my-code');
+    });
+  });
+
+  describe('refreshAccessToken', () => {
+    it('should refresh and update token in database, encrypted at rest', async () => {
+      const existingToken = {
+        systemId: 42,
+        accessToken: encryptForTest('old-access'),
+        refreshToken: encryptForTest('old-refresh'),
+        expiresAt: new Date(),
+      };
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue(existingToken);
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      const result = await service.refreshAccessToken(42);
+
+      expect(result).toBe('new-access-token');
+      const { data } = mockPrismaService.enphaseToken.update.mock.calls[0]![0];
+      expect(decryptForTest(data.accessToken)).toBe('new-access-token');
+      expect(decryptForTest(data.refreshToken)).toBe('new-refresh-token');
+      expect(data.expiresAt).toBeInstanceOf(Date);
+    });
+
+    it('should use refresh_token grant type with the decrypted token', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 42,
+        refreshToken: encryptForTest('my-refresh-token'),
+        expiresAt: new Date(),
+      });
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      await service.refreshAccessToken(42);
+
+      const calledUrl = mockHttpService.post.mock.calls[0]![0] as string;
+      expect(calledUrl).toContain('grant_type=refresh_token');
+      expect(calledUrl).toContain('refresh_token=my-refresh-token');
+    });
+
+    it('should throw if no token exists for system', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue(null);
+
+      await expect(service.refreshAccessToken(999)).rejects.toThrow(
+        'No Enphase token found for system 999',
+      );
+    });
+  });
+
+  describe('refreshAccessToken — concurrence', () => {
+    // Enphase rotates refresh tokens. Four concurrent refreshes fired three of them with an
+    // already-consumed token, writing an invalid value back to the database: the account then had
+    // to be re-linked by hand.
+    it('should perform a single refresh when called concurrently for the same system', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 1,
+        refreshToken: encryptForTest('refresh-token'),
+        accessToken: encryptForTest('old'),
+        expiresAt: new Date(),
+      });
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      const results = await Promise.all([
+        service.refreshAccessToken(1),
+        service.refreshAccessToken(1),
+        service.refreshAccessToken(1),
+        service.refreshAccessToken(1),
+      ]);
+
+      expect(results).toEqual(Array(4).fill('new-access-token'));
+      expect(mockHttpService.post).toHaveBeenCalledTimes(1);
+      expect(mockPrismaService.enphaseToken.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('should refresh each system separately when called concurrently', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 1,
+        refreshToken: encryptForTest('refresh-token'),
+        accessToken: encryptForTest('old'),
+        expiresAt: new Date(),
+      });
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      await Promise.all([service.refreshAccessToken(1), service.refreshAccessToken(2)]);
+
+      expect(mockHttpService.post).toHaveBeenCalledTimes(2);
+    });
+
+    it('should allow a later refresh once the in-flight one has settled', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 1,
+        refreshToken: encryptForTest('refresh-token'),
+        accessToken: encryptForTest('old'),
+        expiresAt: new Date(),
+      });
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      await service.refreshAccessToken(1);
+      await service.refreshAccessToken(1);
+
+      expect(mockHttpService.post).toHaveBeenCalledTimes(2);
+    });
+
+    it('should share the failure with every concurrent caller and not leave the system stuck', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 1,
+        refreshToken: encryptForTest('refresh-token'),
+        accessToken: encryptForTest('old'),
+        expiresAt: new Date(),
+      });
+      mockHttpService.post.mockImplementationOnce(() => {
+        throw new Error('enphase is down');
+      });
+
+      const outcomes = await Promise.allSettled([
+        service.refreshAccessToken(1),
+        service.refreshAccessToken(1),
+      ]);
+
+      expect(outcomes.every((o) => o.status === 'rejected')).toBe(true);
+      expect(mockHttpService.post).toHaveBeenCalledTimes(1);
+
+      // The in-flight refresh map must have been cleared: a later call starts over rather than
+      // replaying the previous failure.
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      await expect(service.refreshAccessToken(1)).resolves.toBe('new-access-token');
+    });
+  });
+
+  describe('getValidAccessToken', () => {
+    it('should return existing token if not expiring soon', async () => {
+      const futureDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 42,
+        accessToken: encryptForTest('valid-token'),
+        refreshToken: encryptForTest('refresh'),
+        expiresAt: futureDate,
+      });
+
+      const result = await service.getValidAccessToken(42);
+
+      expect(result).toBe('valid-token');
+      expect(mockHttpService.post).not.toHaveBeenCalled();
+    });
+
+    it('should refresh token if expiring within 5 minutes', async () => {
+      const soonDate = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes from now
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue({
+        systemId: 42,
+        accessToken: encryptForTest('expiring-token'),
+        refreshToken: encryptForTest('refresh'),
+        expiresAt: soonDate,
+      });
+      mockHttpService.post.mockReturnValue(of({ data: TOKEN_RESPONSE }));
+      mockPrismaService.enphaseToken.update.mockResolvedValue({});
+
+      const result = await service.getValidAccessToken(42);
+
+      expect(result).toBe('new-access-token');
+      expect(mockHttpService.post).toHaveBeenCalled();
+    });
+
+    it('should throw if no token exists for system', async () => {
+      mockPrismaService.enphaseToken.findUnique.mockResolvedValue(null);
+
+      await expect(service.getValidAccessToken(999)).rejects.toThrow(
+        'No Enphase token found for system 999',
+      );
+    });
+  });
+
+  describe('storeTokens', () => {
+    it('should upsert tokens for system, encrypted at rest', async () => {
+      const tokens = {
+        accessToken: 'access',
+        refreshToken: 'refresh',
+        expiresAt: new Date('2026-04-01'),
+      };
+      mockPrismaService.enphaseToken.upsert.mockResolvedValue({});
+
+      await service.storeTokens(42, tokens);
+
+      const { create, update, where } = mockPrismaService.enphaseToken.upsert.mock.calls[0]![0];
+      expect(where).toEqual({ systemId: 42 });
+      expect(create).toEqual({ systemId: 42, ...update });
+      expect(decryptForTest(update.accessToken)).toBe('access');
+      expect(decryptForTest(update.refreshToken)).toBe('refresh');
+      expect(update.expiresAt).toEqual(tokens.expiresAt);
+    });
+  });
+});

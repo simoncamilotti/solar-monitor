@@ -1,15 +1,14 @@
 import type { INestApplication } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { Logger as PinoLogger } from 'nestjs-pino';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { join } from 'path';
 
-import { AppModule } from './app/app.module';
-import { validateEnv } from './env';
+import { AppModule } from './app.module.js';
+import { validateEnv } from './env.js';
 
 const DEFAULT_TIMEZONE = 'Etc/UTC';
 const globalPrefix = 'api';
@@ -25,9 +24,7 @@ async function createApp(): Promise<INestApplication> {
     );
   }
 
-  // The adapter is passed explicitly: Nest would otherwise resolve it through its dynamic package
-  // loader, which webpack cannot see, leaving `@nestjs/platform-express` out of the built image.
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(), {
+  const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
 
@@ -124,7 +121,7 @@ const setupSwagger = (app: INestApplication): void => {
   // Serve custom oauth2-redirect.html that works with window.opener OR window.parent
   const httpAdapter = app.getHttpAdapter();
   httpAdapter.get('/docs/oauth2-redirect.html', (_req: any, res: any) => {
-    res.sendFile(join(__dirname, 'swagger', 'oauth2-redirect.html'));
+    res.sendFile(join(import.meta.dirname, 'swagger', 'oauth2-redirect.html'));
   });
 };
 

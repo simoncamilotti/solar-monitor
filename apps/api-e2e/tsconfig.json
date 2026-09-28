@@ -1,14 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
-  "files": [],
-  "include": [],
-  "references": [
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ],
   "compilerOptions": {
-    "esModuleInterop": true,
-    "ignoreDeprecations": "6.0"
-  }
+    "outDir": "out-tsc",
+    "tsBuildInfoFile": "out-tsc/tsconfig.tsbuildinfo",
+    "types": ["vitest/globals", "node"]
+  },
+  "include": ["vitest.e2e.config.ts", "src/**/*.ts"]
 }

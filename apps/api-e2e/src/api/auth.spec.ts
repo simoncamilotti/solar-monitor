@@ -1,7 +1,7 @@
 import type { AxiosError } from 'axios';
 import axios from 'axios';
 
-import { getKeycloakToken } from '../support/keycloak-helper';
+import { getKeycloakToken } from '../support/keycloak-helper.js';
 
 describe('Authentication', () => {
   describe('Protected route (GET /api)', () => {

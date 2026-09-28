@@ -14,10 +14,11 @@ RUN pnpm install --offline --frozen-lockfile
 RUN pnpm exec nx build web
 
 FROM ${NGINX_IMAGE} AS runtime
-COPY config/web/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /repo/dist/apps/web/ /usr/share/nginx/html/
-# Empty config.js placeholder: the real one is mounted by the k3s deployment.
+COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+# config.js is mounted by the k3s deployment: an empty placeholder owned by nginx (uid 101).
 USER root
-RUN touch /usr/share/nginx/html/config.js && chown nginx:nginx /usr/share/nginx/html/config.js
-USER nginx
+RUN rm -rf /usr/share/nginx/html/* && chown 101:101 /usr/share/nginx/html \
+ && touch /usr/share/nginx/html/config.js && chown 101:101 /usr/share/nginx/html/config.js
+USER 101
+COPY --from=build --chown=101:101 /repo/apps/web/dist /usr/share/nginx/html
 EXPOSE 8080

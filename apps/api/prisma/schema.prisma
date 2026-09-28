@@ -1,0 +1,55 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String   @id @default(uuid())
+  keycloakId String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([keycloakId], name: "user_kc_index")
+}
+
+model SyncSchedule {
+  id        String   @id @default("default")
+  syncTime  String   @default("02:00")
+  updatedAt DateTime @updatedAt
+}
+
+model EnphaseToken {
+  id           String   @id @default(uuid())
+  systemId     Int      @unique
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  lifetimeData EnphaseLifetimeData[]
+}
+
+model EnphaseLifetimeData {
+  id   String   @id @default(uuid())
+  date DateTime @db.Date
+
+  whProduced Int
+  whConsumed Int
+  whExported Int
+  whImported Int
+
+  createdAt DateTime @default(now())
+
+  EnphaseToken   EnphaseToken @relation(fields: [enphaseTokenId], references: [id])
+  enphaseTokenId String
+
+  @@unique([date, enphaseTokenId])
+  @@index([date])
+}

@@ -12,7 +12,7 @@ Prisma, deployed through GitOps.
 | **Backend**  | NestJS 12, Prisma 7, PostgreSQL 17                      |
 | **Frontend** | React 19, Vite 8, TailwindCSS 3, ECharts 6, ag-grid 35  |
 | **Shared**   | Zod 4 schemas shared between API and client             |
-| **Auth**     | Keycloak 26.2 (OIDC) — `keycloak-js` 26.2 on the client |
+| **Auth**     | Keycloak 26 (OIDC) — `keycloak-js` 26.2 on the client   |
 | **i18n**     | i18next — French and English, French as fallback        |
 | **Testing**  | Vitest (API, libs, web), Playwright (web E2E, Chromium) |
 | **CI/CD**    | GitHub Actions, GHCR, GitOps (Kustomize)                |
@@ -21,31 +21,33 @@ Prisma, deployed through GitOps.
 
 ```
 apps/
-  api/           NestJS API      (port 3000, prefix /api)
-  web/           React client    (port 4200, proxies /api to :3000)
-  api-e2e/       API E2E tests   (Vitest)
-  web-e2e/       Web E2E tests   (Playwright, incl. visual regression)
+  api/                NestJS API      (port 3000, prefix /api)         @repo/api
+  web/                React client    (port 4200, proxies /api to :3000) @repo/web
+  api-e2e/            API E2E tests   (Vitest)                         @repo/api-e2e
+  web-e2e/            Web E2E tests   (Playwright, visual regression)  @repo/web-e2e
 
 libs/
-  api/core/      Global NestJS module: auth (JWT/Keycloak), Prisma, health, logging, throttling
-  shared-models/ Zod schemas and DTOs shared between API and client
+  shared/contracts/   Zod schemas shared by the API and the client     @repo/contracts
+
+docker/               Local services: Keycloak realm, PostgreSQL init script
 ```
+
+Every project is a pnpm workspace package (`@repo/*`), in ESM: relative imports end in `.js`, even
+for a `.ts` file. A lib is consumed through its package name, from its sources in development and
+tests (`@repo/source` condition), from its build otherwise.
+
+The API code is organized by domain: `apps/api/src/modules/<domain>/` (`enphase`, `health`), with
+the cross-cutting pieces in `apps/api/src/common/` (`auth`, `database`). The Prisma client is
+generated into `apps/api/src/generated/prisma` (not versioned).
 
 Frontend concerns that are sometimes expected in a library live under `apps/web/src`:
 
-| Concern            | Location                                        |
-| :----------------- | :---------------------------------------------- |
-| Axios instance     | `apps/web/src/app/modules/api/axiosInstance.ts` |
-| React Query client | `apps/web/src/app/modules/providers/`           |
-| i18n setup         | `apps/web/src/i18n/`                            |
-| Locale files       | `apps/web/src/i18n/locales/{en,fr}/web.json`    |
-
-### Path Aliases (`tsconfig.base.json`)
-
-| Alias             | Target                            |
-| :---------------- | :-------------------------------- |
-| `@/core`          | `libs/api/core/src/index.ts`      |
-| `@/shared-models` | `libs/shared-models/src/index.ts` |
+| Concern            | Location                                     |
+| :----------------- | :------------------------------------------- |
+| Axios instance     | `apps/web/src/modules/api/axios-instance.ts` |
+| React Query client | `apps/web/src/modules/providers/`            |
+| i18n setup         | `apps/web/src/i18n/`                         |
+| Locale files       | `apps/web/src/i18n/locales/{en,fr}/web.json` |
 
 ## Prerequisites
 
@@ -63,7 +65,7 @@ Copy `.env.example` to `.env`, then adjust:
 
 | File                        | Value to update            | Description              |
 | :-------------------------- | :------------------------- | :----------------------- |
-| `.env`                      | `DB_NAME`                  | Database name            |
+| `.env`                      | `POSTGRES_DB`              | Database name            |
 | `.env`                      | `DATABASE_URL`             | Full connection string   |
 | `.env`                      | `CORS_ORIGINS`             | Comma-separated origins  |
 | `.env`                      | `KEYCLOAK_CLIENT_ID`       | Keycloak client ID       |
@@ -93,7 +95,7 @@ Every task runs through Nx: `pnpm nx <target> <project>`.
 ### Development
 
 ```bash
-pnpm dev                       # Postgres and Keycloak, migrations, then API and web
+pnpm dev                       # Postgres, Keycloak and Mailpit, migrations, then API and web
 ```
 
 API on `http://localhost:3000` (Swagger `/docs` outside production), web on
@@ -115,8 +117,8 @@ pnpm nx test api -- --run <pattern>
 pnpm nx test web -- --run <pattern>
 ```
 
-`typecheck` covers the specs: each `project.json` runs `tsc` on the source tsconfig, then on
-`tsconfig.spec.json`.
+`typecheck` covers the specs: `tsc --build` on each project's `tsconfig.json`, which references the
+source and the spec configurations.
 
 ### E2E
 
@@ -133,15 +135,14 @@ image. `api-e2e` stays out of the CI until it moves to a fake OIDC issuer.
 ### Database
 
 ```bash
-pnpm prisma:generate           # After any schema change
-pnpm prisma:migrate:dev        # Create or apply migrations (dev)
-pnpm prisma:migrate:deploy     # Apply migrations (prod)
-pnpm prisma:seed               # Idempotent default rows
-pnpm prisma:studio             # Database GUI
+pnpm nx run api:prisma-generate            # After any schema change (build, test and serve run it)
+pnpm nx run api:migrate-dev --name=<slug>  # Create or apply migrations (dev)
+pnpm nx run api:migrate-deploy             # Apply migrations
+pnpm nx run api:seed                       # Idempotent default rows
 ```
 
-Schema: `libs/api/core/src/prisma/schema.prisma` · config: `prisma.config.ts` (repository root) ·
-migrations: `libs/api/core/src/prisma/migrations/`.
+Schema: `apps/api/prisma/schema.prisma` · config: `apps/api/prisma.config.ts` · migrations:
+`apps/api/prisma/migrations/`. The API image applies the pending migrations at startup.
 
 Models: `User` (Keycloak identity), `SyncSchedule` (daily sync time), `EnphaseToken` (OAuth2
 credentials per system), `EnphaseLifetimeData` (daily Wh readings).
@@ -164,7 +165,7 @@ ENPHASE_REDIRECT_URI=http://localhost:3000/api/enphase/callback
 ENPHASE_TOKEN_ENCRYPTION_KEY=$(openssl rand -hex 32)
 ```
 
-3. Apply the migrations: `pnpm prisma:migrate:deploy`
+3. Apply the migrations: `pnpm nx run api:migrate-deploy`
 4. Start the API and open `http://localhost:3000/api/enphase/authorize` to link your Enphase
    account over OAuth2.
 
@@ -194,7 +195,7 @@ decorator. Rate limiting is global at 100 requests per 60 s, except `/backfill` 
 ### Verifying the stored history
 
 ```bash
-pnpm enphase:verify
+pnpm nx run api:enphase-verify
 ```
 
 Compares every stored day against what the Enphase API returns today for the same range, and reports
@@ -218,38 +219,47 @@ is **not** hard-coded.
 
 ## Docker Infrastructure
 
-| Service    | Port | Description        |
-| :--------- | :--- | :----------------- |
-| PostgreSQL | 5432 | Database           |
-| Keycloak   | 8080 | OIDC/OAuth2 server |
+`docker-compose.yml` runs the local services; the applications run on the host through Nx. Ports
+come from `.env` (`POSTGRES_PORT`, `KEYCLOAK_PORT`, `MAILPIT_SMTP_PORT`, `MAILPIT_UI_PORT`).
+
+| Service    | Port       | Description                              |
+| :--------- | :--------- | :--------------------------------------- |
+| PostgreSQL | 5432       | Database (PostgreSQL 17, as production)  |
+| Keycloak   | 8080       | OIDC server, stored in PostgreSQL        |
+| Mailpit    | 1025, 8025 | SMTP server and web UI for local e-mails |
+
+On its first start, PostgreSQL creates the e2e database (`<POSTGRES_DB>_e2e`) and the Keycloak one
+(`docker/postgres/init/`). On an older volume, create them once:
+
+```bash
+docker compose exec postgres sh -c 'createdb -U "$POSTGRES_USER" keycloak'
+docker compose exec postgres sh -c 'createdb -U "$POSTGRES_USER" "${POSTGRES_DB}_e2e"'
+```
 
 ### Keycloak Realm
 
-Keycloak starts with `--import-realm` and reads `config/keycloak/realm-export.json`, so a fresh
-clone gets the `solar-monitor` realm, its `solar-monitor-web` public client and its roles without
-any manual setup. The import is skipped once the realm exists, so it never overwrites local
-changes.
+Keycloak starts with `--import-realm` and reads `docker/keycloak/realm.json`, so a fresh database
+gets the `solar-monitor` realm, its `solar-monitor-web` public client and its roles without any
+manual setup. The import is skipped once the realm exists, so it never overwrites local changes.
 
 The export deliberately carries **no users**: user credentials have no place in a public
-repository. Create your own after the first boot:
+repository. Create your own after the first boot (admin console: `admin` / `admin`):
 
 ```bash
-docker exec solar-monitor_keycloak /opt/keycloak/bin/kcadm.sh config credentials \
-  --server http://localhost:8080 --realm master --user "$KEYCLOAK_ADMIN" --password "$KEYCLOAK_ADMIN_PASSWORD"
-docker exec solar-monitor_keycloak /opt/keycloak/bin/kcadm.sh create users \
+docker compose exec keycloak /opt/keycloak/bin/kcadm.sh config credentials \
+  --server http://localhost:8080 --realm master --user admin --password admin
+docker compose exec keycloak /opt/keycloak/bin/kcadm.sh create users \
   -r solar-monitor -s username=<user> -s enabled=true
-docker exec solar-monitor_keycloak /opt/keycloak/bin/kcadm.sh set-password \
+docker compose exec keycloak /opt/keycloak/bin/kcadm.sh set-password \
   -r solar-monitor --username <user> --new-password <password>
 ```
 
-The H2 database under `config/keycloak/data/` is local development state: it is generated by the
-container and is not tracked. After changing the realm through the admin console, re-export it so
-the change survives a wipe:
+After changing the realm through the admin console, re-export it so the change survives a wipe:
 
 ```bash
-docker exec solar-monitor_keycloak /opt/keycloak/bin/kcadm.sh create \
+docker compose exec keycloak /opt/keycloak/bin/kcadm.sh create \
   'realms/solar-monitor/partial-export?exportClients=true&exportGroupsAndRoles=true' -o \
-  > config/keycloak/realm-export.json
+  > docker/keycloak/realm.json
 ```
 
 ## CI/CD
@@ -272,9 +282,10 @@ typecheck and tests of the affected projects on push, and no direct push to `mai
 
 ## Conventions
 
-- **Documentation travels with the change.** Any modification to the project structure, to a path
-  alias, or to an API endpoint updates this README **in the same pull request**. Every path, alias
-  and endpoint quoted above is expected to exist in the repository.
+- **Documentation travels with the change.** Any modification to the project structure, to a
+  package, or to an API endpoint updates this README **in the same pull request**. Every path,
+  package and endpoint quoted above is expected to exist in the repository.
+- **Files and folders in kebab-case**, React components included.
 - **Single user by design.** The application is built for one household and one Enphase account.
   The `User` model only records the Keycloak identity; there is no per-user data partitioning and
   no role model.

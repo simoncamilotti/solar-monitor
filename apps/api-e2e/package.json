@@ -1,0 +1,33 @@
+{
+  "name": "@repo/api-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "nx": {
+    "name": "api-e2e",
+    "tags": [
+      "type:e2e",
+      "platform:node"
+    ],
+    "implicitDependencies": [
+      "api"
+    ],
+    "targets": {
+      "e2e-local": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "vitest run --config vitest.e2e.config.ts",
+          "cwd": "{projectRoot}"
+        },
+        "dependsOn": [
+          "api:serve"
+        ]
+      }
+    }
+  },
+  "devDependencies": {
+    "@nx/node": "catalog:",
+    "axios": "catalog:",
+    "vitest": "catalog:"
+  }
+}

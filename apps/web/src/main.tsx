@@ -1,12 +1,13 @@
-import './i18n/init-i18n';
-import './app/modules/charts/init-echarts';
+import './styles.css';
+import './i18n/init-i18n.js';
+import './modules/charts/init-echarts.js';
 
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter } from 'react-router';
 
-import { App } from './app/App';
-import { initAuth } from './app/modules/auth/auth';
-import { routes } from './app/routes/routes';
+import { App } from './app.js';
+import { initAuth } from './modules/auth/auth.js';
+import { routes } from './routes/routes.js';
 
 if (!window.config?.auth) {
   throw new Error(

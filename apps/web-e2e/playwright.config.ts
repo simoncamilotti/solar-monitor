@@ -7,6 +7,7 @@ const ci = Boolean(process.env['CI']);
 
 export default defineConfig({
   testDir: './src',
+  testMatch: '**/*.e2e.ts',
   // One worker, retries and long timeouts: the CI runners are shared.
   workers: 1,
   retries: ci ? 2 : 0,
@@ -36,7 +37,7 @@ export default defineConfig({
   ],
   webServer: {
     // The binary itself, not through pnpm: Playwright must be able to stop it.
-    command: '../../node_modules/.bin/vite preview --port 4200 --strictPort',
+    command: './node_modules/.bin/vite preview --port 4200 --strictPort',
     cwd: '../web',
     url: webUrl,
     reuseExistingServer: !ci,

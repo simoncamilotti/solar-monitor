@@ -1,35 +1,23 @@
-/// <reference types='vitest' />
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { readFileSync } from 'node:fs';
 import swc from 'unplugin-swc';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
-export default defineConfig(() => ({
-  root: __dirname,
+const swcrc = JSON.parse(readFileSync(new URL('.swcrc', import.meta.url), 'utf8'));
+
+export default defineConfig({
+  root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/apps/api',
-  // esbuild, Vitest's default transformer, drops `emitDecoratorMetadata`. Without it Nest cannot
-  // read the constructor parameter types it injects on, so swc handles the transform instead.
-  plugins: [
-    nxViteTsPaths(),
-    swc.vite({
-      module: { type: 'es6' },
-      jsc: {
-        target: 'es2022',
-        parser: { syntax: 'typescript', decorators: true },
-        transform: { legacyDecorator: true, decoratorMetadata: true },
-      },
-    }),
-  ],
+  // SWC emits the decorator metadata Nest relies on for dependency injection (ADR 0006).
+  // Same compiler options as the build.
+  plugins: [swc.vite(swcrc)],
   test: {
     name: 'api',
-    watch: false,
     globals: true,
     environment: 'node',
-    setupFiles: ['./src/test-setup.ts'],
-    include: ['src/**/*.{test,spec}.ts'],
-    reporters: ['default'],
+    include: ['src/**/*.{spec,test}.ts'],
     coverage: {
-      reportsDirectory: '../../coverage/apps/api',
-      provider: 'v8' as const,
+      provider: 'v8',
+      reportsDirectory: './test-output/coverage',
     },
   },
-}));
+});
