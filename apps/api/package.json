@@ -1,0 +1,158 @@
+{
+  "name": "@repo/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "nx": {
+    "name": "api",
+    "tags": [
+      "type:app",
+      "platform:node"
+    ],
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "nest build",
+          "cwd": "{projectRoot}"
+        },
+        "cache": true,
+        "dependsOn": [
+          "^build",
+          "prisma-generate"
+        ],
+        "inputs": [
+          "production",
+          "^production"
+        ],
+        "outputs": [
+          "{projectRoot}/dist"
+        ]
+      },
+      "serve": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "nest start --watch",
+          "cwd": "{projectRoot}"
+        },
+        "continuous": true,
+        "dependsOn": [
+          "^build",
+          "prisma-generate"
+        ]
+      },
+      "prisma-generate": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma generate",
+          "cwd": "{projectRoot}"
+        },
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/prisma/schema.prisma",
+          "{projectRoot}/prisma.config.ts"
+        ],
+        "outputs": [
+          "{projectRoot}/src/generated/prisma"
+        ]
+      },
+      "typecheck": {
+        "dependsOn": [
+          "^build",
+          "prisma-generate"
+        ]
+      },
+      "test": {
+        "dependsOn": [
+          "^build",
+          "prisma-generate"
+        ]
+      },
+      "lint": {
+        "dependsOn": [
+          "prisma-generate"
+        ]
+      },
+      "migrate-dev": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma migrate dev",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "migrate-deploy": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma migrate deploy",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "migrate-reset": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma migrate reset",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "seed": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma db seed",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "enphase-verify": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/verify-enphase-history.ts",
+          "cwd": "{projectRoot}"
+        },
+        "dependsOn": [
+          "prisma-generate"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "@nestjs/axios": "catalog:",
+    "@nestjs/common": "catalog:",
+    "@nestjs/config": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/passport": "catalog:",
+    "@nestjs/platform-express": "catalog:",
+    "@nestjs/schedule": "catalog:",
+    "@nestjs/swagger": "catalog:",
+    "@nestjs/terminus": "catalog:",
+    "@nestjs/throttler": "catalog:",
+    "@prisma/adapter-pg": "catalog:",
+    "@prisma/client": "catalog:",
+    "@repo/contracts": "workspace:*",
+    "axios": "catalog:",
+    "cron": "catalog:",
+    "decimal.js": "catalog:",
+    "helmet": "catalog:",
+    "jwks-rsa": "catalog:",
+    "nestjs-pino": "catalog:",
+    "nestjs-zod": "catalog:",
+    "passport-jwt": "catalog:",
+    "pino": "catalog:",
+    "pino-http": "catalog:",
+    "pino-pretty": "catalog:",
+    "prisma": "catalog:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "catalog:",
+    "@nestjs/testing": "catalog:",
+    "@swc/cli": "catalog:",
+    "@swc/core": "catalog:",
+    "@types/express": "catalog:",
+    "@types/node": "catalog:",
+    "@types/passport-jwt": "catalog:",
+    "tsx": "catalog:",
+    "unplugin-swc": "catalog:",
+    "vitest": "catalog:"
+  }
+}

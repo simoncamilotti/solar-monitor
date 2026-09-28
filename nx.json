@@ -15,14 +15,17 @@
   },
   "plugins": [
     {
-      "plugin": "@nx/webpack/plugin",
+      "plugin": "@nx/js/typescript",
       "options": {
-        "buildTargetName": "build",
-        "serveTargetName": "serve",
-        "previewTargetName": "preview",
-        "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps",
-        "serveStaticTargetName": "serve-static"
+        "typecheck": {
+          "targetName": "typecheck"
+        },
+        "build": {
+          "targetName": "build",
+          "configName": "tsconfig.lib.json",
+          "buildDepsName": "build-deps",
+          "watchDepsName": "watch-deps"
+        }
       }
     },
     {
@@ -35,8 +38,7 @@
       "plugin": "@nx/vitest",
       "options": {
         "testTargetName": "test"
-      },
-      "exclude": ["apps/api-e2e/**/*"]
+      }
     },
     {
       "plugin": "@nx/vite/plugin",
@@ -49,20 +51,13 @@
         "typecheckTargetName": "typecheck",
         "buildDepsTargetName": "build-deps",
         "watchDepsTargetName": "watch-deps"
-      },
-      "exclude": ["apps/api-e2e/**/*"]
+      }
     }
   ],
-  "analytics": false,
   "targetDefaults": {
-    "build": {
-      "dependsOn": ["^prisma-generate", "prisma-generate"]
-    },
     "test": {
-      "dependsOn": ["^prisma-generate", "prisma-generate"]
-    },
-    "typecheck": {
-      "dependsOn": ["^prisma-generate", "prisma-generate"]
+      "dependsOn": ["^build"]
     }
-  }
+  },
+  "analytics": false
 }

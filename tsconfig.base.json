@@ -1,25 +1,23 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "bundler",
+    "composite": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
     "importHelpers": true,
-    "target": "es2022",
-    "module": "esnext",
-    "lib": ["es2022", "dom"],
-    "strict": true,
+    "isolatedModules": true,
+    "lib": ["es2024"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/core": ["libs/api/core/src/index.ts"],
-      "@/shared-models": ["libs/shared-models/src/index.ts"]
-    },
+    "strict": true,
+    "target": "es2024",
+    "customConditions": ["@repo/source"],
     "noUncheckedSideEffectImports": false,
-    "esModuleInterop": false,
-    "ignoreDeprecations": "6.0"
-  },
-  "exclude": ["node_modules", "tmp"]
+    "noUncheckedIndexedAccess": true
+  }
 }

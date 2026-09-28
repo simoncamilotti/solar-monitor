@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "incremental": false,
+    "sourceMap": true
+  },
+  "references": [
+    {
+      "path": "../../libs/shared/contracts/tsconfig.lib.json"
+    }
+  ]
+}

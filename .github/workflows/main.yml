@@ -35,7 +35,7 @@ jobs:
     uses: simoncamilotti/shared-workflows/.github/workflows/nx-e2e.yml@v1
     with:
       affected: true
-      browsers_command: pnpm exec playwright install chromium
+      browsers_command: pnpm --filter @repo/web-e2e exec playwright install chromium
     secrets: inherit
 
   # main → dev, release → prod, through the GitOps repository.
