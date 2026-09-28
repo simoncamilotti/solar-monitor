@@ -1,4 +1,8 @@
-import { DiskHealthIndicator, MemoryHealthIndicator, PrismaHealthIndicator } from '@nestjs/terminus';
+import {
+  DiskHealthIndicator,
+  MemoryHealthIndicator,
+  PrismaHealthIndicator,
+} from '@nestjs/terminus';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 
@@ -45,7 +49,10 @@ describe('HealthService', () => {
 
       await service.database();
 
-      expect(mockPrismaHealthIndicator.pingCheck).toHaveBeenCalledWith('database', mockPrismaService);
+      expect(mockPrismaHealthIndicator.pingCheck).toHaveBeenCalledWith(
+        'database',
+        mockPrismaService,
+      );
     });
 
     it('should return the health indicator result', async () => {

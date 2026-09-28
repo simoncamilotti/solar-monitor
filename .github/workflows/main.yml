@@ -1,6 +1,4 @@
-# Solar Monitor — Node 24, Prisma, 2 images (api + web)
-
-name: CI/CD
+name: CI
 
 on:
   push:
@@ -10,29 +8,51 @@ on:
     types: [published]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   actions: read
   contents: read
-  packages: write
 
+# `if` on ci and e2e: a repository created from the template starts with an "Initial commit"
+# pushed before the init generator and the secrets. Nothing to check or deploy there.
 jobs:
-  check:
-    uses: simoncamilotti/shared-workflows/.github/workflows/nx-ci.yml@main
+  # Pull requests: affected projects only. main: the whole monorepo (ADR 0010).
+  ci:
+    if: github.event.head_commit.message != 'Initial commit'
+    uses: simoncamilotti/shared-workflows/.github/workflows/nx-ci.yml@v1
     with:
-      node_version: '24'
-      nx_targets: 'lint test typecheck build'
-      prisma: true
-      env_file: 'DATABASE_URL=postgresql://user:pass@localhost:5432/dummy'
+      nx_targets: lint typecheck test build
+      affected: true
+      knip: true
+      gitleaks: true
     secrets: inherit
 
-  docker:
-    if: github.ref == 'refs/heads/main' || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
-    needs: check
-    uses: simoncamilotti/shared-workflows/.github/workflows/docker.yml@main
+  e2e:
+    if: github.event.head_commit.message != 'Initial commit'
+    uses: simoncamilotti/shared-workflows/.github/workflows/nx-e2e.yml@v1
     with:
-      images: |
-        [
-          { "name": "api", "dockerfile": "apps/api/Dockerfile" },
-          { "name": "web", "dockerfile": "apps/web/Dockerfile" }
-        ]
+      affected: true
+      browsers_command: pnpm exec playwright install chromium
+    secrets: inherit
+
+  # main → dev, release → prod, through the GitOps repository.
+  docker:
+    needs: [ci, e2e]
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      packages: write
+    uses: simoncamilotti/shared-workflows/.github/workflows/docker.yml@v1
+    with:
+      images: >-
+        [{"name": "api", "dockerfile": "apps/api/Dockerfile"},
+         {"name": "web", "dockerfile": "apps/web/Dockerfile"}]
+      # The starter only checks that its images build; the projects push them.
+      push: ${{ github.repository != 'simoncamilotti/monorepo-starter' }}
+      # Only once apps/<project>/ exists in the GitOps repository: set the GITOPS_DEPLOY repository
+      # variable after merging the GitOps pull request (docs/runbooks/deployment.md).
+      deploy: ${{ vars.GITOPS_DEPLOY == 'true' }}
     secrets: inherit

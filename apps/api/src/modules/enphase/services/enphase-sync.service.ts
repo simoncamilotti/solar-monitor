@@ -28,7 +28,9 @@ export class EnphaseSyncService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    const schedule = await this._prismaService.syncSchedule.findUnique({ where: { id: 'default' } });
+    const schedule = await this._prismaService.syncSchedule.findUnique({
+      where: { id: 'default' },
+    });
     const syncTime = schedule?.syncTime ?? '02:00';
     this._registerSyncCron(syncTime);
   }
@@ -45,7 +47,9 @@ export class EnphaseSyncService implements OnModuleInit {
   }
 
   async getSyncSchedule(): Promise<{ syncTime: string }> {
-    const schedule = await this._prismaService.syncSchedule.findUnique({ where: { id: 'default' } });
+    const schedule = await this._prismaService.syncSchedule.findUnique({
+      where: { id: 'default' },
+    });
     return { syncTime: schedule?.syncTime ?? '02:00' };
   }
 
@@ -75,7 +79,11 @@ export class EnphaseSyncService implements OnModuleInit {
     this._logger.log(`Saved lifetime data for system ${systemId}`);
   }
 
-  async backfillLifetimeData(systemId: number, startDate: string, endDate: string): Promise<number> {
+  async backfillLifetimeData(
+    systemId: number,
+    startDate: string,
+    endDate: string,
+  ): Promise<number> {
     this._logger.log(`Backfilling system ${systemId} from ${startDate} to ${endDate}`);
 
     const lifetimeData = await this._apiService.getLifetimeData(systemId, startDate, endDate);
@@ -129,7 +137,7 @@ export class EnphaseSyncService implements OnModuleInit {
       const batch = records.slice(i, i + UPSERT_BATCH_SIZE);
 
       await this._prismaService.$transaction(
-        batch.map(record =>
+        batch.map((record) =>
           this._prismaService.enphaseLifetimeData.upsert({
             where: {
               date_enphaseTokenId: {

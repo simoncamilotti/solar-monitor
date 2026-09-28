@@ -10,7 +10,9 @@
         var isValid, qp, arr;
 
         if (/code|token|error/.test(window.location.href)) {
-          qp = (window.location.search || '').substring(1) || (window.location.hash || '').substring(1);
+          qp =
+            (window.location.search || '').substring(1) ||
+            (window.location.hash || '').substring(1);
         }
 
         if (qp) {
@@ -24,7 +26,10 @@
         }
 
         if (isValid || qp) {
-          oauth2.callback({ url: redirectUrl, window: window, state: sentState, redirectUrl: redirectUrl }, qp);
+          oauth2.callback(
+            { url: redirectUrl, window: window, state: sentState, redirectUrl: redirectUrl },
+            qp,
+          );
         } else {
           oauth2.errCb({
             authId: oauth2.state,

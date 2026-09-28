@@ -33,7 +33,7 @@ export const HistoryGrid: FunctionComponent<HistoryGridProps> = ({ data }) => {
           paginationPageSize={50}
           paginationPageSizeSelector={[25, 50, 100, 500]}
           onGridReady={onGridReady}
-          getRowId={params => String(params.data.date)}
+          getRowId={(params) => String(params.data.date)}
         />
       </div>
     </motion.div>

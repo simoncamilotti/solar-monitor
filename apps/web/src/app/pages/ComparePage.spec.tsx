@@ -1,3 +1,7 @@
+import { render, screen } from '@testing-library/react';
+
+import { ComparePage } from './ComparePage';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
@@ -17,13 +21,23 @@ vi.mock('../modules/comparison/components/ComparisonPageSkeleton', () => ({
   ComparisonPageSkeleton: () => <div data-testid="comparison-skeleton" />,
 }));
 
-import { render, screen } from '@testing-library/react';
-
-import { ComparePage } from './ComparePage';
-
 const mockData = [
-  { date: '2024-01-01', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
-  { date: '2024-01-02', kwhProduced: 12, kwhConsumed: 9, kwhImported: 1, kwhExported: 5, gridDependency: 15 },
+  {
+    date: '2024-01-01',
+    kwhProduced: 10,
+    kwhConsumed: 8,
+    kwhImported: 2,
+    kwhExported: 4,
+    gridDependency: 20,
+  },
+  {
+    date: '2024-01-02',
+    kwhProduced: 12,
+    kwhConsumed: 9,
+    kwhImported: 1,
+    kwhExported: 5,
+    gridDependency: 15,
+  },
 ];
 
 describe('ComparePage', () => {

@@ -31,4 +31,6 @@ export class SyncStatusResponseDto extends createZodDto(syncStatusResponseDtoSch
 
 export class SyncScheduleDto extends createZodDto(syncScheduleDtoSchema) {}
 
-export class UpdateSyncScheduleRequestDto extends createZodDto(updateSyncScheduleRequestDtoSchema) {}
+export class UpdateSyncScheduleRequestDto extends createZodDto(
+  updateSyncScheduleRequestDtoSchema,
+) {}

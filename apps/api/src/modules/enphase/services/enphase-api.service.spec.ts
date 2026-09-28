@@ -83,9 +83,24 @@ describe('EnphaseApiService', () => {
         production: [1000, 2000],
         meter_start_date: '2025-01-01',
       };
-      const consumptionResp = { system_id: 1, start_date: '2026-03-10', meta: LIFETIME_META, consumption: [500, 600] };
-      const importResp = { system_id: 1, start_date: '2026-03-10', meta: LIFETIME_META, import: [100, 200] };
-      const exportResp = { system_id: 1, start_date: '2026-03-10', meta: LIFETIME_META, export: [400, 500] };
+      const consumptionResp = {
+        system_id: 1,
+        start_date: '2026-03-10',
+        meta: LIFETIME_META,
+        consumption: [500, 600],
+      };
+      const importResp = {
+        system_id: 1,
+        start_date: '2026-03-10',
+        meta: LIFETIME_META,
+        import: [100, 200],
+      };
+      const exportResp = {
+        system_id: 1,
+        start_date: '2026-03-10',
+        meta: LIFETIME_META,
+        export: [400, 500],
+      };
 
       mockHttpService.get
         .mockReturnValueOnce(of({ data: productionResp }))
@@ -122,13 +137,24 @@ describe('EnphaseApiService', () => {
           }),
         )
         .mockReturnValueOnce(
-          of({ data: { system_id: 1, start_date: '2026-04-01', meta: LIFETIME_META, consumption: [500] } }),
+          of({
+            data: {
+              system_id: 1,
+              start_date: '2026-04-01',
+              meta: LIFETIME_META,
+              consumption: [500],
+            },
+          }),
         )
         .mockReturnValueOnce(
-          of({ data: { system_id: 1, start_date: '2026-04-01', meta: LIFETIME_META, import: [100] } }),
+          of({
+            data: { system_id: 1, start_date: '2026-04-01', meta: LIFETIME_META, import: [100] },
+          }),
         )
         .mockReturnValueOnce(
-          of({ data: { system_id: 1, start_date: '2026-04-01', meta: LIFETIME_META, export: [400] } }),
+          of({
+            data: { system_id: 1, start_date: '2026-04-01', meta: LIFETIME_META, export: [400] },
+          }),
         );
 
       const result = await service.getLifetimeData(1, '2026-01-01');
@@ -185,7 +211,9 @@ describe('EnphaseApiService', () => {
     it('should call the consumption_lifetime endpoint', async () => {
       mockAuthService.getValidAccessToken.mockResolvedValue('token');
       mockHttpService.get.mockReturnValue(
-        of({ data: { system_id: 1, start_date: '2026-03-10', meta: LIFETIME_META, consumption: [500] } }),
+        of({
+          data: { system_id: 1, start_date: '2026-03-10', meta: LIFETIME_META, consumption: [500] },
+        }),
       );
 
       await service.getConsumptionLifetime(1, '2026-03-10');
@@ -199,7 +227,9 @@ describe('EnphaseApiService', () => {
     it('should call the energy_export_lifetime endpoint', async () => {
       mockAuthService.getValidAccessToken.mockResolvedValue('token');
       mockHttpService.get.mockReturnValue(
-        of({ data: { system_id: 1, start_date: '2026-03-10', meta: LIFETIME_META, export: [400] } }),
+        of({
+          data: { system_id: 1, start_date: '2026-03-10', meta: LIFETIME_META, export: [400] },
+        }),
       );
 
       await service.getExportLifetime(1, '2026-03-10');
@@ -213,7 +243,9 @@ describe('EnphaseApiService', () => {
     it('should call the energy_import_lifetime endpoint', async () => {
       mockAuthService.getValidAccessToken.mockResolvedValue('token');
       mockHttpService.get.mockReturnValue(
-        of({ data: { system_id: 1, start_date: '2026-03-10', meta: LIFETIME_META, import: [100] } }),
+        of({
+          data: { system_id: 1, start_date: '2026-03-10', meta: LIFETIME_META, import: [100] },
+        }),
       );
 
       await service.getImportLifetime(1, '2026-03-10');

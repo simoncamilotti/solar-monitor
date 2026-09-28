@@ -56,7 +56,7 @@ export const useComparisonData = (
           case 'daily': {
             const categories = Array.from({ length: totalDays }, (_, i) => `${i + 1}`);
             const values = Array.from({ length: totalDays }, (_, d) => {
-              const dayEntries = entries.filter(e => parseISO(e.date).getDate() === d + 1);
+              const dayEntries = entries.filter((e) => parseISO(e.date).getDate() === d + 1);
               return computeMetric(filters.metric, dayEntries);
             });
             return { label, color, categories, values };
@@ -72,7 +72,9 @@ export const useComparisonData = (
             }
             const sortedWeeks = [...weekMap.keys()].sort((a, b) => a - b);
             const categories = sortedWeeks.map((_, i) => `S${i + 1}`);
-            const values = sortedWeeks.map(w => computeMetric(filters.metric, weekMap.get(w) ?? []));
+            const values = sortedWeeks.map((w) =>
+              computeMetric(filters.metric, weekMap.get(w) ?? []),
+            );
             return { label, color, categories, values };
           }
 
@@ -88,7 +90,7 @@ export const useComparisonData = (
           case 'monthly': {
             const categories = Array.from({ length: 12 }, (_, i) => monthName(i));
             const values = Array.from({ length: 12 }, (_, m) => {
-              const monthEntries = entries.filter(e => parseISO(e.date).getMonth() === m);
+              const monthEntries = entries.filter((e) => parseISO(e.date).getMonth() === m);
               return computeMetric(filters.metric, monthEntries);
             });
             return { label, color, categories, values };
@@ -97,7 +99,7 @@ export const useComparisonData = (
           case 'quarterly': {
             const categories = ['T1', 'T2', 'T3', 'T4'];
             const values = Array.from({ length: 4 }, (_, q) => {
-              const qEntries = entries.filter(e => {
+              const qEntries = entries.filter((e) => {
                 const m = parseISO(e.date).getMonth();
                 return Math.floor(m / 3) === q;
               });
@@ -107,13 +109,16 @@ export const useComparisonData = (
           }
 
           case 'daily': {
-            const isLeap = (period.year % 4 === 0 && period.year % 100 !== 0) || period.year % 400 === 0;
+            const isLeap =
+              (period.year % 4 === 0 && period.year % 100 !== 0) || period.year % 400 === 0;
             const totalDays = isLeap ? 366 : 365;
             const categories = Array.from({ length: totalDays }, (_, i) => `${i + 1}`);
             const dayMap = new Map<number, LifetimeDataDto[]>();
             for (const e of entries) {
               const d = parseISO(e.date);
-              const dayOfYear = Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 0).getTime()) / 86400000);
+              const dayOfYear = Math.floor(
+                (d.getTime() - new Date(d.getFullYear(), 0, 0).getTime()) / 86400000,
+              );
               const arr = dayMap.get(dayOfYear) ?? [];
               arr.push(e);
               dayMap.set(dayOfYear, arr);

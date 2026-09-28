@@ -1,12 +1,12 @@
 import type { InternalAxiosRequestConfig } from 'axios';
 import Axios from 'axios';
 
+import { getStoredToken } from '../auth/auth';
+import { axiosInstance } from './axiosInstance';
+
 vi.mock('../auth/auth', () => ({
   getStoredToken: vi.fn(),
 }));
-
-import { getStoredToken } from '../auth/auth';
-import { axiosInstance } from './axiosInstance';
 
 const mockedGetStoredToken = vi.mocked(getStoredToken);
 

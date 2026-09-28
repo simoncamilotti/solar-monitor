@@ -22,8 +22,10 @@ initAuth({
   .then(() => {
     const router = createBrowserRouter(routes);
 
-    ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(<App router={router} />);
+    ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+      <App router={router} />,
+    );
   })
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
   });

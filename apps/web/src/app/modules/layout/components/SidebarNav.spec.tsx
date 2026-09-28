@@ -1,3 +1,7 @@
+import { render, screen } from '@testing-library/react';
+
+import { SidebarNav } from './SidebarNav';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -12,10 +16,6 @@ vi.mock('react-router', () => ({
     </a>
   ),
 }));
-
-import { render, screen } from '@testing-library/react';
-
-import { SidebarNav } from './SidebarNav';
 
 describe('SidebarNav', () => {
   beforeEach(() => {

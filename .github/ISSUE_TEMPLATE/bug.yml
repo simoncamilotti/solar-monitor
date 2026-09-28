@@ -1,43 +1,34 @@
 name: Bug
-description: Signaler un comportement incorrect
+description: Un comportement ne correspond pas à ce qui est attendu.
 labels: ['type: bug']
 body:
   - type: textarea
-    id: observed
+    id: actual
     attributes:
-      label: Ce qui se passe
-      description: Le comportement constaté, et celui attendu à la place.
+      label: Comportement actuel
+      description: Ce qui se passe, avec les messages d'erreur et les captures utiles.
     validations:
       required: true
-
   - type: textarea
-    id: repro
+    id: expected
     attributes:
-      label: Reproduction
-      description: Les étapes minimales pour le reproduire.
+      label: Comportement attendu
+      description: Ce qui devrait se passer. Lien vers la spec concernée si elle existe.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes pour reproduire
       placeholder: |
-        1. Aller sur /history
-        2. Exporter en CSV
-        3. Les en-têtes affichent « Wh » alors que les valeurs sont en kWh
+        1. Aller sur …
+        2. Cliquer sur …
+        3. Constater …
     validations:
       required: true
-
-  - type: textarea
-    id: evidence
+  - type: input
+    id: environment
     attributes:
-      label: Traces
-      description: Logs, message d'erreur, capture, chemin de fichier concerné.
-    validations:
-      required: false
-
-  - type: dropdown
-    id: scope
-    attributes:
-      label: Périmètre
-      options:
-        - API (NestJS / Enphase)
-        - Web (React)
-        - Base de données (Prisma)
-        - CI / Docker
-    validations:
-      required: true
+      label: Environnement
+      description: Local, dev ou prod ; version ou commit ; navigateur si besoin.
+      placeholder: prod v1.2.0, Firefox 140

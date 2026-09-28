@@ -8,8 +8,11 @@ type ThemeContextType = {
   toggleTheme: () => void;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export const ThemeContext = createContext<ThemeContextType>({ theme: 'dark', toggleTheme: () => {} });
+export const ThemeContext = createContext<ThemeContextType>({
+  theme: 'dark',
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  toggleTheme: () => {},
+});
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -27,7 +30,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'));
+  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
 
   return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
 };

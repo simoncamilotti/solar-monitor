@@ -63,7 +63,8 @@ export const SyncSystemItem: FunctionComponent<{
               {t('sync.lastSync')}: {lastSyncLabel}
               <span className="mx-1.5">·</span>
               {system.totalRecords}
-              {system.expectedRecords > system.totalRecords && ` / ${system.expectedRecords}`} {t('sync.records')}
+              {system.expectedRecords > system.totalRecords && ` / ${system.expectedRecords}`}{' '}
+              {t('sync.records')}
             </p>
           </div>
         </div>
@@ -81,7 +82,7 @@ export const SyncSystemItem: FunctionComponent<{
               </button>
               <div className="w-px h-5 bg-border" />
               <button
-                onClick={() => setOpen(prev => !prev)}
+                onClick={() => setOpen((prev) => !prev)}
                 disabled={isDisabled}
                 className={`${buttonClasses} rounded-r-lg px-2`}
                 aria-label="More sync options"
@@ -119,8 +120,11 @@ export const SyncSystemItem: FunctionComponent<{
 
       {system.gaps.length > 0 && (
         <ul className="border-t border-border/50 divide-y divide-border/50">
-          {system.gaps.map(gap => (
-            <li key={`${gap.from}-${gap.to}`} className="flex items-center justify-between gap-3 px-4 py-2.5">
+          {system.gaps.map((gap) => (
+            <li
+              key={`${gap.from}-${gap.to}`}
+              className="flex items-center justify-between gap-3 px-4 py-2.5"
+            >
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-500" />
                 <span>
@@ -130,7 +134,9 @@ export const SyncSystemItem: FunctionComponent<{
                 </span>
               </p>
               <button
-                onClick={() => onBackfill(system.systemId, { startDate: gap.from, endDate: gap.to })}
+                onClick={() =>
+                  onBackfill(system.systemId, { startDate: gap.from, endDate: gap.to })
+                }
                 disabled={isDisabled}
                 className={`${buttonClasses} shrink-0 rounded-lg border border-border bg-card`}
               >

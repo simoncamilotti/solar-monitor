@@ -17,10 +17,10 @@ const buildPinoOptions = (configService: ConfigService): Params => {
     forRoutes: [{ method: RequestMethod.ALL, path: '*splat' }],
     pinoHttp: {
       level: isProduction ? 'info' : 'debug',
-      genReqId: req => req.headers['x-request-id'] ?? crypto.randomUUID(),
+      genReqId: (req) => req.headers['x-request-id'] ?? crypto.randomUUID(),
       redact: ['req.headers.authorization', 'req.headers.cookie'],
       autoLogging: {
-        ignore: (req): boolean => ['/health'].some(publicPath => req.url === publicPath),
+        ignore: (req): boolean => ['/health'].some((publicPath) => req.url === publicPath),
       },
       transport: isProduction ? undefined : { target: 'pino-pretty' },
     } as Options,

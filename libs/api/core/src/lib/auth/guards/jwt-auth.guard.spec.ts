@@ -59,7 +59,10 @@ describe('JwtAuthGuard', () => {
 
       guard.canActivate(context);
 
-      expect(reflector.getAllAndOverride).toHaveBeenCalledWith('isPublic', [context.getHandler(), context.getClass()]);
+      expect(reflector.getAllAndOverride).toHaveBeenCalledWith('isPublic', [
+        context.getHandler(),
+        context.getClass(),
+      ]);
     });
 
     it('should delegate when metadata is undefined', () => {

@@ -12,7 +12,7 @@ const errorInterceptor = (error: unknown) => {
 };
 
 const instance = Axios.create({ baseURL: '/api' });
-instance.interceptors.response.use(_ => _, errorInterceptor);
+instance.interceptors.response.use((_) => _, errorInterceptor);
 
 export const axiosInstance = instance;
 
@@ -41,4 +41,4 @@ const forbiddenInterceptor = (error: unknown) => {
 };
 
 axiosInstance.interceptors.request.use(authRequestInterceptor);
-axiosInstance.interceptors.response.use(_ => _, forbiddenInterceptor);
+axiosInstance.interceptors.response.use((_) => _, forbiddenInterceptor);

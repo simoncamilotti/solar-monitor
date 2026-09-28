@@ -1,3 +1,10 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
+import type { ReactNode } from 'react';
+
+import { HistoryService } from '../history.service';
+import { useHistoryData } from './use-history-data.hook';
+
 vi.mock('../history.service', () => ({
   HistoryService: {
     getAll: vi.fn().mockResolvedValue([]),
@@ -7,13 +14,6 @@ vi.mock('../history.service', () => ({
 vi.mock('../history.key', () => ({
   historyKey: { getAll: ['history', 'getAll'] },
 }));
-
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, waitFor } from '@testing-library/react';
-import type { ReactNode } from 'react';
-
-import { HistoryService } from '../history.service';
-import { useHistoryData } from './use-history-data.hook';
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -34,7 +34,14 @@ describe('useHistoryData', () => {
 
   it('should return data after fetch', async () => {
     const mockResponse = [
-      { date: '2024-01-01', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
+      {
+        date: '2024-01-01',
+        kwhProduced: 10,
+        kwhConsumed: 8,
+        kwhImported: 2,
+        kwhExported: 4,
+        gridDependency: 20,
+      },
     ];
     vi.mocked(HistoryService.getAll).mockResolvedValueOnce(mockResponse);
 

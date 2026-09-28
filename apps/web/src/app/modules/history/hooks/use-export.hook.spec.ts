@@ -1,9 +1,3 @@
-const { languageRef } = vi.hoisted(() => ({ languageRef: { current: 'fr' } }));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ i18n: { language: languageRef.current } }),
-}));
-
 import { renderHook } from '@testing-library/react';
 
 import type { LifetimeDataResponseDto } from '@/shared-models';
@@ -11,9 +5,29 @@ import type { LifetimeDataResponseDto } from '@/shared-models';
 import type { ExportConfig } from './use-export.hook';
 import { useExport } from './use-export.hook';
 
+const { languageRef } = vi.hoisted(() => ({ languageRef: { current: 'fr' } }));
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({ i18n: { language: languageRef.current } }),
+}));
+
 const mockData: LifetimeDataResponseDto = [
-  { date: '2023-03-15', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
-  { date: '2024-01-10', kwhProduced: 12, kwhConsumed: 9, kwhImported: 1, kwhExported: 5, gridDependency: 15 },
+  {
+    date: '2023-03-15',
+    kwhProduced: 10,
+    kwhConsumed: 8,
+    kwhImported: 2,
+    kwhExported: 4,
+    gridDependency: 20,
+  },
+  {
+    date: '2024-01-10',
+    kwhProduced: 12,
+    kwhConsumed: 9,
+    kwhImported: 1,
+    kwhExported: 5,
+    gridDependency: 15,
+  },
   {
     date: '2024-06-20',
     kwhProduced: 15,
@@ -124,7 +138,11 @@ describe('useExport', () => {
     it('should write a header row followed by one row per entry', async () => {
       const { result } = renderHook(() => useExport(mockData));
 
-      result.current.exportData({ year: 'all', month: 'all', metrics: ['kwhProduced', 'kwhConsumed'] });
+      result.current.exportData({
+        year: 'all',
+        month: 'all',
+        metrics: ['kwhProduced', 'kwhConsumed'],
+      });
 
       expect(await exportedCsv()).toBe(
         [
@@ -139,9 +157,15 @@ describe('useExport', () => {
     it('should only write the requested metrics, in the requested order', async () => {
       const { result } = renderHook(() => useExport(mockData));
 
-      result.current.exportData({ year: '2023', month: 'all', metrics: ['gridDependency', 'kwhExported'] });
+      result.current.exportData({
+        year: '2023',
+        month: 'all',
+        metrics: ['gridDependency', 'kwhExported'],
+      });
 
-      expect(await exportedCsv()).toBe(['Date;Dépendance (%);Export (kWh)', '2023-03-15;20,00;4,00'].join('\n'));
+      expect(await exportedCsv()).toBe(
+        ['Date;Dépendance (%);Export (kWh)', '2023-03-15;20,00;4,00'].join('\n'),
+      );
     });
 
     it('should use the anglo-saxon dialect in english', async () => {

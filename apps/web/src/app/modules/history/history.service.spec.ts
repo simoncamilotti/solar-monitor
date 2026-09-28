@@ -1,11 +1,11 @@
+import { axiosInstance } from '../api/axiosInstance';
+import { HistoryService } from './history.service';
+
 vi.mock('../api/axiosInstance', () => ({
   axiosInstance: {
     get: vi.fn(),
   },
 }));
-
-import { axiosInstance } from '../api/axiosInstance';
-import { HistoryService } from './history.service';
 
 describe('HistoryService', () => {
   beforeEach(() => {
@@ -24,7 +24,14 @@ describe('HistoryService', () => {
 
     it('should return data from response', async () => {
       const mockData = [
-        { date: '2024-01-01', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
+        {
+          date: '2024-01-01',
+          kwhProduced: 10,
+          kwhConsumed: 8,
+          kwhImported: 2,
+          kwhExported: 4,
+          gridDependency: 20,
+        },
       ];
       vi.mocked(axiosInstance.get).mockResolvedValueOnce({ data: mockData });
 

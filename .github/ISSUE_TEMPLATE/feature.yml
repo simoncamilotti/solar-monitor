@@ -1,0 +1,33 @@
+name: Fonctionnalité
+description: Une fonctionnalité nouvelle ou modifiée, décrite par une spec.
+labels: ['type: feature']
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Spec liée
+      description: Chemin de la spec dans `docs/specs/`, à créer ou à mettre à jour dans la même PR.
+      placeholder: docs/specs/003-user-avatar.md
+  - type: textarea
+    id: summary
+    attributes:
+      label: Résumé
+      description: Ce que la fonctionnalité apporte, et à qui.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critères d'acceptation
+      placeholder: |
+        - [ ] Étant donné …, quand …, alors …
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Sous-tâches
+      placeholder: |
+        - [ ] API : …
+        - [ ] Web : …
+        - [ ] Documentation : …

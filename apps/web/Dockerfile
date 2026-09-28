@@ -1,30 +1,23 @@
-# ---------- Stage 1: Install dependencies ----------
-FROM node:24-alpine@sha256:7fddd9ddeae8196abf4a3ef2de34e11f7b1a722119f91f28ddf1e99dcafdf114 AS deps
-WORKDIR /app
+# syntax=docker/dockerfile:1
+# Web image. Build context: the repository root.
+ARG NODE_IMAGE=node:24-alpine@sha256:7fddd9ddeae8196abf4a3ef2de34e11f7b1a722119f91f28ddf1e99dcafdf114
+ARG NGINX_IMAGE=nginxinc/nginx-unprivileged:alpine@sha256:ccbac1a4c20a8b41c5dd1691bd91d63eda3b7989d643a33fd47841838519bfb9
 
-COPY package.json package-lock.json ./
-RUN npm ci
-
-# ---------- Stage 2: Build ----------
-FROM node:24-alpine@sha256:7fddd9ddeae8196abf4a3ef2de34e11f7b1a722119f91f28ddf1e99dcafdf114 AS build
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
+FROM ${NODE_IMAGE} AS build
+ENV NX_DAEMON=false NX_NO_CLOUD=true LEFTHOOK=0
+WORKDIR /repo
+RUN corepack enable
+COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm fetch
 COPY . .
+RUN pnpm install --offline --frozen-lockfile
+RUN pnpm exec nx build web
 
-RUN npx nx build web --configuration=production
-
-# ---------- Stage 3: Production ----------
-FROM nginxinc/nginx-unprivileged:alpine@sha256:ccbac1a4c20a8b41c5dd1691bd91d63eda3b7989d643a33fd47841838519bfb9 AS prod
-
+FROM ${NGINX_IMAGE} AS runtime
 COPY config/web/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist/apps/web/ /usr/share/nginx/html/
-
-# Empty config.js placeholder — will be mounted via k3s volume at runtime
+COPY --from=build /repo/dist/apps/web/ /usr/share/nginx/html/
+# Empty config.js placeholder: the real one is mounted by the k3s deployment.
 USER root
 RUN touch /usr/share/nginx/html/config.js && chown nginx:nginx /usr/share/nginx/html/config.js
 USER nginx
-
 EXPOSE 8080
-
-CMD ["nginx", "-g", "daemon off;"]

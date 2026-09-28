@@ -8,7 +8,9 @@ import { useComparisonFilters } from '../hooks/use-comparison-filters.hook';
 import { ComparisonChart } from './ComparisonChart';
 import { ComparisonFilters } from './ComparisonFilters';
 
-export const ComparisonContent: FunctionComponent<{ data: LifetimeDataResponseDto }> = ({ data }) => {
+export const ComparisonContent: FunctionComponent<{ data: LifetimeDataResponseDto }> = ({
+  data,
+}) => {
   const {
     filters,
     availableYears,

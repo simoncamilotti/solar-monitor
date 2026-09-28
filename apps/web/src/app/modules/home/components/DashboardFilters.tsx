@@ -47,12 +47,14 @@ export const DashboardFilters: FunctionComponent<DashboardFiltersProps> = ({
     >
       {/* View Mode */}
       <div className="flex rounded-lg bg-muted p-1">
-        {VIEW_MODES.map(mode => (
+        {VIEW_MODES.map((mode) => (
           <button
             key={mode}
             onClick={() => onViewModeChange(mode)}
             className={`text-xs py-1.5 px-3 rounded-md transition-smooth font-medium ${
-              viewMode === mode ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              viewMode === mode
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {t(`home.viewModes.${mode}`)}
@@ -61,7 +63,13 @@ export const DashboardFilters: FunctionComponent<DashboardFiltersProps> = ({
       </div>
 
       {/* Year */}
-      {showYear && <YearPicker inputYear={selectedYear} availableYears={availableYears} onChange={onYearChange} />}
+      {showYear && (
+        <YearPicker
+          inputYear={selectedYear}
+          availableYears={availableYears}
+          onChange={onYearChange}
+        />
+      )}
 
       {/* Month */}
       {showMonth && (

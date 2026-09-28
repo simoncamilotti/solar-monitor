@@ -3,7 +3,25 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/api/core/src",
   "projectType": "library",
-  "tags": ["scope:api", "type:lib"],
-  "// targets": "to see all targets run: nx show project core --web",
-  "targets": {}
+  "tags": ["type:lib", "platform:node"],
+  "// targets": "prisma-generate is not cached: the client lands in node_modules, outside any output Nx can restore. build, test and typecheck depend on it (nx.json).",
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^default"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": ["tsc --noEmit -p tsconfig.lib.json", "tsc --noEmit -p tsconfig.spec.json"],
+        "parallel": false
+      }
+    },
+    "prisma-generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma generate",
+        "cwd": "{workspaceRoot}"
+      }
+    }
+  }
 }

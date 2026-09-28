@@ -15,13 +15,17 @@ const envSchema = z
     ENPHASE_REDIRECT_URI: z.url(),
     ENPHASE_TOKEN_ENCRYPTION_KEY: z
       .string()
-      .regex(/^[0-9a-f]{64}$/i, 'Must be a 64-character hex string (32 bytes) — generate with `openssl rand -hex 32`'),
+      .regex(
+        /^[0-9a-f]{64}$/i,
+        'Must be a 64-character hex string (32 bytes) — generate with `openssl rand -hex 32`',
+      ),
   })
-  .check(ctx => {
+  .check((ctx) => {
     if (ctx.value.NODE_ENV === 'production' && !ctx.value.CORS_ORIGINS) {
       ctx.issues.push({
         code: 'custom',
-        message: 'CORS_ORIGINS is required in production — an unset value silently blocks the entire frontend',
+        message:
+          'CORS_ORIGINS is required in production — an unset value silently blocks the entire frontend',
         path: ['CORS_ORIGINS'],
         input: ctx.value.CORS_ORIGINS,
       });
@@ -36,7 +40,9 @@ export const validateEnv = (config: Record<string, unknown> = process.env): Env 
   const result = envSchema.safeParse(config);
 
   if (!result.success) {
-    const formatted = result.error.issues.map(issue => `  - ${issue.path.join('.')}: ${issue.message}`).join('\n');
+    const formatted = result.error.issues
+      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
+      .join('\n');
     throw new Error(`Missing or invalid environment variables:\n${formatted}`);
   }
 

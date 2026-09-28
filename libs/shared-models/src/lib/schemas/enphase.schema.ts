@@ -71,11 +71,11 @@ export type LifetimeDataResponseDto = z.infer<typeof lifetimeDataResponseDtoSche
 export type EnphaseSyncRequestDto = z.infer<typeof enphaseSyncRequestDtoSchema>;
 export type EnphaseBackfillResponseDto = z.infer<typeof enphaseBackfillResponseDtoSchema>;
 export type EnphaseBackfillRequestDto = z.infer<typeof enphaseBackfillRequestDtoSchema>;
-export const syncScheduleDtoSchema = z.object({
-  syncTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be in HH:mm format'),
-});
+const syncTimeSchema = z.string().regex(/^\d{2}:\d{2}$/, 'Must be in HH:mm format');
 
-export const updateSyncScheduleRequestDtoSchema = syncScheduleDtoSchema;
+export const syncScheduleDtoSchema = z.object({ syncTime: syncTimeSchema });
+
+export const updateSyncScheduleRequestDtoSchema = z.object({ syncTime: syncTimeSchema });
 
 export type SyncGapDto = z.infer<typeof syncGapDtoSchema>;
 export type SyncStatusDto = z.infer<typeof syncStatusDtoSchema>;

@@ -1,3 +1,7 @@
+import { render, screen } from '@testing-library/react';
+
+import { SettingsPage } from './SettingsPage';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
@@ -9,10 +13,6 @@ vi.mock('../modules/settings/components/SyncStatusCard', () => ({
 vi.mock('../modules/settings/components/SyncScheduleCard', () => ({
   SyncScheduleCard: () => <div data-testid="sync-schedule-card" />,
 }));
-
-import { render, screen } from '@testing-library/react';
-
-import { SettingsPage } from './SettingsPage';
 
 describe('SettingsPage', () => {
   beforeEach(() => {

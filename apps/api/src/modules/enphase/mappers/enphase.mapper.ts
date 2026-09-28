@@ -3,7 +3,12 @@ import type { EnphaseLifetimeData } from '@prisma/client';
 import { Decimal } from 'decimal.js';
 
 import type { EnphaseSystemDto, LifetimeDataResponseDto } from '../dtos/enphase.dto';
-import type { EnphaseSystemRaw, LifetimeData, LifetimeDataRecord, LifetimeSeries } from '../types/enphase.types';
+import type {
+  EnphaseSystemRaw,
+  LifetimeData,
+  LifetimeDataRecord,
+  LifetimeSeries,
+} from '../types/enphase.types';
 
 @Injectable()
 export class EnphaseMapper {
@@ -16,7 +21,7 @@ export class EnphaseMapper {
   }
 
   toSystemDtoList(systems: EnphaseSystemRaw[]): EnphaseSystemDto[] {
-    return systems.map(system => this.toSystemDto(system));
+    return systems.map((system) => this.toSystemDto(system));
   }
 
   /**
@@ -47,7 +52,13 @@ export class EnphaseMapper {
         continue;
       }
 
-      records.push({ date: new Date(`${day}T00:00:00.000Z`), whProduced, whConsumed, whImported, whExported });
+      records.push({
+        date: new Date(`${day}T00:00:00.000Z`),
+        whProduced,
+        whConsumed,
+        whImported,
+        whExported,
+      });
     }
 
     return records;
@@ -72,13 +83,14 @@ export class EnphaseMapper {
   }
 
   toLifetimeDataResponseDto(lifetimeData: EnphaseLifetimeData[]): LifetimeDataResponseDto {
-    return lifetimeData.map(x => ({
+    return lifetimeData.map((x) => ({
       date: x.date.toISOString().slice(0, 10),
       kwhProduced: new Decimal(x.whProduced).div(1000).toNumber(),
       kwhConsumed: new Decimal(x.whConsumed).div(1000).toNumber(),
       kwhImported: new Decimal(x.whImported).div(1000).toNumber(),
       kwhExported: new Decimal(x.whExported).div(1000).toNumber(),
-      gridDependency: x.whConsumed === 0 ? 0 : new Decimal(x.whImported).div(x.whConsumed).mul(100).toNumber(),
+      gridDependency:
+        x.whConsumed === 0 ? 0 : new Decimal(x.whImported).div(x.whConsumed).mul(100).toNumber(),
     }));
   }
 }

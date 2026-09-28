@@ -1,3 +1,9 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import type { LifetimeDataResponseDto } from '@/shared-models';
+
+import { ExportModal } from './ExportModal';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
@@ -17,16 +23,19 @@ vi.mock('../hooks/use-export.hook', () => ({
 }));
 
 const mockExportData = vi.fn();
-const mockGetFilteredData = vi.fn().mockReturnValue([{ date: '2024-01-01' }, { date: '2024-01-02' }]);
-
-import { fireEvent, render, screen } from '@testing-library/react';
-
-import type { LifetimeDataResponseDto } from '@/shared-models';
-
-import { ExportModal } from './ExportModal';
+const mockGetFilteredData = vi
+  .fn()
+  .mockReturnValue([{ date: '2024-01-01' }, { date: '2024-01-02' }]);
 
 const mockData: LifetimeDataResponseDto = [
-  { date: '2024-01-01', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
+  {
+    date: '2024-01-01',
+    kwhProduced: 10,
+    kwhConsumed: 8,
+    kwhImported: 2,
+    kwhExported: 4,
+    gridDependency: 20,
+  },
   {
     date: '2024-06-15',
     kwhProduced: 15,
@@ -149,7 +158,7 @@ describe('ExportModal', () => {
     render(<ExportModal {...defaultProps} />);
 
     const checkboxes = screen.getAllByRole('checkbox');
-    checkboxes.forEach(cb => {
+    checkboxes.forEach((cb) => {
       if (cb.getAttribute('aria-checked') === 'true') {
         fireEvent.click(cb);
       }

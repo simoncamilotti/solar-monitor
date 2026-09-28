@@ -1,3 +1,7 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import { SidebarThemeToggle } from './SidebarThemeToggle';
+
 const mockToggleTheme = vi.fn();
 let mockTheme = 'dark';
 
@@ -11,10 +15,6 @@ vi.mock('react-i18next', () => ({
 vi.mock('../hooks/use-theme.hook', () => ({
   useTheme: () => ({ theme: mockTheme, toggleTheme: mockToggleTheme }),
 }));
-
-import { fireEvent, render, screen } from '@testing-library/react';
-
-import { SidebarThemeToggle } from './SidebarThemeToggle';
 
 describe('SidebarThemeToggle', () => {
   beforeEach(() => {

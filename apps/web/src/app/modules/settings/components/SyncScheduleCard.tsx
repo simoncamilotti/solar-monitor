@@ -1,5 +1,5 @@
 import { Clock, Loader2, Save } from 'lucide-react';
-import { type FunctionComponent, useEffect, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -10,13 +10,9 @@ export const SyncScheduleCard: FunctionComponent = () => {
   const { t } = useTranslation('web');
   const { data, isPending, isError } = useSyncSchedule();
   const mutation = useUpdateSyncScheduleMutation();
-  const [syncTime, setSyncTime] = useState('02:00');
-
-  useEffect(() => {
-    if (data?.syncTime) {
-      setSyncTime(data.syncTime);
-    }
-  }, [data?.syncTime]);
+  // The stored time until the user edits it.
+  const [draft, setDraft] = useState<string | null>(null);
+  const syncTime = draft ?? data?.syncTime ?? '02:00';
 
   const handleSave = () => {
     mutation.mutate(syncTime, {
@@ -61,7 +57,7 @@ export const SyncScheduleCard: FunctionComponent = () => {
             id="sync-time"
             type="time"
             value={syncTime}
-            onChange={e => setSyncTime(e.target.value)}
+            onChange={(e) => setDraft(e.target.value)}
             className="px-3 py-1.5 text-xs rounded-lg border border-border bg-background text-foreground"
           />
           <button
@@ -69,7 +65,11 @@ export const SyncScheduleCard: FunctionComponent = () => {
             disabled={mutation.isPending || !hasChanged}
             className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50 rounded-lg border border-border bg-card"
           >
-            {mutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            {mutation.isPending ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Save className="w-3.5 h-3.5" />
+            )}
             {t('syncSchedule.save')}
           </button>
         </div>

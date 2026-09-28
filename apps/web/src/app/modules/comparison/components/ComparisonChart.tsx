@@ -34,7 +34,7 @@ export const ComparisonChart: FunctionComponent<ComparisonChartProps> = ({
     >
       <div className="flex items-center justify-between mb-4 gap-4">
         <div className="flex flex-wrap gap-1.5">
-          {ALL_METRICS.map(m => (
+          {ALL_METRICS.map((m) => (
             <button
               key={m}
               onClick={() => onMetricChange(m)}
@@ -54,7 +54,9 @@ export const ComparisonChart: FunctionComponent<ComparisonChartProps> = ({
           <button
             onClick={() => onChartTypeChange('bar')}
             className={`p-1.5 rounded-md transition-smooth ${
-              chartType === 'bar' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              chartType === 'bar'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
             title={t('compare.chartType.bar')}
           >
@@ -63,7 +65,9 @@ export const ComparisonChart: FunctionComponent<ComparisonChartProps> = ({
           <button
             onClick={() => onChartTypeChange('line')}
             className={`p-1.5 rounded-md transition-smooth ${
-              chartType === 'line' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              chartType === 'line'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
             title={t('compare.chartType.line')}
           >

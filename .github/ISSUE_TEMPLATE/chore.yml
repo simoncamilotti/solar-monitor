@@ -1,0 +1,29 @@
+name: Tâche
+description: Maintenance, outillage, dette technique, documentation.
+labels: ['type: chore']
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Objectif
+      description: Ce qui doit être fait.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Pourquoi
+      description: Ce que la tâche débloque ou évite.
+    validations:
+      required: true
+  - type: textarea
+    id: todo
+    attributes:
+      label: À faire
+      placeholder: |
+        - [ ] …
+  - type: textarea
+    id: done
+    attributes:
+      label: Critères de sortie
+      description: Comment savoir que la tâche est terminée.

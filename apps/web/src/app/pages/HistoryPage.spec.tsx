@@ -1,3 +1,7 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import { HistoryPage } from './HistoryPage';
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
@@ -8,7 +12,9 @@ vi.mock('../modules/history/hooks/use-history-data.hook', () => ({
 }));
 
 vi.mock('../modules/history/components/HistoryGrid', () => ({
-  HistoryGrid: ({ data }: { data: unknown[] }) => <div data-testid="history-grid">{data.length} rows</div>,
+  HistoryGrid: ({ data }: { data: unknown[] }) => (
+    <div data-testid="history-grid">{data.length} rows</div>
+  ),
 }));
 
 vi.mock('../modules/history/components/ExportModal', () => ({
@@ -24,13 +30,23 @@ vi.mock('../modules/history/components/GridSkeleton', () => ({
   GridSkeleton: () => <div data-testid="grid-skeleton" />,
 }));
 
-import { fireEvent, render, screen } from '@testing-library/react';
-
-import { HistoryPage } from './HistoryPage';
-
 const mockData = [
-  { date: '2024-01-01', kwhProduced: 10, kwhConsumed: 8, kwhImported: 2, kwhExported: 4, gridDependency: 20 },
-  { date: '2024-01-02', kwhProduced: 12, kwhConsumed: 9, kwhImported: 1, kwhExported: 5, gridDependency: 15 },
+  {
+    date: '2024-01-01',
+    kwhProduced: 10,
+    kwhConsumed: 8,
+    kwhImported: 2,
+    kwhExported: 4,
+    gridDependency: 20,
+  },
+  {
+    date: '2024-01-02',
+    kwhProduced: 12,
+    kwhConsumed: 9,
+    kwhImported: 1,
+    kwhExported: 5,
+    gridDependency: 15,
+  },
 ];
 
 describe('HistoryPage', () => {
@@ -81,7 +97,9 @@ describe('HistoryPage', () => {
     mockHistoryData.mockReturnValue({ data: undefined, isPending: true, isError: false });
     render(<HistoryPage />);
 
-    expect((screen.getByRole('button', { name: /export.export/ }) as HTMLButtonElement).disabled).toBe(true);
+    expect(
+      (screen.getByRole('button', { name: /export.export/ }) as HTMLButtonElement).disabled,
+    ).toBe(true);
   });
 
   it('should display record count when data is loaded', () => {

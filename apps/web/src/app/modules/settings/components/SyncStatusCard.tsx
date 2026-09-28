@@ -33,7 +33,8 @@ export const SyncStatusCard: FunctionComponent = () => {
     backfillMutation.mutate(
       { systemId, startDate, endDate },
       {
-        onSuccess: data => toast.success(t('sync.backfillSuccess', { count: data.daysBackfilled })),
+        onSuccess: (data) =>
+          toast.success(t('sync.backfillSuccess', { count: data.daysBackfilled })),
         onError: () => toast.error(t('sync.backfillError')),
       },
     );
@@ -58,14 +59,17 @@ export const SyncStatusCard: FunctionComponent = () => {
 
       {systems && systems.length > 0 && (
         <div className="space-y-2">
-          {systems.map(system => (
+          {systems.map((system) => (
             <SyncSystemItem
               key={system.systemId}
               system={system}
               onSync={handleSync}
               isSyncing={syncMutation.isPending && syncMutation.variables === system.systemId}
               onBackfill={handleBackfill}
-              isBackfilling={backfillMutation.isPending && backfillMutation.variables?.systemId === system.systemId}
+              isBackfilling={
+                backfillMutation.isPending &&
+                backfillMutation.variables?.systemId === system.systemId
+              }
             />
           ))}
         </div>

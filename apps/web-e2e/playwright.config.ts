@@ -1,26 +1,23 @@
-import { workspaceRoot } from '@nx/devkit';
-import { nxE2EPreset } from '@nx/playwright/preset';
 import { defineConfig, devices } from '@playwright/test';
 
-// For CI, you may want to set BASE_URL to the deployed application.
-const baseURL = process.env['BASE_URL'] || 'http://localhost:4200';
+// UI integration tests: the production build of the web, with the API and Keycloak mocked by
+// the tests themselves (api-mock.ts, keycloak-mock.ts).
+const webUrl = 'http://localhost:4200';
+const ci = Boolean(process.env['CI']);
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
 export default defineConfig({
-  ...nxE2EPreset(__filename, { testDir: './src' }),
+  testDir: './src',
+  // One worker, retries and long timeouts: the CI runners are shared.
+  workers: 1,
+  retries: ci ? 2 : 0,
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
+  reporter: ci ? [['list'], ['html', { open: 'never' }]] : 'list',
+  outputDir: './test-output/results',
   use: {
-    baseURL,
+    baseURL: webUrl,
     locale: 'fr-FR',
-    trace: 'on-first-retry',
-  },
-  /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'npx nx run web:preview',
-    url: 'http://localhost:4200',
-    reuseExistingServer: true,
-    cwd: workspaceRoot,
+    trace: 'retain-on-failure',
   },
   projects: [
     {
@@ -30,17 +27,18 @@ export default defineConfig({
         launchOptions: {
           // Disable private network access checks so the mocked Keycloak iframe
           // redirect (localhost:8080 → localhost:4200) is not blocked by Chrome.
-          args: ['--disable-features=PrivateNetworkAccessForIframes,BlockInsecurePrivateNetworkRequests'],
+          args: [
+            '--disable-features=PrivateNetworkAccessForIframes,BlockInsecurePrivateNetworkRequests',
+          ],
         },
       },
     },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
   ],
+  webServer: {
+    // The binary itself, not through pnpm: Playwright must be able to stop it.
+    command: '../../node_modules/.bin/vite preview --port 4200 --strictPort',
+    cwd: '../web',
+    url: webUrl,
+    reuseExistingServer: !ci,
+  },
 });

@@ -1,0 +1,37 @@
+# Local hooks stay fast: the CI is the reference (ADR 0006).
+pre-commit:
+  parallel: true
+  jobs:
+    - name: format
+      glob: '*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,html}'
+      run: pnpm exec prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
+    - name: lint
+      glob: '*.{js,jsx,ts,tsx,mjs,cjs}'
+      run: pnpm exec eslint --fix --no-warn-ignored {staged_files}
+      stage_fixed: true
+    - name: gitleaks
+      # Optional locally, mandatory in CI.
+      run: if command -v gitleaks >/dev/null 2>&1; then gitleaks git --pre-commit --staged --redact --no-banner; fi
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}
+
+pre-push:
+  piped: true
+  jobs:
+    - name: protect-main
+      # main has no server-side protection on the Free plan: everything goes through a PR (ADR 0010).
+      # Bypass on purpose with LEFTHOOK=0.
+      use_stdin: true
+      run: |
+        while read -r _ _ remote_ref _; do
+          if [ "$remote_ref" = "refs/heads/main" ]; then
+            echo "Direct push to main is not allowed: open a pull request."
+            exit 1
+          fi
+        done
+    - name: typecheck-test
+      run: pnpm exec nx affected -t typecheck test

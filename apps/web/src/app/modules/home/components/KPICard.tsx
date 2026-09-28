@@ -39,7 +39,10 @@ export const KPICard: FunctionComponent<KPICardProps> = ({
           className={`w-8 h-8 rounded-lg flex items-center justify-center bg-muted`}
           style={color ? { backgroundColor: `${color}20` } : undefined}
         >
-          <Icon className={`w-4 h-4 ${color ? '' : 'text-muted-foreground'}`} style={color ? { color } : undefined} />
+          <Icon
+            className={`w-4 h-4 ${color ? '' : 'text-muted-foreground'}`}
+            style={color ? { color } : undefined}
+          />
         </div>
       </div>
 

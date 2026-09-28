@@ -67,7 +67,13 @@ describe('EnphaseMapper', () => {
   describe('toLifetimeDataRecords', () => {
     const series = (startDate: string, values: number[]): LifetimeSeries => ({ startDate, values });
 
-    const aligned = (startDate: string, p: number[], c: number[], i: number[], e: number[]): LifetimeData => ({
+    const aligned = (
+      startDate: string,
+      p: number[],
+      c: number[],
+      i: number[],
+      e: number[],
+    ): LifetimeData => ({
       whProduced: series(startDate, p),
       whConsumed: series(startDate, c),
       whImported: series(startDate, i),
@@ -76,7 +82,13 @@ describe('EnphaseMapper', () => {
 
     it('should map lifetime data to records with correct dates', () => {
       const records = mapper.toLifetimeDataRecords(
-        aligned('2026-03-10', [1000, 2000, 3000], [500, 600, 700], [100, 200, 300], [400, 500, 600]),
+        aligned(
+          '2026-03-10',
+          [1000, 2000, 3000],
+          [500, 600, 700],
+          [100, 200, 300],
+          [400, 500, 600],
+        ),
       );
 
       expect(records).toHaveLength(3);
@@ -104,7 +116,9 @@ describe('EnphaseMapper', () => {
     });
 
     it('should return single record for single-day data', () => {
-      const records = mapper.toLifetimeDataRecords(aligned('2026-01-15', [5000], [3000], [1000], [2000]));
+      const records = mapper.toLifetimeDataRecords(
+        aligned('2026-01-15', [5000], [3000], [1000], [2000]),
+      );
 
       expect(records).toHaveLength(1);
       expect(records[0]).toEqual({
@@ -123,14 +137,18 @@ describe('EnphaseMapper', () => {
     });
 
     it('should handle month boundary correctly', () => {
-      const records = mapper.toLifetimeDataRecords(aligned('2026-01-31', [100, 200], [50, 60], [10, 20], [40, 50]));
+      const records = mapper.toLifetimeDataRecords(
+        aligned('2026-01-31', [100, 200], [50, 60], [10, 20], [40, 50]),
+      );
 
       expect(records[0].date).toEqual(new Date('2026-01-31'));
       expect(records[1].date).toEqual(new Date('2026-02-01'));
     });
 
     it('should handle a leap day correctly', () => {
-      const records = mapper.toLifetimeDataRecords(aligned('2028-02-28', [100, 200], [50, 60], [10, 20], [40, 50]));
+      const records = mapper.toLifetimeDataRecords(
+        aligned('2028-02-28', [100, 200], [50, 60], [10, 20], [40, 50]),
+      );
 
       expect(records[0].date).toEqual(new Date('2028-02-28'));
       expect(records[1].date).toEqual(new Date('2028-02-29'));
@@ -143,7 +161,7 @@ describe('EnphaseMapper', () => {
         aligned('2026-06-01', [1000, 2000], [500, 600], [100, 200], [400, 500]),
       );
 
-      expect(records.map(r => r.date)).toEqual([new Date('2026-06-01'), new Date('2026-06-02')]);
+      expect(records.map((r) => r.date)).toEqual([new Date('2026-06-01'), new Date('2026-06-02')]);
       expect(records[0].whProduced).toBe(1000);
     });
 
@@ -177,7 +195,7 @@ describe('EnphaseMapper', () => {
         whExported: series('2026-03-10', [400, 500]),
       });
 
-      expect(records.map(r => r.date)).toEqual([new Date('2026-03-10'), new Date('2026-03-11')]);
+      expect(records.map((r) => r.date)).toEqual([new Date('2026-03-10'), new Date('2026-03-11')]);
     });
 
     it('should return no record when a meter has no overlapping day', () => {

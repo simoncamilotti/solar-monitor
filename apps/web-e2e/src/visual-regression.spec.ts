@@ -4,7 +4,14 @@ import { mockApi } from './api-mock';
 import { mockKeycloak } from './keycloak-mock';
 
 const mockHistoryData = [
-  { date: '2024-01-15', kwhProduced: 12.5, kwhConsumed: 8.3, kwhImported: 2.1, kwhExported: 6.3, gridDependency: 25.3 },
+  {
+    date: '2024-01-15',
+    kwhProduced: 12.5,
+    kwhConsumed: 8.3,
+    kwhImported: 2.1,
+    kwhExported: 6.3,
+    gridDependency: 25.3,
+  },
   {
     date: '2024-02-20',
     kwhProduced: 15.0,
@@ -13,8 +20,22 @@ const mockHistoryData = [
     kwhExported: 6.3,
     gridDependency: 14.7,
   },
-  { date: '2024-03-10', kwhProduced: 18.0, kwhConsumed: 11.0, kwhImported: 1.0, kwhExported: 8.0, gridDependency: 9.1 },
-  { date: '2024-04-15', kwhProduced: 20.5, kwhConsumed: 9.5, kwhImported: 0.5, kwhExported: 11.5, gridDependency: 5.3 },
+  {
+    date: '2024-03-10',
+    kwhProduced: 18.0,
+    kwhConsumed: 11.0,
+    kwhImported: 1.0,
+    kwhExported: 8.0,
+    gridDependency: 9.1,
+  },
+  {
+    date: '2024-04-15',
+    kwhProduced: 20.5,
+    kwhConsumed: 9.5,
+    kwhImported: 0.5,
+    kwhExported: 11.5,
+    gridDependency: 5.3,
+  },
   {
     date: '2024-05-20',
     kwhProduced: 25.0,
@@ -34,7 +55,7 @@ const mockHistoryData = [
 ];
 
 async function mockHistoryApi(page: Page) {
-  await page.route('**/api/enphase/all', route =>
+  await page.route('**/api/enphase/all', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -64,6 +85,9 @@ async function switchToLightTheme(page: Page) {
 }
 
 test.describe('Visual regression', () => {
+  // The charts skip their animations: a screenshot never catches the bars mid-growth.
+  test.use({ reducedMotion: 'reduce' });
+
   test.beforeEach(async ({ page, browserName }) => {
     await mockKeycloak(page, browserName);
     await mockApi(page);

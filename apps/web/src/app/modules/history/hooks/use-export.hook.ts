@@ -64,7 +64,7 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
     (config: ExportConfig) => {
       if (!data) return [];
 
-      return data.filter(row => {
+      return data.filter((row) => {
         const date = parseISO(row.date);
         if (config.year !== 'all' && String(date.getFullYear()) !== config.year) return false;
         return !(config.month !== 'all' && String(date.getMonth()) !== config.month);
@@ -82,13 +82,13 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
       const headers = METRIC_HEADERS[locale];
       const { separator, decimal } = CSV_DIALECTS[locale];
 
-      const headerLine = ['Date', ...metrics.map(metric => headers[metric])]
-        .map(cell => escapeCell(cell, separator))
+      const headerLine = ['Date', ...metrics.map((metric) => headers[metric])]
+        .map((cell) => escapeCell(cell, separator))
         .join(separator);
 
-      const lines = filteredData.map(row =>
-        [row.date, ...metrics.map(metric => row[metric].toFixed(2).replace('.', decimal))]
-          .map(cell => escapeCell(cell, separator))
+      const lines = filteredData.map((row) =>
+        [row.date, ...metrics.map((metric) => row[metric].toFixed(2).replace('.', decimal))]
+          .map((cell) => escapeCell(cell, separator))
           .join(separator),
       );
 
@@ -111,7 +111,7 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
 
   const getAvailableYears = useCallback((): string[] => {
     if (!data) return [];
-    const years = new Set(data.map(row => String(parseISO(row.date).getFullYear())));
+    const years = new Set(data.map((row) => String(parseISO(row.date).getFullYear())));
     return Array.from(years).sort();
   }, [data]);
 

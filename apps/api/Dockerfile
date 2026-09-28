@@ -1,58 +1,38 @@
-# ---------- Stage 1: Install dependencies ----------
-FROM node:24-alpine@sha256:7fddd9ddeae8196abf4a3ef2de34e11f7b1a722119f91f28ddf1e99dcafdf114 AS deps
-WORKDIR /app
+# syntax=docker/dockerfile:1
+# API image. Build context: the repository root.
+ARG NODE_IMAGE=node:24-alpine@sha256:7fddd9ddeae8196abf4a3ef2de34e11f7b1a722119f91f28ddf1e99dcafdf114
 
-COPY package.json package-lock.json ./
-RUN npm ci
-
-COPY libs/api/core/src/prisma/schema.prisma libs/api/core/src/prisma/schema.prisma
-COPY prisma.config.ts prisma.config.ts
-RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate --schema=libs/api/core/src/prisma/schema.prisma
-
-# ---------- Stage 2: Build ----------
-FROM node:24-alpine@sha256:7fddd9ddeae8196abf4a3ef2de34e11f7b1a722119f91f28ddf1e99dcafdf114 AS build
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
+FROM ${NODE_IMAGE} AS build
+ENV NX_DAEMON=false NX_NO_CLOUD=true LEFTHOOK=0
+WORKDIR /repo
+RUN corepack enable
+# Dependencies first: this layer is reused as long as the lockfile does not change.
+COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm fetch
 COPY . .
+RUN pnpm install --offline --frozen-lockfile
+RUN pnpm exec nx build api
 
-RUN npx nx build api --configuration=production
+# `generatePackageJson` emits a package.json and a lockfile holding only what the bundle imports.
+# Added on top, pinned to the workspace versions: tslib (the tsc helpers of the bundle) and the
+# Prisma CLI (entrypoint.sh runs `prisma migrate deploy`).
+# Adding them installs the rest from the pruned lockfile.
+WORKDIR /repo/dist/apps/api
+RUN version() { node -p "require('/repo/node_modules/$1/package.json').version"; } \
+ && pnpm --dir . add --workspace-root "tslib@$(version tslib)" "prisma@$(version prisma)"
+RUN cp /repo/prisma.config.ts . \
+ && mkdir -p libs/api/core/src \
+ && cp -r /repo/libs/api/core/src/prisma libs/api/core/src/prisma \
+ && rm libs/api/core/src/prisma/seed.ts \
+ && node_modules/.bin/prisma generate
 
-# ---------- Stage 3: Production ----------
-FROM node:24-alpine@sha256:7fddd9ddeae8196abf4a3ef2de34e11f7b1a722119f91f28ddf1e99dcafdf114 AS prod
+FROM ${NODE_IMAGE} AS runtime
+# The Prisma schema engine, used by `prisma migrate deploy`, needs OpenSSL.
+RUN apk add --no-cache openssl
+ENV NODE_ENV=production TZ=Etc/UTC
 WORKDIR /app
-
-ENV NODE_ENV=production
-ENV TZ=Etc/UTC
-
-# `generatePackageJson` makes webpack emit both a package.json holding only what the bundle
-# requires and a lockfile pruned to match. Copying the workspace lockfile over that pruned one —
-# as this stage used to — hands `npm ci` the whole monorepo tree to resolve against.
-COPY --from=build /app/dist/apps/api ./
-RUN npm ci --omit=dev
-
-# Prisma client (runtime)
-COPY --from=deps /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=deps /app/node_modules/@prisma/client ./node_modules/@prisma/client
-
-# Prisma CLI, used by entrypoint.sh to run `migrate deploy` on startup. It is not a
-# runtime dependency of the bundle, so the `npm ci --omit=dev` above does not install it.
-#
-# Both versions MUST be pinned to the lockfile. Left unpinned, `npm install prisma`
-# resolves npm's `latest` tag — and Prisma publishes release candidates to it
-# (8.0.0-rc.15 in September 2026). Prisma 8 renamed `migrate` to `migration`, so the
-# container crash-looped on startup with CLI.UNKNOWN_COMMAND.
-RUN PRISMA_VERSION="$(node -p "require('./package-lock.json').packages['node_modules/prisma'].version")" \
- && DOTENV_VERSION="$(node -p "require('./package-lock.json').packages['node_modules/dotenv'].version")" \
- && npm install --no-save "prisma@${PRISMA_VERSION}" "dotenv@${DOTENV_VERSION}"
-
-# Prisma schema, config & migrations
-COPY prisma.config.ts prisma.config.ts
-COPY libs/api/core/src/prisma/schema.prisma libs/api/core/src/prisma/schema.prisma
-COPY libs/api/core/src/prisma/migrations libs/api/core/src/prisma/migrations
-
-COPY apps/api/entrypoint.sh entrypoint.sh
-
+COPY --from=build --chown=node:node /repo/dist/apps/api ./
+COPY --chmod=755 apps/api/entrypoint.sh entrypoint.sh
+USER node
 EXPOSE 3000
-
 ENTRYPOINT ["./entrypoint.sh"]

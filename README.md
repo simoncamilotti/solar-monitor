@@ -8,13 +8,13 @@ Prisma, deployed through GitOps.
 
 | Layer        | Technology                                              |
 | :----------- | :------------------------------------------------------ |
-| **Monorepo** | Nx 22, TypeScript 5.9                                   |
+| **Monorepo** | Nx 23, pnpm, TypeScript 6                               |
 | **Backend**  | NestJS 12, Prisma 7, PostgreSQL 17                      |
-| **Frontend** | React 19, Vite 7, TailwindCSS 3, ECharts 6, ag-grid 35  |
+| **Frontend** | React 19, Vite 8, TailwindCSS 3, ECharts 6, ag-grid 35  |
 | **Shared**   | Zod 4 schemas shared between API and client             |
 | **Auth**     | Keycloak 26.2 (OIDC) — `keycloak-js` 26.2 on the client |
 | **i18n**     | i18next — French and English, French as fallback        |
-| **Testing**  | Vitest (API, libs, web), Playwright (web E2E)           |
+| **Testing**  | Vitest (API, libs, web), Playwright (web E2E, Chromium) |
 | **CI/CD**    | GitHub Actions, GHCR, GitOps (Kustomize)                |
 
 ## Architecture
@@ -50,8 +50,12 @@ Frontend concerns that are sometimes expected in a library live under `apps/web/
 ## Prerequisites
 
 - Node.js 24 (see `.nvmrc`)
+- pnpm, through corepack: `corepack enable` (the version is pinned in `package.json`)
 - Docker & Docker Compose
-- npm
+
+```bash
+pnpm install                   # also installs the git hooks (lefthook)
+```
 
 ## Environment & Configuration
 
@@ -77,62 +81,63 @@ refuses to boot if anything is missing.
 
 | Type     | Name                 | Description                                                    |
 | :------- | :------------------- | :------------------------------------------------------------- |
-| Variable | `GITOPS_REPO`        | GitOps repository (e.g. `org/gitops`)                          |
+| Variable | `GITOPS_DEPLOY`      | `true` to update the GitOps repository after the image push    |
 | Variable | `DOCKER_MANUAL_ONLY` | Set to `true` to restrict Docker builds to manual trigger only |
 | Secret   | `GITOPS_PAT`         | Personal access token for the GitOps repo                      |
 | Secret   | `SLACK_WEBHOOK_URL`  | Slack incoming webhook for deploy notifications                |
 
 ## Main Commands
 
+Every task runs through Nx: `pnpm nx <target> <project>`.
+
 ### Development
 
 ```bash
-docker compose up -d           # Start infrastructure (Postgres, Keycloak)
-npm run serve:api              # Start API
-npm run serve:web              # Start Web
+pnpm dev                       # Postgres and Keycloak, migrations, then API and web
 ```
 
-### Build, Lint & Format
+API on `http://localhost:3000` (Swagger `/docs` outside production), web on
+`http://localhost:4200`.
+
+### Lint, Typecheck, Test, Build
 
 ```bash
-npm run build:api / build:web / build:all
-npm run lint:api  / lint:web  / lint:all
-npm run format                 # Prettier via nx format
-npm run format:check
-```
-
-### Tests
-
-```bash
-npm run test:api               # Vitest
-npm run test:web               # Vitest
-npm run test:all
-
-npm run e2e:api                # Vitest — requires Postgres and Keycloak up
-npm run e2e:web                # Playwright
-npm run e2e:web-ui             # Playwright UI mode
-npm run e2e:web-update-snapshots
+pnpm nx run-many -t lint typecheck test build
+pnpm nx affected -t lint typecheck test      # only what the branch changed
+pnpm format                                  # Prettier
+pnpm knip                                    # unused files, exports and dependencies
 ```
 
 Run a single test file:
 
 ```bash
-npx nx test api -- --run <pattern>
-npx nx test web -- --run <pattern>
-npx nx e2e web-e2e -- --grep "<test name>"
+pnpm nx test api -- --run <pattern>
+pnpm nx test web -- --run <pattern>
 ```
 
-> `npm run typecheck:all` runs `tsc --noEmit` for `api`, `core`, `shared-models` and `web` against
-> their source tsconfig — it does not cover the specs, which live under `tsconfig.spec.json`.
+`typecheck` covers the specs: each `project.json` runs `tsc` on the source tsconfig, then on
+`tsconfig.spec.json`.
+
+### E2E
+
+```bash
+pnpm nx e2e web-e2e                          # Playwright, Chromium, API and Keycloak mocked
+pnpm nx e2e web-e2e -- --grep "<test name>"
+pnpm nx e2e web-e2e -- --update-snapshots    # after an intended visual change
+pnpm nx e2e-local api-e2e                    # Vitest, needs Postgres and Keycloak up
+```
+
+The visual regression snapshots are those of Linux Chromium: the CI runs them in the Playwright
+image. `api-e2e` stays out of the CI until it moves to a fake OIDC issuer.
 
 ### Database
 
 ```bash
-npm run prisma:generate        # After any schema change
-npm run prisma:migrate:dev     # Create or apply migrations (dev)
-npm run prisma:migrate:deploy  # Apply migrations (prod)
-npm run prisma:seed            # Idempotent default rows
-npm run prisma:studio          # Database GUI
+pnpm prisma:generate           # After any schema change
+pnpm prisma:migrate:dev        # Create or apply migrations (dev)
+pnpm prisma:migrate:deploy     # Apply migrations (prod)
+pnpm prisma:seed               # Idempotent default rows
+pnpm prisma:studio             # Database GUI
 ```
 
 Schema: `libs/api/core/src/prisma/schema.prisma` · config: `prisma.config.ts` (repository root) ·
@@ -159,7 +164,7 @@ ENPHASE_REDIRECT_URI=http://localhost:3000/api/enphase/callback
 ENPHASE_TOKEN_ENCRYPTION_KEY=$(openssl rand -hex 32)
 ```
 
-3. Apply the migrations: `npm run prisma:migrate:deploy`
+3. Apply the migrations: `pnpm prisma:migrate:deploy`
 4. Start the API and open `http://localhost:3000/api/enphase/authorize` to link your Enphase
    account over OAuth2.
 
@@ -189,7 +194,7 @@ decorator. Rate limiting is global at 100 requests per 60 s, except `/backfill` 
 ### Verifying the stored history
 
 ```bash
-npm run enphase:verify
+pnpm enphase:verify
 ```
 
 Compares every stored day against what the Enphase API returns today for the same range, and reports
@@ -249,14 +254,21 @@ docker exec solar-monitor_keycloak /opt/keycloak/bin/kcadm.sh create \
 
 ## CI/CD
 
-Two GitHub Actions workflows:
+`.github/workflows/main.yml` delegates to the shared workflows of
+[`simoncamilotti/shared-workflows`](https://github.com/simoncamilotti/shared-workflows) (`@v1`):
 
-- **`main.yml`** — delegates to reusable workflows: `nx-ci` (lint, test, typecheck, build) on every
-  push and pull request, then `docker` (build, push to GHCR, GitOps deploy via Kustomize) on `main`,
-  on release, or on manual dispatch. Both jobs run on self-hosted runners with a remote BuildKit
-  builder.
-- **`dependency-update.yml`** — weekly patch and minor dependency updates, validated by E2E and
-  visual regression runs before and after, opening a pull request with a report.
+- **`ci`** (`nx-ci`): lint, typecheck, test and build, then knip and a gitleaks scan of the
+  history. Pull requests check the affected projects only, `main` the whole monorepo.
+- **`e2e`** (`nx-e2e`): the `e2e` targets in the Playwright image.
+- **`docker`**: on `main`, on a release or on manual dispatch, builds and pushes the `api` and
+  `web` images to GHCR, then updates the GitOps repository when the `GITOPS_DEPLOY` repository
+  variable is `true`.
+
+Dependency updates come from Renovate (`renovate.json`, shared preset
+`github>simoncamilotti/renovate-config`).
+
+Git hooks (lefthook): Prettier, ESLint and gitleaks on commit, commitlint on the message,
+typecheck and tests of the affected projects on push, and no direct push to `main`.
 
 ## Conventions
 
@@ -268,8 +280,8 @@ Two GitHub Actions workflows:
   no role model.
 - **Issue references in pull requests.** Use `Closes #N` only on the pull request that completes an
   issue; use `Concerne #N` on the intermediate ones, since an issue usually spans several pull
-  requests. Either keyword marks the issue `status: en cours` for as long as the pull request is
-  open, and the label is removed when it closes.
+  requests.
+- **Commits** follow Conventional Commits on a single line, checked by commitlint.
 
 ## License
 

@@ -1,6 +1,6 @@
 import type { FunctionComponent, ReactNode } from 'react';
 
-export type PageHeaderAction = {
+type PageHeaderAction = {
   label: string;
   icon?: ReactNode;
   onClick: () => void;
@@ -15,7 +15,13 @@ type PageHeaderProps = {
   trailing?: ReactNode;
 };
 
-export const PageHeader: FunctionComponent<PageHeaderProps> = ({ title, description, icon, action, trailing }) => (
+export const PageHeader: FunctionComponent<PageHeaderProps> = ({
+  title,
+  description,
+  icon,
+  action,
+  trailing,
+}) => (
   <div className="mb-6 flex items-center justify-between">
     <div>
       <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">

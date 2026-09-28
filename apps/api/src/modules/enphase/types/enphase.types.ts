@@ -22,7 +22,7 @@ export type EnphaseSystemsResponse = {
   systems: EnphaseSystemRaw[];
 };
 
-export type EnphaseLifetimeMeta = {
+type EnphaseLifetimeMeta = {
   status: string;
   last_report_at: number;
   last_energy_at: number;

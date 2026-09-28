@@ -1,4 +1,12 @@
-import { differenceInCalendarDays, isAfter, isBefore, parse, parseISO, subDays, subMonths } from 'date-fns';
+import {
+  differenceInCalendarDays,
+  isAfter,
+  isBefore,
+  parse,
+  parseISO,
+  subDays,
+  subMonths,
+} from 'date-fns';
 import { useMemo } from 'react';
 
 import type { LifetimeDataDto, LifetimeDataResponseDto } from '@/shared-models';
@@ -18,7 +26,10 @@ export type DashboardKpis = {
   selfConsumptionDelta: number | null;
 };
 
-const filterCurrentPeriod = (data: LifetimeDataResponseDto, filters: DashboardFilterState): LifetimeDataDto[] => {
+const filterCurrentPeriod = (
+  data: LifetimeDataResponseDto,
+  filters: DashboardFilterState,
+): LifetimeDataDto[] => {
   switch (filters.viewMode) {
     case 'full':
       return data;
@@ -34,12 +45,17 @@ const filterCurrentPeriod = (data: LifetimeDataResponseDto, filters: DashboardFi
 
       const startDate = parse(customStartDate, 'yyyy-MM-dd', new Date());
       const endDate = parse(customEndDate, 'yyyy-MM-dd', new Date());
-      return data.filter(d => isAfter(parseISO(d.date), startDate) && isBefore(parseISO(d.date), endDate));
+      return data.filter(
+        (d) => isAfter(parseISO(d.date), startDate) && isBefore(parseISO(d.date), endDate),
+      );
     }
   }
 };
 
-const filterPreviousPeriod = (data: LifetimeDataResponseDto, filters: DashboardFilterState): LifetimeDataDto[] => {
+const filterPreviousPeriod = (
+  data: LifetimeDataResponseDto,
+  filters: DashboardFilterState,
+): LifetimeDataDto[] => {
   switch (filters.viewMode) {
     case 'full':
       return data;
@@ -59,7 +75,9 @@ const filterPreviousPeriod = (data: LifetimeDataResponseDto, filters: DashboardF
       const rangeDays = differenceInCalendarDays(end, start) + 1;
       const prevEnd = subDays(start, 1);
       const prevStart = subDays(prevEnd, rangeDays - 1);
-      return data.filter(d => isAfter(parseISO(d.date), prevStart) && isBefore(parseISO(d.date), prevEnd));
+      return data.filter(
+        (d) => isAfter(parseISO(d.date), prevStart) && isBefore(parseISO(d.date), prevEnd),
+      );
     }
   }
 };
@@ -69,7 +87,10 @@ const computeDelta = (current: number, previous: number): number | null => {
   return ((current - previous) / previous) * 100;
 };
 
-export const useDashboardKpis = (data: LifetimeDataResponseDto, filters: DashboardFilterState): DashboardKpis => {
+export const useDashboardKpis = (
+  data: LifetimeDataResponseDto,
+  filters: DashboardFilterState,
+): DashboardKpis => {
   return useMemo(() => {
     const currentData = filterCurrentPeriod(data, filters);
     const previousData = filterPreviousPeriod(data, filters);
@@ -82,10 +103,13 @@ export const useDashboardKpis = (data: LifetimeDataResponseDto, filters: Dashboa
       consumption: current.consumed,
       autonomy: current.autonomy,
       selfConsumption: current.selfConsumption,
-      productionDelta: previousData.length > 0 ? computeDelta(current.produced, previous.produced) : null,
-      consumptionDelta: previousData.length > 0 ? computeDelta(current.consumed, previous.consumed) : null,
+      productionDelta:
+        previousData.length > 0 ? computeDelta(current.produced, previous.produced) : null,
+      consumptionDelta:
+        previousData.length > 0 ? computeDelta(current.consumed, previous.consumed) : null,
       autonomyDelta: previousData.length > 0 ? current.autonomy - previous.autonomy : null,
-      selfConsumptionDelta: previousData.length > 0 ? current.selfConsumption - previous.selfConsumption : null,
+      selfConsumptionDelta:
+        previousData.length > 0 ? current.selfConsumption - previous.selfConsumption : null,
     };
   }, [data, filters]);
 };

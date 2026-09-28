@@ -42,7 +42,8 @@ const readFromStorage = (): Partial<ComparisonFilterState> | null => {
   }
 };
 
-export const isYearPeriod = (p: ComparisonPeriod): p is YearPeriod => 'year' in p && !('month' in p) && !('date' in p);
+export const isYearPeriod = (p: ComparisonPeriod): p is YearPeriod =>
+  'year' in p && !('month' in p) && !('date' in p);
 
 export const isMonthPeriod = (p: ComparisonPeriod): p is MonthPeriod => 'year' in p && 'month' in p;
 
@@ -65,11 +66,15 @@ const buildInitialState = (): ComparisonFilterState => {
   const stored = readFromStorage();
 
   const granularity =
-    stored?.granularity && VALID_GRANULARITIES.includes(stored.granularity) ? stored.granularity : 'years';
+    stored?.granularity && VALID_GRANULARITIES.includes(stored.granularity)
+      ? stored.granularity
+      : 'years';
 
-  const metric = stored?.metric && ALL_METRICS.includes(stored.metric) ? stored.metric : 'kwhConsumed';
+  const metric =
+    stored?.metric && ALL_METRICS.includes(stored.metric) ? stored.metric : 'kwhConsumed';
 
-  const chartType = stored?.chartType && VALID_CHART_TYPES.includes(stored.chartType) ? stored.chartType : 'bar';
+  const chartType =
+    stored?.chartType && VALID_CHART_TYPES.includes(stored.chartType) ? stored.chartType : 'bar';
 
   const availableResolutions = RESOLUTIONS_BY_GRANULARITY[granularity];
   const resolution =
@@ -90,7 +95,7 @@ export const useComparisonFilters = (data: LifetimeDataResponseDto) => {
   }, [filters]);
 
   const availableYears = useMemo(
-    () => [...new Set(data.map(d => parseISO(d.date).getFullYear()))].sort((a, b) => a - b),
+    () => [...new Set(data.map((d) => parseISO(d.date).getFullYear()))].sort((a, b) => a - b),
     [data],
   );
 
@@ -107,12 +112,12 @@ export const useComparisonFilters = (data: LifetimeDataResponseDto) => {
   }, [data]);
 
   // Already `yyyy-MM-dd`: no need to round-trip through a `Date`.
-  const availableDays = useMemo(() => data.map(d => d.date).sort(), [data]);
+  const availableDays = useMemo(() => data.map((d) => d.date).sort(), [data]);
 
   const availableResolutions = RESOLUTIONS_BY_GRANULARITY[filters.granularity];
 
   const setGranularity = useCallback((granularity: ComparisonGranularity) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       granularity,
       periods: [],
@@ -121,30 +126,30 @@ export const useComparisonFilters = (data: LifetimeDataResponseDto) => {
   }, []);
 
   const addPeriod = useCallback((period: ComparisonPeriod) => {
-    setFilters(prev => {
-      const exists = prev.periods.some(p => periodsEqual(p, period));
+    setFilters((prev) => {
+      const exists = prev.periods.some((p) => periodsEqual(p, period));
       if (exists) return prev;
       return { ...prev, periods: [...prev.periods, period] };
     });
   }, []);
 
   const removePeriod = useCallback((period: ComparisonPeriod) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      periods: prev.periods.filter(p => !periodsEqual(p, period)),
+      periods: prev.periods.filter((p) => !periodsEqual(p, period)),
     }));
   }, []);
 
   const setMetric = useCallback((metric: ComparisonMetricKey) => {
-    setFilters(prev => ({ ...prev, metric }));
+    setFilters((prev) => ({ ...prev, metric }));
   }, []);
 
   const setResolution = useCallback((resolution: ComparisonResolution) => {
-    setFilters(prev => ({ ...prev, resolution }));
+    setFilters((prev) => ({ ...prev, resolution }));
   }, []);
 
   const setChartType = useCallback((chartType: ComparisonChartType) => {
-    setFilters(prev => ({ ...prev, chartType }));
+    setFilters((prev) => ({ ...prev, chartType }));
   }, []);
 
   return {

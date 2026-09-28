@@ -14,7 +14,7 @@ export const useHistoryGrid = () => {
       {
         field: 'date',
         headerName: t('history.columns.date'),
-        valueGetter: params => {
+        valueGetter: (params) => {
           return format(parseISO(params.data.date), 'dd-MM-yyyy');
         },
         sortable: true,
@@ -23,7 +23,12 @@ export const useHistoryGrid = () => {
             return 0;
           }
 
-          return isAfter(parse(valueA, 'dd-MM-yyyy', new Date()), parse(valueB, 'dd-MM-yyyy', new Date())) ? 1 : -1;
+          return isAfter(
+            parse(valueA, 'dd-MM-yyyy', new Date()),
+            parse(valueB, 'dd-MM-yyyy', new Date()),
+          )
+            ? 1
+            : -1;
         },
         flex: 1,
         filter: 'agDateColumnFilter',
@@ -42,7 +47,7 @@ export const useHistoryGrid = () => {
       },
       {
         headerName: t('history.columns.year'),
-        valueGetter: params => {
+        valueGetter: (params) => {
           return Number(format(parseISO(params.data.date), 'yyyy'));
         },
         type: 'solarNumericColumn',
@@ -52,7 +57,7 @@ export const useHistoryGrid = () => {
       },
       {
         headerName: t('history.columns.month'),
-        valueGetter: params => {
+        valueGetter: (params) => {
           return Number(format(parseISO(params.data.date), 'MM'));
         },
         type: 'solarNumericColumn',
@@ -62,7 +67,7 @@ export const useHistoryGrid = () => {
       },
       {
         headerName: t('history.columns.day'),
-        valueGetter: params => {
+        valueGetter: (params) => {
           return Number(format(parseISO(params.data.date), 'dd'));
         },
         type: 'solarNumericColumn',
@@ -78,7 +83,7 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: p => p.value?.toFixed(2),
+        valueFormatter: (p) => p.value?.toFixed(2),
       },
       {
         field: 'kwhConsumed',
@@ -88,7 +93,7 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: p => p.value?.toFixed(2),
+        valueFormatter: (p) => p.value?.toFixed(2),
       },
       {
         field: 'kwhImported',
@@ -98,7 +103,7 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: p => p.value?.toFixed(2),
+        valueFormatter: (p) => p.value?.toFixed(2),
       },
       {
         field: 'kwhExported',
@@ -108,7 +113,7 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: p => p.value?.toFixed(2),
+        valueFormatter: (p) => p.value?.toFixed(2),
       },
       {
         field: 'gridDependency',
@@ -118,7 +123,7 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: p => p.value?.toFixed(2) + ' %',
+        valueFormatter: (p) => p.value?.toFixed(2) + ' %',
       },
     ],
     [i18n.language, t],

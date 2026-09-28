@@ -37,13 +37,13 @@ export const DashboardChart: FunctionComponent<DashboardChartProps> = ({
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-foreground">
           {t(
-            `home.chart.${METRICS_MAPPING.find(m => m.key === selectedMetric)
+            `home.chart.${METRICS_MAPPING.find((m) => m.key === selectedMetric)
               ?.labelKey.split('.')
               .pop()}`,
           )}
         </h3>
         <div className="flex flex-wrap gap-1.5">
-          {METRICS_MAPPING.map(m => (
+          {METRICS_MAPPING.map((m) => (
             <button
               key={m.key}
               onClick={() => onMetricChange(m.key)}
@@ -52,7 +52,9 @@ export const DashboardChart: FunctionComponent<DashboardChartProps> = ({
                   ? 'text-primary-foreground'
                   : 'bg-muted text-muted-foreground hover:text-foreground'
               }`}
-              style={selectedMetric === m.key ? { backgroundColor: metricColors[m.key] } : undefined}
+              style={
+                selectedMetric === m.key ? { backgroundColor: metricColors[m.key] } : undefined
+              }
             >
               {t(m.labelKey)}
             </button>
