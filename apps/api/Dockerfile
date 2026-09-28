@@ -11,21 +11,20 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm fetch
 COPY . .
 RUN pnpm install --offline --frozen-lockfile
-RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" pnpm exec prisma generate
 RUN pnpm exec nx build api
 
 # `generatePackageJson` emits a package.json and a lockfile holding only what the bundle imports.
-# Added on top, pinned to the workspace versions: tslib (the tsc helpers of the bundle), the Prisma
-# CLI and the dotenv package read by prisma.config.ts (entrypoint.sh runs `prisma migrate deploy`).
+# Added on top, pinned to the workspace versions: tslib (the tsc helpers of the bundle) and the
+# Prisma CLI (entrypoint.sh runs `prisma migrate deploy`).
 # Adding them installs the rest from the pruned lockfile.
 WORKDIR /repo/dist/apps/api
 RUN version() { node -p "require('/repo/node_modules/$1/package.json').version"; } \
- && pnpm --dir . add --workspace-root "tslib@$(version tslib)" "prisma@$(version prisma)" "dotenv@$(version dotenv)"
+ && pnpm --dir . add --workspace-root "tslib@$(version tslib)" "prisma@$(version prisma)"
 RUN cp /repo/prisma.config.ts . \
  && mkdir -p libs/api/core/src \
  && cp -r /repo/libs/api/core/src/prisma libs/api/core/src/prisma \
  && rm libs/api/core/src/prisma/seed.ts \
- && DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" node_modules/.bin/prisma generate
+ && node_modules/.bin/prisma generate
 
 FROM ${NODE_IMAGE} AS runtime
 # The Prisma schema engine, used by `prisma migrate deploy`, needs OpenSSL.

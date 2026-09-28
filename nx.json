@@ -53,5 +53,16 @@
       "exclude": ["apps/api-e2e/**/*"]
     }
   ],
-  "analytics": false
+  "analytics": false,
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^prisma-generate", "prisma-generate"]
+    },
+    "test": {
+      "dependsOn": ["^prisma-generate", "prisma-generate"]
+    },
+    "typecheck": {
+      "dependsOn": ["^prisma-generate", "prisma-generate"]
+    }
+  }
 }
