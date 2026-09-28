@@ -5,13 +5,13 @@ import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { metricColors } from '../../shared/metrics/metric-colors.js';
 import { METRICS_MAPPING } from '../components/dashboard-chart.js';
 import type { DashboardFilterState } from '../dashboard.type.js';
 
-export const useDashboardChart = (data: LifetimeDataResponseDto, filters: DashboardFilterState) => {
+export const useDashboardChart = (data: LifetimeDay[], filters: DashboardFilterState) => {
   const { t } = useTranslation('web');
 
   return useMemo(() => {

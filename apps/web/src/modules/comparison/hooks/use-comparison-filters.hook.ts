@@ -1,7 +1,7 @@
 import { parseISO } from 'date-fns';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { ALL_METRICS } from '../../shared/metrics/index.js';
 import type {
@@ -87,7 +87,7 @@ const buildInitialState = (): ComparisonFilterState => {
   return { granularity, periods, metric, resolution, chartType };
 };
 
-export const useComparisonFilters = (data: LifetimeDataResponseDto) => {
+export const useComparisonFilters = (data: LifetimeDay[]) => {
   const [filters, setFilters] = useState<ComparisonFilterState>(() => buildInitialState());
 
   useEffect(() => {

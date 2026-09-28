@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { ExportModal } from './export-modal.js';
 
@@ -27,7 +27,7 @@ const mockGetFilteredData = vi
   .fn()
   .mockReturnValue([{ date: '2024-01-01' }, { date: '2024-01-02' }]);
 
-const mockData: LifetimeDataResponseDto = [
+const mockData: LifetimeDay[] = [
   {
     date: '2024-01-01',
     kwhProduced: 10,

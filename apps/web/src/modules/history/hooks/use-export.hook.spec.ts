@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import type { ExportConfig } from './use-export.hook.js';
 import { useExport } from './use-export.hook.js';
@@ -11,7 +11,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ i18n: { language: languageRef.current } }),
 }));
 
-const mockData: LifetimeDataResponseDto = [
+const mockData: LifetimeDay[] = [
   {
     date: '2023-03-15',
     kwhProduced: 10,

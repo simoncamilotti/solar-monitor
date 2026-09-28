@@ -17,6 +17,9 @@
     },
     {
       "path": "./apps/web-e2e"
+    },
+    {
+      "path": "./tools/workspace-plugin"
     }
   ],
   "compilerOptions": {}

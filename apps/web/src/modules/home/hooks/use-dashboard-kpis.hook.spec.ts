@@ -1,11 +1,11 @@
 import { renderHook } from '@testing-library/react';
 
-import type { LifetimeDataDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import type { DashboardFilterState } from '../dashboard.type.js';
 import { useDashboardKpis } from './use-dashboard-kpis.hook.js';
 
-const entry = (date: string, overrides: Partial<LifetimeDataDto> = {}): LifetimeDataDto => ({
+const entry = (date: string, overrides: Partial<LifetimeDay> = {}): LifetimeDay => ({
   date,
   kwhProduced: 10,
   kwhConsumed: 8,

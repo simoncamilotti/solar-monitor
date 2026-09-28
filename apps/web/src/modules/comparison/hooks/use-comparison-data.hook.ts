@@ -2,7 +2,7 @@ import { getISOWeek, parseISO } from 'date-fns';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { LifetimeDataDto, LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { filterByDay, filterByMonth, filterByYear } from '../../shared/data/index.js';
 import { computeMetric } from '../../shared/metrics/index.js';
@@ -27,7 +27,7 @@ const getPeriodLabel = (period: ComparisonPeriod, monthNames: (i: number) => str
 };
 
 export const useComparisonData = (
-  data: LifetimeDataResponseDto,
+  data: LifetimeDay[],
   filters: ComparisonFilterState,
 ): ComparisonSeries[] => {
   const { t } = useTranslation('web');
@@ -67,7 +67,7 @@ export const useComparisonData = (
           }
 
           case 'weekly': {
-            const weekMap = new Map<number, LifetimeDataDto[]>();
+            const weekMap = new Map<number, LifetimeDay[]>();
             for (const e of entries) {
               const week = getISOWeek(parseISO(e.date));
               const arr = weekMap.get(week) ?? [];
@@ -117,7 +117,7 @@ export const useComparisonData = (
               (period.year % 4 === 0 && period.year % 100 !== 0) || period.year % 400 === 0;
             const totalDays = isLeap ? 366 : 365;
             const categories = Array.from({ length: totalDays }, (_, i) => `${i + 1}`);
-            const dayMap = new Map<number, LifetimeDataDto[]>();
+            const dayMap = new Map<number, LifetimeDay[]>();
             for (const e of entries) {
               const d = parseISO(e.date);
               const dayOfYear = Math.floor(

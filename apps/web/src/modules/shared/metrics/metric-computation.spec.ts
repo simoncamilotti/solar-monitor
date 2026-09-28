@@ -1,8 +1,8 @@
-import type { LifetimeDataDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { aggregateEntries, computeMetric } from './metric-computation.js';
 
-const entry = (overrides: Partial<LifetimeDataDto>): LifetimeDataDto => ({
+const entry = (overrides: Partial<LifetimeDay>): LifetimeDay => ({
   date: '2026-01-01',
   kwhProduced: 0,
   kwhConsumed: 0,

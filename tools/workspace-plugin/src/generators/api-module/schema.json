@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "WorkspacePluginApiModule",
+  "title": "API module",
+  "description": "Creates a domain module in apps/api: contract, controller, service, test, registration in AppModule.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Domain name in kebab-case, usually plural: invoices, payment-methods.",
+      "$default": { "$source": "argv", "index": 0 },
+      "x-prompt": "Domain name (kebab-case, plural)?"
+    }
+  },
+  "required": ["name"]
+}

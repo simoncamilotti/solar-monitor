@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import type { SyncStatusDto } from '@repo/contracts';
+import type { SyncStatus } from '@repo/contracts';
 
 import { SyncSystemItem } from './sync-system-item.js';
 
@@ -15,7 +15,7 @@ const defaultProps = {
   isBackfilling: false,
 };
 
-const systemWithRecords: SyncStatusDto = {
+const systemWithRecords: SyncStatus = {
   systemId: 42,
   lastSyncDate: '2026-04-01T12:00:00Z',
   totalRecords: 180,
@@ -23,7 +23,7 @@ const systemWithRecords: SyncStatusDto = {
   gaps: [],
 };
 
-const systemWithoutRecords: SyncStatusDto = {
+const systemWithoutRecords: SyncStatus = {
   systemId: 99,
   lastSyncDate: null,
   totalRecords: 0,
@@ -120,7 +120,7 @@ describe('SyncSystemItem', () => {
   });
 
   describe("couverture de l'historique", () => {
-    const systemWithGaps: SyncStatusDto = {
+    const systemWithGaps: SyncStatus = {
       systemId: 7,
       lastSyncDate: '2026-04-02T00:00:00Z',
       totalRecords: 106,

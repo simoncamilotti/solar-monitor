@@ -29,6 +29,9 @@ apps/
 libs/
   shared/contracts/   Zod schemas shared by the API and the client     @repo/contracts
 
+tools/
+  workspace-plugin/   Local Nx generators: api-module, lib             @repo/workspace-plugin
+
 docker/               Local services: Keycloak realm, PostgreSQL init script
 ```
 
@@ -48,6 +51,20 @@ Frontend concerns that are sometimes expected in a library live under `apps/web/
 | React Query client | `apps/web/src/modules/providers/`            |
 | i18n setup         | `apps/web/src/i18n/`                         |
 | Locale files       | `apps/web/src/i18n/locales/{en,fr}/web.json` |
+
+### API contract
+
+The Zod schemas of `@repo/contracts` describe the inputs and outputs of the API. The API applies
+them: `@Body({ schema })` and `@Query({ schema })` validate the inputs (a 400 Problem Details lists
+each invalid field), `@ResponseSchema(schema)` — or `@ResponseListSchema(itemSchema)` for a list —
+filters the response and documents it in OpenAPI.
+
+### Generators
+
+| Command                                                      | Creates                                               |
+| :----------------------------------------------------------- | :---------------------------------------------------- |
+| `pnpm nx g @repo/workspace-plugin:api-module <name>`         | API module: contract, controller, service and test    |
+| `pnpm nx g @repo/workspace-plugin:lib <name> --scope=shared` | Library `libs/<scope>/<name>`, package `@repo/<name>` |
 
 ## Prerequisites
 

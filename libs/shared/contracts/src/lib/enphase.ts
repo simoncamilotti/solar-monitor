@@ -1,84 +1,100 @@
 import { z } from 'zod';
 
-export const enphaseSystemDtoSchema = z.object({
-  id: z.int(),
-  name: z.string(),
-  timezone: z.string(),
-});
+/** A calendar day, not a point in time: always `yyyy-MM-dd`, with no time or time zone to misread. */
+const daySchema = z.iso.date();
 
-export const enphaseCallbackResponseDtoSchema = z.object({
-  message: z.string(),
-  systems: z.array(enphaseSystemDtoSchema),
-});
+export const enphaseSystemSchema = z
+  .object({
+    id: z.int(),
+    name: z.string(),
+    timezone: z.string(),
+  })
+  .meta({ id: 'EnphaseSystem' });
+export type EnphaseSystem = z.infer<typeof enphaseSystemSchema>;
 
-export const enphaseSyncResponseDtoSchema = z.object({
-  message: z.string(),
-});
+/** Answer of the OAuth2 callback once the Enphase account is linked. */
+export const enphaseLinkResultSchema = z
+  .object({
+    message: z.string(),
+    systems: z.array(enphaseSystemSchema),
+  })
+  .meta({ id: 'EnphaseLinkResult' });
+export type EnphaseLinkResult = z.infer<typeof enphaseLinkResultSchema>;
 
-export const enphaseSyncRequestDtoSchema = z.object({
-  systemId: z.int(),
-});
-
-export const enphaseBackfillResponseDtoSchema = z.object({
-  message: z.string(),
-  daysBackfilled: z.int(),
-});
-
-export const enphaseBackfillRequestDtoSchema = z
+export const enphaseSyncRequestSchema = z
   .object({
     systemId: z.int(),
-    startDate: z.iso.date(),
-    endDate: z.iso.date(),
+  })
+  .meta({ id: 'EnphaseSyncRequest' });
+export type EnphaseSyncRequest = z.infer<typeof enphaseSyncRequestSchema>;
+
+export const enphaseSyncResultSchema = z
+  .object({
+    message: z.string(),
+  })
+  .meta({ id: 'EnphaseSyncResult' });
+export type EnphaseSyncResult = z.infer<typeof enphaseSyncResultSchema>;
+
+export const enphaseBackfillRequestSchema = z
+  .object({
+    systemId: z.int(),
+    startDate: daySchema,
+    endDate: daySchema,
   })
   .refine(({ startDate, endDate }) => startDate <= endDate, {
     message: 'startDate must not be after endDate',
     path: ['endDate'],
-  });
+  })
+  .meta({ id: 'EnphaseBackfillRequest' });
+export type EnphaseBackfillRequest = z.infer<typeof enphaseBackfillRequestSchema>;
 
-export const lifetimeDataDtoSchema = z.object({
-  // A calendar date, not a point in time: the API always emits `yyyy-MM-dd`, with no time-of-day
-  // or timezone component to misread.
-  date: z.iso.date(),
-  kwhProduced: z.number(),
-  kwhConsumed: z.number(),
-  kwhImported: z.number(),
-  kwhExported: z.number(),
-  gridDependency: z.number(),
-});
+export const enphaseBackfillResultSchema = z
+  .object({
+    message: z.string(),
+    daysBackfilled: z.int(),
+  })
+  .meta({ id: 'EnphaseBackfillResult' });
+export type EnphaseBackfillResult = z.infer<typeof enphaseBackfillResultSchema>;
 
-export const lifetimeDataResponseDtoSchema = z.array(lifetimeDataDtoSchema);
+/** Energy of one day, in kWh, and the share of it drawn from the grid, in %. */
+export const lifetimeDaySchema = z
+  .object({
+    date: daySchema,
+    kwhProduced: z.number(),
+    kwhConsumed: z.number(),
+    kwhImported: z.number(),
+    kwhExported: z.number(),
+    gridDependency: z.number(),
+  })
+  .meta({ id: 'LifetimeDay' });
+export type LifetimeDay = z.infer<typeof lifetimeDaySchema>;
 
 /** A range of days missing from the stored history, bounds included. */
-export const syncGapDtoSchema = z.object({
-  from: z.iso.date(),
-  to: z.iso.date(),
-  days: z.int(),
-});
+export const syncGapSchema = z
+  .object({
+    from: daySchema,
+    to: daySchema,
+    days: z.int(),
+  })
+  .meta({ id: 'SyncGap' });
+export type SyncGap = z.infer<typeof syncGapSchema>;
 
-export const syncStatusDtoSchema = z.object({
-  systemId: z.number(),
-  lastSyncDate: z.string().nullable(),
-  totalRecords: z.number(),
-  /** Number of days the stored range would cover if it were complete. */
-  expectedRecords: z.number(),
-  gaps: z.array(syncGapDtoSchema),
-});
+export const syncStatusSchema = z
+  .object({
+    systemId: z.number(),
+    lastSyncDate: daySchema.nullable(),
+    totalRecords: z.number(),
+    /** Number of days the stored range would cover if it were complete. */
+    expectedRecords: z.number(),
+    gaps: z.array(syncGapSchema),
+  })
+  .meta({ id: 'SyncStatus' });
+export type SyncStatus = z.infer<typeof syncStatusSchema>;
 
-export const syncStatusResponseDtoSchema = z.array(syncStatusDtoSchema);
-
-export type LifetimeDataDto = z.infer<typeof lifetimeDataDtoSchema>;
-export type LifetimeDataResponseDto = z.infer<typeof lifetimeDataResponseDtoSchema>;
-export type EnphaseSyncRequestDto = z.infer<typeof enphaseSyncRequestDtoSchema>;
-export type EnphaseBackfillResponseDto = z.infer<typeof enphaseBackfillResponseDtoSchema>;
-export type EnphaseBackfillRequestDto = z.infer<typeof enphaseBackfillRequestDtoSchema>;
-const syncTimeSchema = z.string().regex(/^\d{2}:\d{2}$/, 'Must be in HH:mm format');
-
-export const syncScheduleDtoSchema = z.object({ syncTime: syncTimeSchema });
-
-export const updateSyncScheduleRequestDtoSchema = z.object({ syncTime: syncTimeSchema });
-
-export type SyncGapDto = z.infer<typeof syncGapDtoSchema>;
-export type SyncStatusDto = z.infer<typeof syncStatusDtoSchema>;
-export type SyncStatusResponseDto = z.infer<typeof syncStatusResponseDtoSchema>;
-export type SyncScheduleDto = z.infer<typeof syncScheduleDtoSchema>;
-export type UpdateSyncScheduleRequestDto = z.infer<typeof updateSyncScheduleRequestDtoSchema>;
+/** Time of the daily sync, UTC. Read and written with the same shape. */
+export const syncScheduleSchema = z
+  .object({
+    syncTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be in HH:mm format'),
+  })
+  .meta({ id: 'SyncSchedule' });
+export type SyncSchedule = z.infer<typeof syncScheduleSchema>;

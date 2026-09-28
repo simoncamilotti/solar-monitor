@@ -23,6 +23,7 @@
     "@nx/js": "catalog:",
     "@nx/vite": "catalog:",
     "@nx/vitest": "catalog:",
+    "@repo/workspace-plugin": "workspace:*",
     "@swc-node/register": "catalog:",
     "@swc/core": "catalog:",
     "@swc/helpers": "catalog:",

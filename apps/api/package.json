@@ -172,7 +172,6 @@
     "helmet": "catalog:",
     "jose": "catalog:",
     "nestjs-pino": "catalog:",
-    "nestjs-zod": "catalog:",
     "pino": "catalog:",
     "pino-http": "catalog:",
     "pino-pretty": "catalog:",

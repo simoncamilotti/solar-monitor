@@ -1,14 +1,14 @@
-import { Module } from '@nestjs/common';
+import { Module, StandardSchemaSerializerInterceptor } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { ZodValidationPipe } from 'nestjs-zod';
 import { LoggerModule } from 'nestjs-pino';
 import { AuthGuard } from './common/auth/auth.guard.js';
 import { AuthModule } from './common/auth/auth.module.js';
 import { DatabaseModule } from './common/database/database.module.js';
 import { ProblemDetailsFilter } from './common/filters/problem-details.filter.js';
+import { createValidationPipe } from './common/pipes/validation.pipe.js';
 import { type Env, validateEnv } from './config/env.js';
 import { loggerParams } from './config/logger.js';
 import { EnphaseModule } from './modules/enphase/enphase.module.js';
@@ -43,7 +43,8 @@ import { UsersModule } from './modules/users/users.module.js';
     { provide: APP_FILTER, useClass: ProblemDetailsFilter },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
-    { provide: APP_PIPE, useClass: ZodValidationPipe },
+    { provide: APP_PIPE, useFactory: createValidationPipe },
+    { provide: APP_INTERCEPTOR, useClass: StandardSchemaSerializerInterceptor },
   ],
 })
 export class AppModule {}

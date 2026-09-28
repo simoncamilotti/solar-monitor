@@ -1,8 +1,8 @@
 import { parseISO } from 'date-fns';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
-export const getMonthsForYear = (data: LifetimeDataResponseDto, year: number): number[] => {
+export const getMonthsForYear = (data: LifetimeDay[], year: number): number[] => {
   return [
     ...new Set(
       data

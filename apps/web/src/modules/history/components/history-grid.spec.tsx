@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { HistoryGrid } from './history-grid.js';
 
@@ -31,7 +31,7 @@ vi.mock('../../ui/constants/ag-grid-theme.js', () => ({
   agThemeLight: 'light-theme',
 }));
 
-const mockData: LifetimeDataResponseDto = [
+const mockData: LifetimeDay[] = [
   {
     date: '2024-01-01',
     kwhProduced: 10,

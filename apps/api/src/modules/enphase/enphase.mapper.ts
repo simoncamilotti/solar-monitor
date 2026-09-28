@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { EnphaseLifetimeData } from '../../generated/prisma/client.js';
 import { Decimal } from 'decimal.js';
 
-import type { EnphaseSystemDto, LifetimeDataResponseDto } from './enphase.dto.js';
+import type { EnphaseSystem, LifetimeDay } from '@repo/contracts';
 import type {
   EnphaseSystemRaw,
   LifetimeData,
@@ -12,7 +12,7 @@ import type {
 
 @Injectable()
 export class EnphaseMapper {
-  toSystemDto(system: EnphaseSystemRaw): EnphaseSystemDto {
+  toSystem(system: EnphaseSystemRaw): EnphaseSystem {
     return {
       id: system.system_id,
       name: system.name,
@@ -20,8 +20,8 @@ export class EnphaseMapper {
     };
   }
 
-  toSystemDtoList(systems: EnphaseSystemRaw[]): EnphaseSystemDto[] {
-    return systems.map((system) => this.toSystemDto(system));
+  toSystemList(systems: EnphaseSystemRaw[]): EnphaseSystem[] {
+    return systems.map((system) => this.toSystem(system));
   }
 
   /**
@@ -82,7 +82,7 @@ export class EnphaseMapper {
     return byDate;
   }
 
-  toLifetimeDataResponseDto(lifetimeData: EnphaseLifetimeData[]): LifetimeDataResponseDto {
+  toLifetimeDataResponseDto(lifetimeData: EnphaseLifetimeData[]): LifetimeDay[] {
     return lifetimeData.map((x) => ({
       date: x.date.toISOString().slice(0, 10),
       kwhProduced: new Decimal(x.whProduced).div(1000).toNumber(),

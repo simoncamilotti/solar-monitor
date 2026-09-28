@@ -1,4 +1,4 @@
-import type { LifetimeDataDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import type { MetricKey } from './metric.type.js';
 
@@ -12,7 +12,7 @@ export type AggregatedMetrics = {
   gridDependency: number;
 };
 
-export const aggregateEntries = (entries: LifetimeDataDto[]): AggregatedMetrics => {
+export const aggregateEntries = (entries: LifetimeDay[]): AggregatedMetrics => {
   const produced = entries.reduce((s, e) => s + e.kwhProduced, 0);
   const consumed = entries.reduce((s, e) => s + e.kwhConsumed, 0);
   const imported = entries.reduce((s, e) => s + e.kwhImported, 0);
@@ -25,7 +25,7 @@ export const aggregateEntries = (entries: LifetimeDataDto[]): AggregatedMetrics 
   return { produced, consumed, imported, exported, autonomy, selfConsumption, gridDependency };
 };
 
-export const computeMetric = (metric: MetricKey, entries: LifetimeDataDto[]): number => {
+export const computeMetric = (metric: MetricKey, entries: LifetimeDay[]): number => {
   const agg = aggregateEntries(entries);
 
   switch (metric) {

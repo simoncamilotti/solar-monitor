@@ -10,7 +10,7 @@ describe('EnphaseMapper', () => {
     mapper = new EnphaseMapper();
   });
 
-  describe('toSystemDto', () => {
+  describe('toSystem', () => {
     it('should map raw system to dto', () => {
       const raw: EnphaseSystemRaw = {
         system_id: 123,
@@ -19,7 +19,7 @@ describe('EnphaseMapper', () => {
         status: 'normal',
       };
 
-      const result = mapper.toSystemDto(raw);
+      const result = mapper.toSystem(raw);
 
       expect(result).toEqual({
         id: 123,
@@ -36,20 +36,20 @@ describe('EnphaseMapper', () => {
         status: 'error',
       };
 
-      const result = mapper.toSystemDto(raw);
+      const result = mapper.toSystem(raw);
 
       expect(result).not.toHaveProperty('status');
     });
   });
 
-  describe('toSystemDtoList', () => {
+  describe('toSystemList', () => {
     it('should map multiple systems', () => {
       const systems: EnphaseSystemRaw[] = [
         { system_id: 1, name: 'System A', timezone: 'Europe/Paris', status: 'normal' },
         { system_id: 2, name: 'System B', timezone: 'US/Eastern', status: 'normal' },
       ];
 
-      const result = mapper.toSystemDtoList(systems);
+      const result = mapper.toSystemList(systems);
 
       expect(result).toEqual([
         { id: 1, name: 'System A', timezone: 'Europe/Paris' },
@@ -58,7 +58,7 @@ describe('EnphaseMapper', () => {
     });
 
     it('should return empty array for empty input', () => {
-      const result = mapper.toSystemDtoList([]);
+      const result = mapper.toSystemList([]);
 
       expect(result).toEqual([]);
     });

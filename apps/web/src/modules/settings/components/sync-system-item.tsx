@@ -4,7 +4,7 @@ import { AlertTriangle, ChevronDown, Database, History, Loader2, RefreshCw } fro
 import { type FunctionComponent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { SyncStatusDto } from '@repo/contracts';
+import type { SyncStatus } from '@repo/contracts';
 
 export type BackfillRange = { startDate: string; endDate: string };
 
@@ -12,7 +12,7 @@ const buttonClasses =
   'inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50';
 
 export const SyncSystemItem: FunctionComponent<{
-  system: SyncStatusDto;
+  system: SyncStatus;
   onSync: (systemId: number) => void;
   isSyncing: boolean;
   onBackfill: (systemId: number, range?: BackfillRange) => void;

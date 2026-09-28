@@ -2,7 +2,7 @@ import { format, parseISO } from 'date-fns';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import type { EnergyMetricKey } from '../../shared/metrics/metric.type.js';
 
@@ -59,7 +59,7 @@ const downloadCsv = (content: string, filename: string): void => {
   URL.revokeObjectURL(url);
 };
 
-export const useExport = (data: LifetimeDataResponseDto | undefined) => {
+export const useExport = (data: LifetimeDay[] | undefined) => {
   const { i18n } = useTranslation();
 
   const getFilteredData = useCallback(
@@ -76,7 +76,7 @@ export const useExport = (data: LifetimeDataResponseDto | undefined) => {
   );
 
   const buildCsv = useCallback(
-    (filteredData: LifetimeDataResponseDto, metrics: ExportMetric[]) => {
+    (filteredData: LifetimeDay[], metrics: ExportMetric[]) => {
       // `i18n.language` can carry a region ("en-US"): match on the base language only, or an
       // English browser would silently get French headers instead of falling back to English.
       const baseLanguage = i18n.language.split('-')[0];

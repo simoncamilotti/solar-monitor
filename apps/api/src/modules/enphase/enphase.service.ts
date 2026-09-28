@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../common/database/prisma.service.js';
-import type { SyncGapDto, SyncStatusDto } from '@repo/contracts';
+import type { SyncGap, SyncStatus } from '@repo/contracts';
 
-import type { LifetimeDataResponseDto } from './enphase.dto.js';
+import type { LifetimeDay } from '@repo/contracts';
 
 const DAY_MS = 86_400_000;
 
@@ -19,7 +19,7 @@ export class EnphaseService {
     private readonly _enphaseMapper: EnphaseMapper,
   ) {}
 
-  async getAllLifetimeData(): Promise<LifetimeDataResponseDto> {
+  async getAllLifetimeData(): Promise<LifetimeDay[]> {
     const data = await this._prismaService.enphaseLifetimeData.findMany({
       orderBy: { date: 'asc' },
     });
@@ -27,7 +27,7 @@ export class EnphaseService {
     return this._enphaseMapper.toLifetimeDataResponseDto(data);
   }
 
-  async getSyncStatus(): Promise<SyncStatusDto[]> {
+  async getSyncStatus(): Promise<SyncStatus[]> {
     const tokens = await this._prismaService.enphaseToken.findMany({
       include: {
         lifetimeData: {
@@ -59,7 +59,7 @@ export class EnphaseService {
    *
    * Dates are stored at UTC midnight, so they compare day to day with no timezone risk.
    */
-  private _computeCoverage(dates: Date[]): { expectedRecords: number; gaps: SyncGapDto[] } {
+  private _computeCoverage(dates: Date[]): { expectedRecords: number; gaps: SyncGap[] } {
     const [first, ...rest] = dates;
     const last = dates.at(-1);
 
@@ -69,7 +69,7 @@ export class EnphaseService {
 
     const expectedRecords = Math.round((last.getTime() - first.getTime()) / DAY_MS) + 1;
 
-    const gaps: SyncGapDto[] = [];
+    const gaps: SyncGap[] = [];
     let previous = first;
 
     for (const current of rest) {

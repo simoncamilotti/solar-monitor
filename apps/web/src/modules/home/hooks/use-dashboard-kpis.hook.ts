@@ -9,7 +9,7 @@ import {
 } from 'date-fns';
 import { useMemo } from 'react';
 
-import type { LifetimeDataDto, LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import { filterByMonth, filterByYear } from '../../shared/data/data-filters.js';
 import { aggregateEntries } from '../../shared/metrics/metric-computation.js';
@@ -26,10 +26,7 @@ export type DashboardKpis = {
   selfConsumptionDelta: number | null;
 };
 
-const filterCurrentPeriod = (
-  data: LifetimeDataResponseDto,
-  filters: DashboardFilterState,
-): LifetimeDataDto[] => {
+const filterCurrentPeriod = (data: LifetimeDay[], filters: DashboardFilterState): LifetimeDay[] => {
   switch (filters.viewMode) {
     case 'full':
       return data;
@@ -53,9 +50,9 @@ const filterCurrentPeriod = (
 };
 
 const filterPreviousPeriod = (
-  data: LifetimeDataResponseDto,
+  data: LifetimeDay[],
   filters: DashboardFilterState,
-): LifetimeDataDto[] => {
+): LifetimeDay[] => {
   switch (filters.viewMode) {
     case 'full':
       return data;
@@ -88,7 +85,7 @@ const computeDelta = (current: number, previous: number): number | null => {
 };
 
 export const useDashboardKpis = (
-  data: LifetimeDataResponseDto,
+  data: LifetimeDay[],
   filters: DashboardFilterState,
 ): DashboardKpis => {
   return useMemo(() => {

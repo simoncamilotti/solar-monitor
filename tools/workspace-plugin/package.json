@@ -1,0 +1,20 @@
+{
+  "name": "@repo/workspace-plugin",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "generators": "./generators.json",
+  "exports": {
+    "./package.json": "./package.json",
+    "./generators.json": "./generators.json"
+  },
+  "nx": {
+    "tags": [
+      "type:tool",
+      "platform:node"
+    ]
+  },
+  "dependencies": {
+    "@nx/devkit": "catalog:"
+  }
+}

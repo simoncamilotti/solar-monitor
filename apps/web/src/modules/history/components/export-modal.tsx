@@ -3,7 +3,7 @@ import { Check, Download, FileText, X } from 'lucide-react';
 import { type FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { LifetimeDataResponseDto } from '@repo/contracts';
+import type { LifetimeDay } from '@repo/contracts';
 
 import type { ExportConfig, ExportMetric } from '../hooks/use-export.hook.js';
 import { useExport } from '../hooks/use-export.hook.js';
@@ -11,7 +11,7 @@ import { useExport } from '../hooks/use-export.hook.js';
 type ExportModalProps = {
   open: boolean;
   onClose: () => void;
-  data: LifetimeDataResponseDto;
+  data: LifetimeDay[];
 };
 
 const ALL_METRICS: ExportMetric[] = [
