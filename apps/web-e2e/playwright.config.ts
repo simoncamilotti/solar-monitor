@@ -1,15 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
+import { E2E_CLIENT_ID, readE2eEnv } from '@repo/e2e-support';
 
-import { OIDC_AUTHORITY, OIDC_CLIENT_ID } from './src/oidc-mock.js';
-
-// UI integration tests: the production build of the web, with the API and the identity provider
-// mocked by the tests themselves (api-mock.ts, oidc-mock.ts).
-const webUrl = 'http://localhost:4200';
+// Full-stack e2e: the production build of the web against the production build
+// of the API, a real database and a fake OIDC issuer.
+const env = readE2eEnv();
+const webUrl = `http://localhost:${env.E2E_WEB_PORT}`;
 const ci = Boolean(process.env['CI']);
 
 export default defineConfig({
   testDir: './src',
   testMatch: '**/*.e2e.ts',
+  globalSetup: './src/global-setup.ts',
   // One worker, retries and long timeouts: the CI runners are shared.
   workers: 1,
   retries: ci ? 2 : 0,
@@ -22,32 +23,17 @@ export default defineConfig({
     locale: 'fr-FR',
     trace: 'retain-on-failure',
   },
-  projects: [
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        launchOptions: {
-          // Disable private network access checks so the mocked identity provider
-          // redirect (localhost:8080 → localhost:4200) is not blocked by Chrome.
-          args: [
-            '--disable-features=PrivateNetworkAccessForIframes,BlockInsecurePrivateNetworkRequests',
-          ],
-        },
-      },
-    },
-  ],
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
     // The binary itself, not through pnpm: Playwright must be able to stop it.
-    command: './node_modules/.bin/vite preview --port 4200 --strictPort',
+    command: `./node_modules/.bin/vite preview --port ${env.E2E_WEB_PORT} --strictPort`,
     cwd: '../web',
     url: webUrl,
     reuseExistingServer: !ci,
-    // Served as /config.js by the runtime-config plugin of the web.
     env: {
-      WEB_API_URL: webUrl,
-      WEB_OIDC_AUTHORITY: OIDC_AUTHORITY,
-      WEB_OIDC_CLIENT_ID: OIDC_CLIENT_ID,
+      WEB_API_URL: `http://localhost:${env.E2E_API_PORT}`,
+      WEB_OIDC_AUTHORITY: `http://localhost:${env.E2E_ISSUER_PORT}`,
+      WEB_OIDC_CLIENT_ID: E2E_CLIENT_ID,
     },
   },
 });

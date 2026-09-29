@@ -33,6 +33,12 @@ describe('syncScheduleSchema', () => {
     expect(syncScheduleSchema.safeParse({ syncTime: 200 }).success).toBe(false);
   });
 
+  it('should reject a time that does not exist', () => {
+    // Stored as is, it would make the cron job, and the next boot of the API, fail.
+    expect(syncScheduleSchema.safeParse({ syncTime: '24:00' }).success).toBe(false);
+    expect(syncScheduleSchema.safeParse({ syncTime: '12:60' }).success).toBe(false);
+  });
+
   it('should reject random string', () => {
     expect(syncScheduleSchema.safeParse({ syncTime: 'noon' }).success).toBe(false);
   });

@@ -3,7 +3,12 @@
   "compilerOptions": {
     "outDir": "out-tsc",
     "tsBuildInfoFile": "out-tsc/tsconfig.tsbuildinfo",
-    "types": ["vitest/globals", "node"]
+    "types": ["node"]
   },
-  "include": ["vitest.e2e.config.ts", "src/**/*.ts"]
+  "include": ["vitest.e2e.config.ts", "src/**/*.ts"],
+  "references": [
+    {
+      "path": "../../libs/api/e2e-support"
+    }
+  ]
 }

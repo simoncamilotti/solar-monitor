@@ -94,7 +94,7 @@ export type SyncStatus = z.infer<typeof syncStatusSchema>;
 /** Time of the daily sync, UTC. Read and written with the same shape. */
 export const syncScheduleSchema = z
   .object({
-    syncTime: z.string().regex(/^\d{2}:\d{2}$/, 'Must be in HH:mm format'),
+    syncTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Must be a time of day, HH:mm'),
   })
   .meta({ id: 'SyncSchedule' });
 export type SyncSchedule = z.infer<typeof syncScheduleSchema>;
