@@ -18,7 +18,7 @@ export const PeriodPicker: FunctionComponent<PeriodPickerProps> = ({
   availableYears,
   onAdd,
 }) => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const firstYear = availableYears[0];
   const lastYear = availableYears.at(-1);
   const minDate = firstYear !== undefined ? new Date(firstYear, 0, 1) : undefined;

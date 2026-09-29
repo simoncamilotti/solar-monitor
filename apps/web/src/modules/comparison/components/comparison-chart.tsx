@@ -23,7 +23,7 @@ export const ComparisonChart: FunctionComponent<ComparisonChartProps> = ({
   onMetricChange,
   onChartTypeChange,
 }) => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
 
   return (
     <motion.div

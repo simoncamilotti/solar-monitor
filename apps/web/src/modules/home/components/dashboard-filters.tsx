@@ -31,7 +31,7 @@ export const DashboardFilters: FunctionComponent<DashboardFiltersProps> = ({
   onMonthChange,
   onCustomRangeChange,
 }) => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const { viewMode, selectedYear, selectedMonth } = filters;
 
   const showYear = viewMode === 'yearly';

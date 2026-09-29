@@ -2,6 +2,8 @@ import { X } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { monthKey } from '../../../i18n/keys.js';
+
 import type { ComparisonGranularity, ComparisonPeriod } from '../comparison.type.js';
 import { comparisonPeriodColors } from '../constants/comparison-colors.js';
 import { isDayPeriod, isMonthPeriod, isYearPeriod } from '../hooks/use-comparison-filters.hook.js';
@@ -35,8 +37,8 @@ export const ComparisonPeriodList: FunctionComponent<ComparisonPeriodListProps> 
   onAdd,
   onRemove,
 }) => {
-  const { t } = useTranslation('web');
-  const monthName = (i: number) => t(`months.${i}`);
+  const { t } = useTranslation();
+  const monthName = (i: number) => t(monthKey(i));
 
   return (
     <div className="flex flex-wrap items-center gap-2">

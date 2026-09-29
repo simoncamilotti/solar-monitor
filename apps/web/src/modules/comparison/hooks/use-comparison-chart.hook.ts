@@ -9,7 +9,7 @@ export const useComparisonChart = (
   series: ComparisonSeries[],
   filters: ComparisonFilterState,
 ): EChartsOption | undefined => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
 
   return useMemo(() => {
     if (series.length === 0) {

@@ -23,7 +23,7 @@ export const KPICard: FunctionComponent<KPICardProps> = ({
   color,
   index = 0,
 }) => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const isPositive = delta !== null && delta >= 0;
 
   return (

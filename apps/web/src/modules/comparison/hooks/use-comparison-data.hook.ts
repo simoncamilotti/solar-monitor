@@ -2,6 +2,8 @@ import { getISOWeek, parseISO } from 'date-fns';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { monthKey } from '../../../i18n/keys.js';
+
 import type { LifetimeDay } from '@repo/contracts';
 
 import { filterByDay, filterByMonth, filterByYear } from '../../shared/data/index.js';
@@ -30,10 +32,10 @@ export const useComparisonData = (
   data: LifetimeDay[],
   filters: ComparisonFilterState,
 ): ComparisonSeries[] => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   // Memoized so the `useMemo` below actually memoizes: an inline arrow here would be a fresh
   // reference on every render, which was defeating the memoization entirely.
-  const monthName = useCallback((i: number) => t(`months.${i}`), [t]);
+  const monthName = useCallback((i: number) => t(monthKey(i)), [t]);
 
   return useMemo(() => {
     if (filters.periods.length === 0) return [];

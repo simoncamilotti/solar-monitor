@@ -5,6 +5,8 @@ import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { monthKey } from '../../../i18n/keys.js';
+
 import type { LifetimeDay } from '@repo/contracts';
 
 import { metricColors } from '../../shared/metrics/metric-colors.js';
@@ -12,7 +14,7 @@ import { METRICS_MAPPING } from '../components/dashboard-chart.js';
 import type { DashboardFilterState } from '../dashboard.type.js';
 
 export const useDashboardChart = (data: LifetimeDay[], filters: DashboardFilterState) => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
 
   return useMemo(() => {
     const metricKey = filters.selectedMetric;
@@ -44,7 +46,7 @@ export const useDashboardChart = (data: LifetimeDay[], filters: DashboardFilterS
           monthMap.set(m, (monthMap.get(m) ?? 0) + d[metricKey]);
         }
         const sortedMonths = [...monthMap.keys()].sort((a, b) => a - b);
-        categories = sortedMonths.map((m) => t(`months.${m}`));
+        categories = sortedMonths.map((m) => t(monthKey(m)));
         values = sortedMonths.map((m) => monthMap.get(m) ?? 0);
         break;
       }
@@ -111,9 +113,9 @@ export const useDashboardChart = (data: LifetimeDay[], filters: DashboardFilterS
 
           const value = dataParams.value as number;
           const labelKey = METRICS_MAPPING.find((m) => m.key === metricKey)?.labelKey;
-          const metricName = t(labelKey!);
+          const metricName = labelKey ? t(labelKey) : '';
 
-          const monthLabel = (monthIndex: number) => t(`months.${monthIndex}`);
+          const monthLabel = (monthIndex: number) => t(monthKey(monthIndex));
 
           let name = '';
           switch (filters.viewMode) {

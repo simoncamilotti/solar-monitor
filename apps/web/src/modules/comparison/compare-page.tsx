@@ -2,13 +2,13 @@ import { Sun } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ComparisonContent } from '../modules/comparison/components/comparison-content.js';
-import { ComparisonPageSkeleton } from '../modules/comparison/components/comparison-page-skeleton.js';
-import { useHistoryData } from '../modules/history/hooks/use-history-data.hook.js';
-import { PageHeader } from '../modules/layout/components/page-header.js';
+import { ComparisonContent } from './components/comparison-content.js';
+import { ComparisonPageSkeleton } from './components/comparison-page-skeleton.js';
+import { useHistoryData } from '../history/hooks/use-history-data.hook.js';
+import { PageHeader } from '../layout/components/page-header.js';
 
 export const ComparePage: FunctionComponent = () => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const { data, isPending, isError } = useHistoryData();
 
   return (

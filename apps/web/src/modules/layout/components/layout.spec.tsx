@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 
 import { Layout } from './layout.js';
 
-vi.mock('react-router', () => ({
+vi.mock('@tanstack/react-router', () => ({
   Outlet: () => <div data-testid="outlet" />,
 }));
 

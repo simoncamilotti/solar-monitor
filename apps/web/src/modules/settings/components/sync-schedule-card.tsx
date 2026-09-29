@@ -7,7 +7,7 @@ import { useEnphaseGetSyncSchedule } from '@repo/api-client';
 import { useUpdateSyncScheduleMutation } from '../hooks/use-update-sync-schedule-mutation.hook.js';
 
 export const SyncScheduleCard: FunctionComponent = () => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
   const { data, isPending, isError } = useEnphaseGetSyncSchedule();
   const mutation = useUpdateSyncScheduleMutation();
   // The stored time until the user edits it.

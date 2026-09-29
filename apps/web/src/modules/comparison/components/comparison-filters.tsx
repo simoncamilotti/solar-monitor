@@ -34,7 +34,7 @@ export const ComparisonFilters: FunctionComponent<ComparisonFiltersProps> = ({
   onAddPeriod,
   onRemovePeriod,
 }) => {
-  const { t } = useTranslation('web');
+  const { t } = useTranslation();
 
   return (
     <motion.div

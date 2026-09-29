@@ -6,7 +6,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-vi.mock('../modules/history/hooks/use-history-data.hook.js', () => ({
+vi.mock('../history/hooks/use-history-data.hook.js', () => ({
   useHistoryData: () => ({ data: undefined, isPending: true, isError: false }),
 }));
 

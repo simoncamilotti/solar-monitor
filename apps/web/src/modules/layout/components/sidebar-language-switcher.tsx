@@ -2,12 +2,15 @@ import { Flag } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { LANGUAGES } from '../../../i18n/i18n.js';
+
 export const SidebarLanguageSwitcher: FunctionComponent = () => {
-  const { i18n, t } = useTranslation('web');
-  const currentLang = i18n.language;
+  const { i18n, t } = useTranslation();
+  // Two languages: the button offers the other one.
+  const nextLanguage = LANGUAGES.find((language) => language !== i18n.language) ?? 'fr';
 
   const toggle = () => {
-    i18n.changeLanguage(currentLang === 'fr' ? 'en' : 'fr');
+    void i18n.changeLanguage(nextLanguage);
   };
 
   return (
@@ -17,7 +20,7 @@ export const SidebarLanguageSwitcher: FunctionComponent = () => {
         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent transition-smooth w-full"
       >
         <Flag className="w-4 h-4" />
-        {currentLang === 'fr' ? t('language.en') : t('language.fr')}
+        {t(`language.${nextLanguage}`)}
       </button>
     </div>
   );

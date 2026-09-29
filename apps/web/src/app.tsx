@@ -1,14 +1,11 @@
-import type { FunctionComponent } from 'react';
-import React, { useState } from 'react';
-import { useAuth } from 'react-oidc-context';
-import { createBrowserRouter, RouterProvider } from 'react-router';
-import { Toaster } from 'sonner';
+import type { QueryClient } from '@tanstack/react-query';
+import { RouterProvider } from '@tanstack/react-router';
+import { useState } from 'react';
+import { type AuthContextProps, useAuth } from 'react-oidc-context';
 
-import { ThemeProvider } from './modules/layout/providers/theme-provider.js';
-import { ReactQueryProvider } from './modules/providers/react-query-provider.js';
-import { routes } from './routes/routes.js';
+import { createAppRouter } from './router.js';
 
-export const App: FunctionComponent = () => {
+export function App({ queryClient }: { queryClient: QueryClient }) {
   const auth = useAuth();
 
   // The routes decide on access: wait until the OIDC state is known, including the return
@@ -16,21 +13,11 @@ export const App: FunctionComponent = () => {
   if (auth.isLoading) {
     return null;
   }
-  return <AppRouter />;
-};
+  return <AppRouter queryClient={queryClient} auth={auth} />;
+}
 
-const AppRouter: FunctionComponent = () => {
+function AppRouter({ queryClient, auth }: { queryClient: QueryClient; auth: AuthContextProps }) {
   // Created once the sign-in callback has restored the requested URL, so it starts there.
-  const [router] = useState(() => createBrowserRouter(routes));
-
-  return (
-    <React.StrictMode>
-      <ReactQueryProvider>
-        <ThemeProvider>
-          <RouterProvider router={router} />
-          <Toaster richColors position="bottom-right" />
-        </ThemeProvider>
-      </ReactQueryProvider>
-    </React.StrictMode>
-  );
-};
+  const [router] = useState(() => createAppRouter(queryClient));
+  return <RouterProvider router={router} context={{ auth }} />;
+}

@@ -6,11 +6,11 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-vi.mock('../modules/settings/components/sync-status-card.js', () => ({
+vi.mock('./components/sync-status-card.js', () => ({
   SyncStatusCard: () => <div data-testid="sync-status-card" />,
 }));
 
-vi.mock('../modules/settings/components/sync-schedule-card.js', () => ({
+vi.mock('./components/sync-schedule-card.js', () => ({
   SyncScheduleCard: () => <div data-testid="sync-schedule-card" />,
 }));
 

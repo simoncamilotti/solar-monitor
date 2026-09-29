@@ -1,3 +1,4 @@
+import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import { defaultClientConditions } from 'vite';
 import { defineConfig } from 'vitest/config';
@@ -12,7 +13,16 @@ export default defineConfig({
   },
   server: { port: 4200, strictPort: true, host: 'localhost' },
   preview: { port: 4200, host: 'localhost' },
-  plugins: [react(), runtimeConfig()],
+  plugins: [
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+      routesDirectory: './src/routes',
+      generatedRouteTree: './src/route-tree.gen.ts',
+    }),
+    react(),
+    runtimeConfig(),
+  ],
   build: {
     outDir: './dist',
     emptyOutDir: true,

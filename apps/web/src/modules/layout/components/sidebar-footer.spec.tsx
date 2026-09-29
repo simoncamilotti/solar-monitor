@@ -9,9 +9,9 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('react-router', () => ({
-  NavLink: ({ children, to, ...props }: any) => (
-    <a href={to} {...props}>
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to, className }: any) => (
+    <a href={to} className={className}>
       {children}
     </a>
   ),

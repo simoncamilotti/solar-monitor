@@ -18,7 +18,7 @@ export const SyncSystemItem: FunctionComponent<{
   onBackfill: (systemId: number, range?: BackfillRange) => void;
   isBackfilling: boolean;
 }> = ({ system, onSync, isSyncing, onBackfill, isBackfilling }) => {
-  const { t, i18n } = useTranslation('web');
+  const { t, i18n } = useTranslation();
   const locale = i18n.language === 'fr' ? fr : enUS;
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
