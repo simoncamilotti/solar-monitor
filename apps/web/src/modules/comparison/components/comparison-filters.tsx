@@ -50,7 +50,7 @@ export const ComparisonFilters: FunctionComponent<ComparisonFiltersProps> = ({
             onClick={() => onGranularityChange(g)}
             className={`text-xs py-1.5 px-3 rounded-md transition-smooth font-medium ${
               granularity === g
-                ? 'bg-card text-foreground shadow-sm'
+                ? 'bg-card text-foreground shadow-xs'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -63,7 +63,7 @@ export const ComparisonFilters: FunctionComponent<ComparisonFiltersProps> = ({
         <select
           value={resolution}
           onChange={(e) => onResolutionChange(e.target.value as ComparisonResolution)}
-          className="text-xs border border-border rounded-lg px-3 py-2 bg-background text-foreground transition-smooth focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="text-xs border border-border rounded-lg px-3 py-2 bg-background text-foreground transition-smooth focus:outline-hidden focus:ring-2 focus:ring-primary/20"
         >
           {availableResolutions.map((r) => (
             <option key={r} value={r}>

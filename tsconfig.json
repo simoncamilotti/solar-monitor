@@ -23,6 +23,9 @@
     },
     {
       "path": "./tools/workspace-plugin"
+    },
+    {
+      "path": "./libs/web/ui"
     }
   ],
   "compilerOptions": {}

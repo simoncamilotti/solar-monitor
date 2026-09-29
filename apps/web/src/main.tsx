@@ -3,6 +3,7 @@ import './i18n/i18n.js';
 import './modules/charts/init-echarts.js';
 
 import { configureApiClient } from '@repo/api-client';
+import { ThemeProvider } from '@repo/ui/components/theme-provider';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -11,7 +12,6 @@ import { AuthProvider } from 'react-oidc-context';
 import { App } from './app.js';
 import { createUserManager, type SigninState } from './auth/user-manager.js';
 import { loadConfig } from './config/config.js';
-import { ThemeProvider } from './modules/layout/providers/theme-provider.js';
 import { createQueryClient } from './modules/providers/query-client.js';
 
 const config = loadConfig();
@@ -31,7 +31,7 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <ThemeProvider>
+    <ThemeProvider defaultTheme="dark">
       <AuthProvider
         userManager={userManager}
         onSigninCallback={(user) => {

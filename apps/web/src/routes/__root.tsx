@@ -1,3 +1,4 @@
+import { Toaster } from '@repo/ui/components/sonner';
 import {
   createRootRouteWithContext,
   type ErrorComponentProps,
@@ -5,7 +6,6 @@ import {
   Outlet,
 } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { Toaster } from 'sonner';
 
 import type { RouterContext } from '../router.js';
 

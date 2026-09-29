@@ -9,7 +9,7 @@ type PickerDropdownProps = {
 };
 
 const triggerClasses =
-  'flex items-center gap-2 text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground hover:bg-muted transition-smooth focus:outline-none focus:ring-2 focus:ring-primary/20';
+  'flex items-center gap-2 text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground hover:bg-muted transition-smooth focus:outline-hidden focus:ring-2 focus:ring-primary/20';
 
 export const PickerDropdown: FunctionComponent<PickerDropdownProps> = ({ label, children }) => {
   const [open, setOpen] = useState(false);

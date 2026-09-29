@@ -30,7 +30,11 @@
       "ignoreDependencies": ["@tanstack/react-query", "@faker-js/faker", "msw"]
     },
     "apps/web": {
-      "entry": ["src/routes/**/*.tsx"]
+      "entry": ["src/routes/**/*.tsx"],
+      "ignoreDependencies": ["tailwindcss"]
+    },
+    "libs/web/ui": {
+      "entry": ["src/components/*.tsx", "src/lib/*.ts"]
     }
   },
   "ignore": ["apps/web/src/route-tree.gen.ts"]

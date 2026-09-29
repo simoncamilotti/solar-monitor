@@ -1,129 +1,142 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import '@repo/ui/globals.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind classes used by the application. */
+@source './';
 
-@layer base {
-  :root {
-    --background: 270 20% 98%;
-    --foreground: 270 50% 10%;
+/* Solar-monitor keeps its own palette, font and radius scale over the @repo/ui defaults. */
+@theme inline {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --radius-sm: 0.25rem;
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: 0.75rem;
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+}
 
-    --card: 270 20% 100%;
-    --card-foreground: 270 50% 10%;
+:root {
+  --background: hsl(270 20% 98%);
+  --foreground: hsl(270 50% 10%);
 
-    --popover: 270 20% 100%;
-    --popover-foreground: 270 50% 10%;
+  --card: hsl(270 20% 100%);
+  --card-foreground: hsl(270 50% 10%);
 
-    --primary: 280 80% 55%;
-    --primary-foreground: 0 0% 100%;
+  --popover: hsl(270 20% 100%);
+  --popover-foreground: hsl(270 50% 10%);
 
-    --secondary: 310 40% 70%;
-    --secondary-foreground: 270 50% 10%;
+  --primary: hsl(280 80% 55%);
+  --primary-foreground: hsl(0 0% 100%);
 
-    --muted: 270 15% 94%;
-    --muted-foreground: 270 10% 45%;
+  --secondary: hsl(310 40% 70%);
+  --secondary-foreground: hsl(270 50% 10%);
 
-    --accent: 270 15% 94%;
-    --accent-foreground: 270 50% 10%;
+  --muted: hsl(270 15% 94%);
+  --muted-foreground: hsl(270 10% 45%);
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+  --accent: hsl(270 15% 94%);
+  --accent-foreground: hsl(270 50% 10%);
 
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 100%);
 
-    --border: 270 15% 88%;
-    --input: 270 15% 88%;
-    --ring: 280 80% 55%;
+  --success: hsl(142 71% 45%);
+  --success-foreground: hsl(0 0% 100%);
 
-    --radius: 0.75rem;
+  --border: hsl(270 15% 88%);
+  --input: hsl(270 15% 88%);
+  --ring: hsl(280 80% 55%);
 
-    --card-shadow:
-      0 0 0 1px rgba(120, 0, 200, 0.04), 0 2px 4px rgba(120, 0, 200, 0.03),
-      0 8px 16px rgba(120, 0, 200, 0.03);
+  --radius: 0.75rem;
 
-    --sidebar-background: 270 50% 8%;
-    --sidebar-foreground: 270 15% 92%;
-    --sidebar-primary: 280 80% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 40% 14%;
-    --sidebar-accent-foreground: 270 15% 92%;
-    --sidebar-border: 270 35% 16%;
-    --sidebar-ring: 280 80% 55%;
-    --sidebar-muted: 270 10% 50%;
+  --card-shadow:
+    0 0 0 1px rgba(120, 0, 200, 0.04), 0 2px 4px rgba(120, 0, 200, 0.03),
+    0 8px 16px rgba(120, 0, 200, 0.03);
 
-    --surface: 240 5% 98%;
-    --surface-hover: 240 5% 94%;
+  --sidebar: hsl(270 50% 8%);
+  --sidebar-foreground: hsl(270 15% 92%);
+  --sidebar-primary: hsl(280 80% 55%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(270 40% 14%);
+  --sidebar-accent-foreground: hsl(270 15% 92%);
+  --sidebar-border: hsl(270 35% 16%);
+  --sidebar-ring: hsl(280 80% 55%);
+  --sidebar-muted: hsl(270 10% 50%);
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-  }
+  --surface: hsl(240 5% 98%);
+  --surface-hover: hsl(240 5% 94%);
 
-  .dark {
-    --background: 270 50% 4%;
-    --foreground: 270 15% 92%;
+  --warning: hsl(38 92% 50%);
+  --warning-foreground: hsl(0 0% 100%);
+}
 
-    --card: 270 40% 8%;
-    --card-foreground: 270 15% 92%;
+.dark {
+  --background: hsl(270 50% 4%);
+  --foreground: hsl(270 15% 92%);
 
-    --popover: 270 40% 8%;
-    --popover-foreground: 270 15% 92%;
+  --card: hsl(270 40% 8%);
+  --card-foreground: hsl(270 15% 92%);
 
-    --primary: 280 80% 60%;
-    --primary-foreground: 0 0% 100%;
+  --popover: hsl(270 40% 8%);
+  --popover-foreground: hsl(270 15% 92%);
 
-    --secondary: 310 40% 40%;
-    --secondary-foreground: 270 15% 92%;
+  --primary: hsl(280 80% 60%);
+  --primary-foreground: hsl(0 0% 100%);
 
-    --muted: 270 35% 12%;
-    --muted-foreground: 270 10% 55%;
+  --secondary: hsl(310 40% 40%);
+  --secondary-foreground: hsl(270 15% 92%);
 
-    --accent: 270 35% 12%;
-    --accent-foreground: 270 15% 92%;
+  --muted: hsl(270 35% 12%);
+  --muted-foreground: hsl(270 10% 55%);
 
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 100%;
+  --accent: hsl(270 35% 12%);
+  --accent-foreground: hsl(270 15% 92%);
 
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
+  --destructive: hsl(0 62% 30%);
+  --destructive-foreground: hsl(0 0% 100%);
 
-    --border: 270 35% 14%;
-    --input: 270 35% 14%;
-    --ring: 280 80% 60%;
+  --success: hsl(142 71% 45%);
+  --success-foreground: hsl(0 0% 100%);
 
-    --card-shadow:
-      0 0 0 1px rgba(160, 0, 255, 0.06), 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+  --border: hsl(270 35% 14%);
+  --input: hsl(270 35% 14%);
+  --ring: hsl(280 80% 60%);
 
-    --sidebar-background: 270 50% 4%;
-    --sidebar-foreground: 270 15% 92%;
-    --sidebar-primary: 280 80% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 40% 10%;
-    --sidebar-accent-foreground: 270 15% 92%;
-    --sidebar-border: 270 35% 14%;
-    --sidebar-ring: 280 80% 60%;
-    --sidebar-muted: 270 10% 50%;
+  --card-shadow:
+    0 0 0 1px rgba(160, 0, 255, 0.06), 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
 
-    --surface: 240 14% 7%;
-    --surface-hover: 240 12% 10%;
+  --sidebar: hsl(270 50% 4%);
+  --sidebar-foreground: hsl(270 15% 92%);
+  --sidebar-primary: hsl(280 80% 60%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(270 40% 10%);
+  --sidebar-accent-foreground: hsl(270 15% 92%);
+  --sidebar-border: hsl(270 35% 14%);
+  --sidebar-ring: hsl(280 80% 60%);
+  --sidebar-muted: hsl(270 10% 50%);
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-  }
+  --surface: hsl(240 14% 7%);
+  --surface-hover: hsl(240 12% 10%);
+
+  --warning: hsl(38 92% 50%);
+  --warning-foreground: hsl(0 0% 100%);
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family:
-      'Inter',
-      system-ui,
-      -apple-system,
-      sans-serif;
+    @apply antialiased;
+  }
+
+  /* Tailwind 4 no longer gives buttons a pointer cursor. */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
   }
 
   .font-mono {
@@ -157,7 +170,7 @@
   }
 
   .helios-datepicker .react-datepicker__close-icon::after {
-    background-color: hsl(var(--primary));
+    background-color: var(--primary);
     font-size: 12px;
   }
 
@@ -167,77 +180,77 @@
       system-ui,
       -apple-system,
       sans-serif;
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
+    background-color: var(--card);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--card-shadow);
-    color: hsl(var(--foreground));
+    color: var(--foreground);
     font-size: 0.8rem;
   }
 
   .helios-calendar .react-datepicker__header {
-    background-color: hsl(var(--muted));
-    border-bottom: 1px solid hsl(var(--border));
+    background-color: var(--muted);
+    border-bottom: 1px solid var(--border);
     border-radius: var(--radius) var(--radius) 0 0;
     padding-top: 10px;
   }
 
   .helios-calendar .react-datepicker__current-month,
   .helios-calendar .react-datepicker__day-name {
-    color: hsl(var(--foreground));
+    color: var(--foreground);
   }
 
   .helios-calendar .react-datepicker__day {
-    color: hsl(var(--foreground));
+    color: var(--foreground);
     border-radius: 6px;
     transition: all 150ms ease;
   }
 
   .helios-calendar .react-datepicker__day:hover {
-    background-color: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
+    background-color: var(--accent);
+    color: var(--accent-foreground);
   }
 
   .helios-calendar .react-datepicker__day--selected,
   .helios-calendar .react-datepicker__day--in-selecting-range,
   .helios-calendar .react-datepicker__day--in-range {
-    background-color: hsl(var(--primary)) !important;
-    color: hsl(var(--primary-foreground)) !important;
+    background-color: var(--primary) !important;
+    color: var(--primary-foreground) !important;
   }
 
   .helios-calendar
     .react-datepicker__day--in-selecting-range:not(.react-datepicker__day--in-range) {
-    background-color: hsl(var(--primary) / 0.3) !important;
-    color: hsl(var(--foreground)) !important;
+    background-color: color-mix(in srgb, var(--primary) 30%, transparent) !important;
+    color: var(--foreground) !important;
   }
 
   .helios-calendar .react-datepicker__day--range-start,
   .helios-calendar .react-datepicker__day--range-end {
-    background-color: hsl(var(--primary)) !important;
-    color: hsl(var(--primary-foreground)) !important;
+    background-color: var(--primary) !important;
+    color: var(--primary-foreground) !important;
   }
 
   .helios-calendar .react-datepicker__day--keyboard-selected {
-    background-color: hsl(var(--primary) / 0.2);
-    color: hsl(var(--foreground));
+    background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    color: var(--foreground);
   }
 
   .helios-calendar .react-datepicker__day--outside-month {
-    color: hsl(var(--muted-foreground));
+    color: var(--muted-foreground);
     opacity: 0.5;
   }
 
   .helios-calendar .react-datepicker__day--disabled {
-    color: hsl(var(--muted-foreground));
+    color: var(--muted-foreground);
     opacity: 0.3;
   }
 
   .helios-calendar .react-datepicker__navigation-icon::before {
-    border-color: hsl(var(--muted-foreground));
+    border-color: var(--muted-foreground);
   }
 
   .helios-calendar .react-datepicker__navigation:hover *::before {
-    border-color: hsl(var(--foreground));
+    border-color: var(--foreground);
   }
 
   .helios-calendar .react-datepicker__month-dropdown-container,
@@ -247,9 +260,9 @@
 
   .helios-calendar .react-datepicker__month-dropdown-container select,
   .helios-calendar .react-datepicker__year-dropdown-container select {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    border: 1px solid hsl(var(--border));
+    background-color: var(--background);
+    color: var(--foreground);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 2px 4px;
     font-size: 0.75rem;
@@ -261,12 +274,11 @@
   }
 }
 
-@layer utilities {
-  .card-elevated {
-    box-shadow: var(--card-shadow);
-    @apply bg-card rounded-xl;
-  }
-  .transition-smooth {
-    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
-  }
+@utility card-elevated {
+  box-shadow: var(--card-shadow);
+  @apply bg-card rounded-xl;
+}
+
+@utility transition-smooth {
+  transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
 }
