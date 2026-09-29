@@ -30,8 +30,8 @@ export const SyncScheduleCard: FunctionComponent = () => {
     return (
       <div className="space-y-3">
         <div>
-          <div className="h-4 w-48 bg-muted animate-pulse rounded mb-1" />
-          <div className="h-3 w-72 bg-muted animate-pulse rounded" />
+          <div className="h-4 w-48 bg-muted animate-pulse rounded-sm mb-1" />
+          <div className="h-3 w-72 bg-muted animate-pulse rounded-sm" />
         </div>
         <div className="h-16 bg-muted animate-pulse rounded-xl" />
       </div>

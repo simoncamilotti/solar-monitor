@@ -55,7 +55,7 @@ export const ComparisonChart: FunctionComponent<ComparisonChartProps> = ({
             onClick={() => onChartTypeChange('bar')}
             className={`p-1.5 rounded-md transition-smooth ${
               chartType === 'bar'
-                ? 'bg-card text-foreground shadow-sm'
+                ? 'bg-card text-foreground shadow-xs'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
             title={t('compare.chartType.bar')}
@@ -66,7 +66,7 @@ export const ComparisonChart: FunctionComponent<ComparisonChartProps> = ({
             onClick={() => onChartTypeChange('line')}
             className={`p-1.5 rounded-md transition-smooth ${
               chartType === 'line'
-                ? 'bg-card text-foreground shadow-sm'
+                ? 'bg-card text-foreground shadow-xs'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
             title={t('compare.chartType.line')}

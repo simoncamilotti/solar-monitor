@@ -53,7 +53,7 @@ export const DashboardFilters: FunctionComponent<DashboardFiltersProps> = ({
             onClick={() => onViewModeChange(mode)}
             className={`text-xs py-1.5 px-3 rounded-md transition-smooth font-medium ${
               viewMode === mode
-                ? 'bg-card text-foreground shadow-sm'
+                ? 'bg-card text-foreground shadow-xs'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >

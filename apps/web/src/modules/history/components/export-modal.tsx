@@ -81,7 +81,7 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-xs"
             onClick={onClose}
           />
 
@@ -141,7 +141,7 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
                   <select
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
+                    className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-hidden focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
                   >
                     <option value="all">{t('export.allYears')}</option>
                     {years.map((y) => (
@@ -158,7 +158,7 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
                   <select
                     value={month}
                     onChange={(e) => setMonth(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
+                    className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-hidden focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
                   >
                     <option value="all">{t('export.allMonths')}</option>
                     {months.map((m) => (
@@ -188,7 +188,7 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
                           role="checkbox"
                           aria-checked={checked}
                           onClick={() => toggleMetric(metric)}
-                          className={`w-4 h-4 rounded flex items-center justify-center transition-all ${
+                          className={`w-4 h-4 rounded-sm flex items-center justify-center transition-all ${
                             checked ? 'bg-primary' : 'border-2 border-border bg-transparent'
                           }`}
                         >
