@@ -1,12 +1,16 @@
 {
   "name": "solar-monitor",
   "version": "0.0.0",
+  "description": "Suivi de la production et de la consommation solaires d'un foyer",
   "private": true,
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@12.6.0",
   "engines": {
     "node": ">=24 <25"
+  },
+  "starter": {
+    "version": "1.0.2"
   },
   "scripts": {
     "prepare": "if [ -d .git ] && [ -z \"${CI:-}\" ]; then lefthook install; fi",
