@@ -1,0 +1,25 @@
+{
+  "name": "@repo/e2e-support",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@repo/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "nx": {
+    "tags": [
+      "type:lib",
+      "platform:node"
+    ]
+  },
+  "dependencies": {
+    "jose": "catalog:",
+    "zod": "catalog:"
+  }
+}

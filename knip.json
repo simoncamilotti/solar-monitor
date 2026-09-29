@@ -1,5 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreBinaries": ["prisma"],
   "workspaces": {
     ".": {
       "ignoreDependencies": [
@@ -17,10 +18,7 @@
     },
     "apps/web-e2e": {
       "playwright": false,
-      "entry": ["playwright.config.ts", "src/**/*.e2e.ts"]
-    },
-    "apps/api-e2e": {
-      "entry": ["src/**/*.spec.ts", "src/support/*.ts"]
+      "entry": ["playwright.config.ts", "src/global-setup.ts", "src/**/*.e2e.ts"]
     },
     "tools/workspace-plugin": {
       "entry": ["src/generators/*/*.ts"]

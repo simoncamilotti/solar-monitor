@@ -1,12 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { uniqueUser } from '@repo/e2e-support';
 
-import { mockApi } from './api-mock.js';
-import { mockOidc } from './oidc-mock.js';
+import { expect, test } from './fixtures.js';
 
 test.describe('Home page', () => {
-  test.beforeEach(async ({ page }) => {
-    await mockOidc(page);
-    await mockApi(page);
+  test.beforeEach(async ({ signIn }) => {
+    await signIn(uniqueUser());
   });
 
   test('should display the home page', async ({ page }) => {

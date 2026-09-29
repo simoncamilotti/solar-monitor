@@ -1,50 +1,10 @@
-import { expect, type Page, test } from '@playwright/test';
+import { uniqueUser } from '@repo/e2e-support';
 
-import { mockApi } from './api-mock.js';
-import { mockOidc } from './oidc-mock.js';
-
-const mockHistoryData = [
-  {
-    date: '2024-01-15',
-    kwhProduced: 12.5,
-    kwhConsumed: 8.3,
-    kwhImported: 2.1,
-    kwhExported: 6.3,
-    gridDependency: 25.3,
-  },
-  {
-    date: '2024-02-20',
-    kwhProduced: 15.0,
-    kwhConsumed: 10.2,
-    kwhImported: 1.5,
-    kwhExported: 6.3,
-    gridDependency: 14.7,
-  },
-  {
-    date: '2024-06-10',
-    kwhProduced: 22.0,
-    kwhConsumed: 12.0,
-    kwhImported: 0.8,
-    kwhExported: 10.8,
-    gridDependency: 6.7,
-  },
-];
-
-async function mockHistoryApi(page: Page) {
-  await page.route('**/api/enphase/all', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify(mockHistoryData),
-    }),
-  );
-}
+import { expect, test } from './fixtures.js';
 
 test.describe('History page', () => {
-  test.beforeEach(async ({ page }) => {
-    await mockOidc(page);
-    await mockApi(page);
-    await mockHistoryApi(page);
+  test.beforeEach(async ({ signIn }) => {
+    await signIn(uniqueUser());
   });
 
   test('should navigate to history page via sidebar', async ({ page }) => {
@@ -67,7 +27,7 @@ test.describe('History page', () => {
 
   test('should display record count after data loads', async ({ page }) => {
     await page.goto('/history');
-    await expect(page.locator('main')).toContainText('3 enregistrements');
+    await expect(page.locator('main')).toContainText('6 enregistrements');
   });
 
   test('should open export modal on button click', async ({ page }) => {
@@ -133,9 +93,9 @@ test.describe('History page', () => {
 });
 
 test.describe('History page - error state', () => {
-  test.beforeEach(async ({ page }) => {
-    await mockOidc(page);
-    await mockApi(page);
+  // The only call still intercepted: a failing API cannot be produced otherwise.
+  test.beforeEach(async ({ page, signIn }) => {
+    await signIn(uniqueUser());
     await page.route('**/api/enphase/all', (route) =>
       route.fulfill({
         status: 500,
