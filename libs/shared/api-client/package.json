@@ -35,7 +35,9 @@
           "api:openapi"
         ],
         "inputs": [
-          "{workspaceRoot}/apps/api/openapi.json",
+          {
+            "dependentTasksOutputFiles": "**/openapi.json"
+          },
           "{projectRoot}/orval.config.ts"
         ],
         "outputs": [
