@@ -3,12 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { LifetimeDay } from '@repo/contracts';
 
-import { ENERGY_METRICS } from '../../shared/metrics/index.js';
-import type {
-  DashboardFilterState,
-  DashboardMetricKey,
-  DashboardViewMode,
-} from '../dashboard.type.js';
+import type { DashboardFilterState, DashboardViewMode } from '../dashboard.type.js';
 import { getMonthsForYear } from './get-months-for-year.js';
 
 const STORAGE_KEY = 'dashboard-filters';
@@ -48,11 +43,6 @@ const buildInitialState = (data: LifetimeDay[]): DashboardFilterState => {
       ? stored.selectedMonth
       : latestMonth;
 
-  const selectedMetric =
-    stored?.selectedMetric && ENERGY_METRICS.includes(stored.selectedMetric)
-      ? stored.selectedMetric
-      : 'kwhConsumed';
-
   const getCustomDate = (key: 'customStartDate' | 'customEndDate'): string | null => {
     if (data.length === 0) {
       return null;
@@ -78,7 +68,6 @@ const buildInitialState = (data: LifetimeDay[]): DashboardFilterState => {
     viewMode,
     selectedYear,
     selectedMonth,
-    selectedMetric,
     customStartDate,
     customEndDate,
   };
@@ -142,10 +131,6 @@ export const useDashboardFilters = (data: LifetimeDay[]) => {
     [data, filters.selectedYear],
   );
 
-  const setMetric = useCallback((metric: DashboardMetricKey) => {
-    setFilters((prev) => ({ ...prev, selectedMetric: metric }));
-  }, []);
-
   const setCustomRange = useCallback((startDate: string | null, endDate: string | null) => {
     setFilters((prev) => ({ ...prev, customStartDate: startDate, customEndDate: endDate }));
   }, []);
@@ -164,7 +149,6 @@ export const useDashboardFilters = (data: LifetimeDay[]) => {
     setViewMode,
     setYear,
     setMonth,
-    setMetric,
     setCustomRange,
   };
 };

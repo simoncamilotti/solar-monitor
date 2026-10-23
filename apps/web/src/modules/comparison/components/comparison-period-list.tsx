@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { monthKey } from '../../../i18n/keys.js';
 
+import { getPeriodColor, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import type { ComparisonGranularity, ComparisonPeriod } from '../comparison.type.js';
-import { comparisonPeriodColors } from '../constants/comparison-colors.js';
 import { isDayPeriod, isMonthPeriod, isYearPeriod } from '../hooks/use-comparison-filters.hook.js';
 import { PeriodPicker } from './period-picker.js';
 
@@ -38,29 +38,30 @@ export const ComparisonPeriodList: FunctionComponent<ComparisonPeriodListProps> 
   onRemove,
 }) => {
   const { t } = useTranslation();
+  const theme = useDisplayedTheme();
   const monthName = (i: number) => t(monthKey(i));
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       {periods.map((period, index) => {
-        const color = comparisonPeriodColors[index % comparisonPeriodColors.length];
         const label = getPeriodChipLabel(period, monthName);
 
         return (
           <span
             key={label}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border"
-            style={{
-              backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
-              borderColor: `color-mix(in srgb, ${color} 30%, transparent)`,
-              color,
-            }}
+            className="inline-flex items-center gap-2 pl-3 pr-1.5 py-1 rounded-full text-xs font-medium border border-border bg-background"
           >
+            <span
+              className="w-2.5 h-2.5 rounded-xs"
+              style={{ backgroundColor: getPeriodColor(index, theme) }}
+              aria-hidden="true"
+            />
             {label}
             <button
               type="button"
               onClick={() => onRemove(period)}
-              className="hover:opacity-70 transition-smooth"
+              aria-label={t('compare.periods.remove', { period: label })}
+              className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-smooth"
             >
               <X className="w-3 h-3" />
             </button>

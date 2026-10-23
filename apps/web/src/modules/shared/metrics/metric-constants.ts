@@ -1,6 +1,6 @@
 import type { DerivedMetricKey, EnergyMetricKey, MetricKey } from './metric.type.js';
 
-export const ENERGY_METRICS: EnergyMetricKey[] = [
+const ENERGY_METRICS: EnergyMetricKey[] = [
   'kwhProduced',
   'kwhConsumed',
   'kwhImported',

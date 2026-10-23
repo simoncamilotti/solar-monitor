@@ -13,7 +13,43 @@ type KPICardProps = {
   deltaUnit?: 'percent' | 'points';
   icon: LucideIcon;
   color?: string;
+  /** Values of the last buckets of the period, oldest first, drawn as small bars. */
+  sparkline?: number[];
   index?: number;
+};
+
+const SPARKLINE_HEIGHT = 32;
+
+const Sparkline: FunctionComponent<{ values: number[]; color: string }> = ({ values, color }) => {
+  const max = Math.max(...values.map((v) => Math.abs(v)), 0);
+  if (max === 0) {
+    return null;
+  }
+  return (
+    <svg
+      width={values.length * 7}
+      height={SPARKLINE_HEIGHT}
+      viewBox={`0 0 ${values.length * 7} ${SPARKLINE_HEIGHT}`}
+      aria-hidden="true"
+      data-testid="kpi-sparkline"
+    >
+      {values.map((v, i) => {
+        const h = Math.max(2, (Math.abs(v) / max) * SPARKLINE_HEIGHT);
+        return (
+          <rect
+            key={i}
+            x={i * 7}
+            y={SPARKLINE_HEIGHT - h}
+            width={5}
+            height={h}
+            rx={1}
+            fill={color}
+            opacity={i === values.length - 1 ? 1 : 0.45}
+          />
+        );
+      })}
+    </svg>
+  );
 };
 
 export const KPICard: FunctionComponent<KPICardProps> = ({
@@ -24,6 +60,7 @@ export const KPICard: FunctionComponent<KPICardProps> = ({
   deltaUnit = 'percent',
   icon: Icon,
   color,
+  sparkline,
   index = 0,
 }) => {
   const { t } = useTranslation();
@@ -49,9 +86,14 @@ export const KPICard: FunctionComponent<KPICardProps> = ({
         </div>
       </div>
 
-      <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-semibold tracking-tight data-text">{value}</span>
-        <span className="text-sm text-muted-foreground/60">{unit}</span>
+      <div className="flex items-end justify-between gap-3">
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-semibold tracking-tight data-text">{value}</span>
+          <span className="text-sm text-muted-foreground">{unit}</span>
+        </div>
+        {sparkline && sparkline.length > 1 && color && (
+          <Sparkline values={sparkline} color={color} />
+        )}
       </div>
 
       <div className="mt-3 flex items-center gap-1.5">

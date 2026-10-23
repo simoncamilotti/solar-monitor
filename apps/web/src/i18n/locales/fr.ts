@@ -12,6 +12,7 @@ export const fr = {
       compare: 'Comparaison',
       settings: 'Paramétrage',
       logout: 'Déconnexion',
+      label: 'Navigation principale',
     },
   },
   language: {
@@ -72,10 +73,25 @@ export const fr = {
       noPrevious: 'Pas de période précédente',
     },
     chart: {
+      titleByYear: 'Énergie par année',
+      titleByMonth: 'Énergie par mois',
+      titleByDay: 'Énergie par jour',
+      description: "Au-dessus de l'axe, ce que la maison consomme ; en dessous, ce qu'elle revend",
+      produced: 'Produit',
+      consumed: 'Consommé',
+      selfConsumed: 'Autoconsommé',
+      exported: 'Exporté',
+      imported: 'Importé',
+    },
+    sunShare: {
+      title: 'Où va le soleil',
       production: 'Production',
       consumption: 'Consommation',
-      import: 'Import',
-      export: 'Export',
+      usedOnSite: 'consommée sur place',
+      exported: 'revendue au réseau',
+      fromSun: 'couverte par le soleil',
+      imported: 'achetée au réseau',
+      empty: 'Aucune donnée sur la période.',
     },
     records: {
       title: 'Records',
@@ -152,6 +168,21 @@ export const fr = {
     periods: {
       empty: 'Aucune période sélectionnée',
       add: 'Ajouter',
+      remove: 'Retirer {{period}}',
+      selected: '{{selected}} sur {{max}}',
+    },
+    empty: {
+      title: 'Que voulez-vous comparer ?',
+      description: "Partez d'une comparaison courante, ou composez la vôtre.",
+      custom:
+        "Pour une comparaison personnalisée, choisissez années, mois ou jours, puis ajoutez jusqu'à {{max}} périodes avec « Ajouter ».",
+    },
+    presets: {
+      thisYearVsLastYear: "Cette année vs l'an dernier",
+      thisMonthVsLastYear: "Ce mois vs le même mois l'an dernier",
+      bestAndWorstYear: 'Meilleure et moins bonne année',
+      recentYears: 'Les dernières années',
+      notEnoughHistory: "Pas encore assez d'historique",
     },
     error: 'Une erreur est survenue lors du chargement des données.',
     chartType: {
@@ -161,11 +192,11 @@ export const fr = {
     metrics: {
       kwhProduced: 'Production',
       kwhConsumed: 'Consommation',
-      kwhImported: 'Importer',
-      kwhExported: 'Exporter',
+      kwhImported: 'Import',
+      kwhExported: 'Export',
       autonomy: 'Autonomie',
       selfConsumption: 'Autoconsommation',
-      gridDependency: 'Dépéndence réseau',
+      gridDependency: 'Dépendance réseau',
     },
   },
   settings: {

@@ -7,13 +7,13 @@ import { monthKey } from '../../../i18n/keys.js';
 import type { LifetimeDay } from '@repo/contracts';
 
 import { filterByDay, filterByMonth, filterByYear } from '../../shared/data/index.js';
+import { getPeriodColor, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import { computeMetric } from '../../shared/metrics/index.js';
 import type {
   ComparisonFilterState,
   ComparisonPeriod,
   ComparisonSeries,
 } from '../comparison.type.js';
-import { comparisonPeriodColor } from '../constants/comparison-colors.js';
 import { isDayPeriod, isMonthPeriod, isYearPeriod } from './use-comparison-filters.hook.js';
 
 const daysInMonth = (year: number, month: number): number => new Date(year, month + 1, 0).getDate();
@@ -33,6 +33,7 @@ export const useComparisonData = (
   filters: ComparisonFilterState,
 ): ComparisonSeries[] => {
   const { t } = useTranslation();
+  const theme = useDisplayedTheme();
   // Memoized so the `useMemo` below actually memoizes: an inline arrow here would be a fresh
   // reference on every render, which was defeating the memoization entirely.
   const monthName = useCallback((i: number) => t(monthKey(i)), [t]);
@@ -41,7 +42,7 @@ export const useComparisonData = (
     if (filters.periods.length === 0) return [];
 
     return filters.periods.map((period: ComparisonPeriod, index): ComparisonSeries => {
-      const color = comparisonPeriodColor(index);
+      const color = getPeriodColor(index, theme);
       const label = getPeriodLabel(period, monthName);
 
       if (isDayPeriod(period)) {
@@ -142,5 +143,5 @@ export const useComparisonData = (
 
       return { label, color, categories: [], values: [] };
     });
-  }, [data, filters, monthName]);
+  }, [data, filters, monthName, theme]);
 };
