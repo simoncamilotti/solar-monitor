@@ -2,8 +2,8 @@
 
 Suivi de la production et de la consommation solaires d'un foyer : chaque jour, l'API récupère
 les données de l'installation depuis l'[API Enphase v4](https://developer-v4.enphase.com) ;
-l'application web les présente en tableau de bord, comparaison de périodes et historique
-exportable.
+l'application web les présente en tableau de bord avec les records de l'installation,
+comparaison de périodes et historique exportable.
 
 Monorepo Nx : une API NestJS, une application web React et leurs bibliothèques partagées, sur
 le socle de [monorepo-starter](https://github.com/simoncamilotti/monorepo-starter) v1.0.2.
