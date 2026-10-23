@@ -58,6 +58,26 @@ describe('Dashboard records', () => {
     });
   });
 
+  it('should open the dashboard on the longest surplus streak, despite night imports', async () => {
+    renderHome([
+      day('2024-05-01', 9, 3),
+      day('2024-05-02', 6, 4),
+      day('2024-05-03', 8, 3),
+      day('2024-05-04', 12, 2),
+      day('2024-05-05', 5, 5),
+    ]);
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Plus longue série de jours excédentaires/ }),
+    );
+
+    expect(storedFilters()).toMatchObject({
+      viewMode: 'custom',
+      customStartDate: '2024-05-03',
+      customEndDate: '2024-05-04',
+    });
+  });
+
   it('should not show the card for an empty history', async () => {
     renderHome([]);
 

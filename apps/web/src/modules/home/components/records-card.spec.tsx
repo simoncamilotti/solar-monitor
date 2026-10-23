@@ -33,11 +33,11 @@ describe('RecordsCard', () => {
     expect(screen.getByText('depuis le 1 janv. 2024')).toBeDefined();
   });
 
-  it('should leave out the streaks and the autonomous month when there are none', () => {
+  it('should leave out the streaks and the most autonomous month when there are none', () => {
     renderCard({ longestStreak: null, currentStreak: null, mostAutonomousMonth: null });
 
-    expect(screen.queryByText('Plus longue série autonome')).toBeNull();
-    expect(screen.queryByText('Série autonome en cours')).toBeNull();
+    expect(screen.queryByText('Plus longue série de jours excédentaires')).toBeNull();
+    expect(screen.queryByText('Série excédentaire en cours')).toBeNull();
     expect(screen.queryByText('Mois le plus autonome')).toBeNull();
     expect(screen.getAllByRole('button')).toHaveLength(3);
   });

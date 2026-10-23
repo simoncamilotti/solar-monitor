@@ -14,17 +14,20 @@ export type Streak = { from: string; to: string; days: number };
 export type Records = {
   bestDay: DayRecord;
   bestMonth: MonthRecord;
-  /** Longest run of fully autonomous days, `null` when there is none. */
+  /** Longest run of surplus days, `null` when there is none. */
   longestStreak: Streak | null;
-  /** Run of fully autonomous days ending on the last stored day, `null` when that day was not. */
+  /** Run of surplus days ending on the last stored day, `null` when that day was not one. */
   currentStreak: Streak | null;
   /** Month with the highest autonomy, `null` when no month has any consumption. */
   mostAutonomousMonth: MonthRecord | null;
   totalProduction: { since: string; value: number };
 };
 
-/** A day is fully autonomous when nothing was drawn from the grid. */
-export const isAutonomousDay = (day: LifetimeDay): boolean => day.kwhImported === 0;
+/**
+ * A day is a surplus day when the installation produced at least what the household consumed.
+ * Without a battery, the house draws from the grid every night: "no import at all" would never happen.
+ */
+export const isSurplusDay = (day: LifetimeDay): boolean => day.kwhProduced >= day.kwhConsumed;
 
 const nextDay = (date: string) => format(addDays(parseISO(date), 1), 'yyyy-MM-dd');
 
@@ -50,13 +53,13 @@ const groupByMonth = (days: LifetimeDay[]): MonthTotals[] => {
   return [...months.values()];
 };
 
-/** Runs of autonomous days; a missing day ends a run like a day with imports does. */
-const autonomousStreaks = (days: LifetimeDay[]): Streak[] => {
+/** Runs of surplus days; a missing day ends a run like a deficit day does. */
+const surplusStreaks = (days: LifetimeDay[]): Streak[] => {
   const streaks: Streak[] = [];
   let current: Streak | null = null;
 
   for (const day of days) {
-    if (!isAutonomousDay(day)) {
+    if (!isSurplusDay(day)) {
       current = null;
       continue;
     }
@@ -88,7 +91,7 @@ export const computeRecords = (data: LifetimeDay[]): Records | null => {
   const autonomy = (m: MonthTotals) => (1 - m.imported / m.consumed) * 100;
   const mostAutonomous = maxBy(consumingMonths, autonomy);
 
-  const streaks = autonomousStreaks(days);
+  const streaks = surplusStreaks(days);
   const lastStreak = streaks[streaks.length - 1];
 
   return {

@@ -1,13 +1,14 @@
 import type { LifetimeDay } from '@repo/contracts';
 
-import { computeRecords, isAutonomousDay } from './records.js';
+import { computeRecords, isSurplusDay } from './records.js';
 
+/** A surplus day by default, that still drew from the grid at night. */
 const day = (date: string, overrides: Partial<LifetimeDay> = {}): LifetimeDay => ({
   date,
   kwhProduced: 10,
   kwhConsumed: 8,
-  kwhImported: 0,
-  kwhExported: 2,
+  kwhImported: 3,
+  kwhExported: 5,
   gridDependency: 0,
   ...overrides,
 });
@@ -45,15 +46,15 @@ describe('computeRecords', () => {
     expect(records?.totalProduction).toEqual({ since: '2024-05-01', value: 15 });
   });
 
-  it('should find the longest run of autonomous days', () => {
+  it('should find the longest run of surplus days', () => {
     const records = computeRecords([
       day('2024-05-01'),
       day('2024-05-02'),
-      day('2024-05-03', { kwhImported: 1 }),
+      day('2024-05-03', { kwhConsumed: 12 }),
       day('2024-05-04'),
       day('2024-05-05'),
       day('2024-05-06'),
-      day('2024-05-07', { kwhImported: 0.5 }),
+      day('2024-05-07', { kwhConsumed: 10.5 }),
     ]);
 
     expect(records?.longestStreak).toEqual({ from: '2024-05-04', to: '2024-05-06', days: 3 });
@@ -74,7 +75,7 @@ describe('computeRecords', () => {
   it('should keep the earliest run when two have the same length', () => {
     const records = computeRecords([
       day('2024-05-01'),
-      day('2024-05-02', { kwhImported: 1 }),
+      day('2024-05-02', { kwhConsumed: 12 }),
       day('2024-05-03'),
     ]);
 
@@ -92,7 +93,7 @@ describe('computeRecords', () => {
       day('2024-05-01'),
       day('2024-05-02'),
       day('2024-05-03'),
-      day('2024-05-04', { kwhImported: 1 }),
+      day('2024-05-04', { kwhConsumed: 12 }),
       day('2024-05-05'),
     ]);
 
@@ -100,14 +101,14 @@ describe('computeRecords', () => {
     expect(records?.longestStreak?.days).toBe(3);
   });
 
-  it('should have no current run when the last day drew from the grid', () => {
-    const records = computeRecords([day('2024-05-01'), day('2024-05-02', { kwhImported: 1 })]);
+  it('should have no current run when the last day was a deficit', () => {
+    const records = computeRecords([day('2024-05-01'), day('2024-05-02', { kwhConsumed: 12 })]);
 
     expect(records?.currentStreak).toBeNull();
   });
 
-  it('should have no run at all when every day drew from the grid', () => {
-    const records = computeRecords([day('2024-05-01', { kwhImported: 1 })]);
+  it('should have no run at all when every day was a deficit', () => {
+    const records = computeRecords([day('2024-05-01', { kwhConsumed: 12 })]);
 
     expect(records?.longestStreak).toBeNull();
     expect(records?.currentStreak).toBeNull();
@@ -130,9 +131,13 @@ describe('computeRecords', () => {
   });
 });
 
-describe('isAutonomousDay', () => {
-  it('should be true only when nothing was imported', () => {
-    expect(isAutonomousDay(day('2024-05-01'))).toBe(true);
-    expect(isAutonomousDay(day('2024-05-01', { kwhImported: 0.001 }))).toBe(false);
+describe('isSurplusDay', () => {
+  it('should be true when production covers consumption, even with night imports', () => {
+    expect(isSurplusDay(day('2024-05-01'))).toBe(true);
+    expect(isSurplusDay(day('2024-05-01', { kwhProduced: 7.999 }))).toBe(false);
+  });
+
+  it('should count a day where production equals consumption', () => {
+    expect(isSurplusDay(day('2024-05-01', { kwhProduced: 8, kwhConsumed: 8 }))).toBe(true);
   });
 });
