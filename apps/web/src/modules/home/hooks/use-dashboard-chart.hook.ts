@@ -31,8 +31,9 @@ const tooltipRow = (color: string, label: string, value: string) =>
   `<div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:${color}"></span><span style="flex:1">${label}</span><b style="margin-left:16px">${value}</b></div>`;
 
 /**
- * Grouped bars, one series per flow, so none hides another. The legend toggles each series and
- * the value axis follows.
+ * Mirrored stacked bars, one per bucket: where the energy came from above the axis (produced, then
+ * imported), where it went below (consumed, then exported, as negative values). Both sides have the
+ * same height. The legend toggles each series and the stacks follow.
  */
 export const buildEnergyChartOptions = (
   buckets: DashboardBucket[],
@@ -41,20 +42,37 @@ export const buildEnergyChartOptions = (
   language: string,
 ): EChartsOption => {
   const splits: EnergySplit[] = buckets.map((b) => computeEnergySplit(b.entries));
-  const scale: EnergyScale = energyScale(splits.flatMap((s) => [s.produced, s.consumed]));
+  const scale: EnergyScale = energyScale(
+    splits.flatMap((s) => [s.produced + s.imported, s.consumed + s.exported]),
+  );
   const energy = (kwh: number) => formatScaled(kwh, scale, language);
-  // Self-consumed is a share of the production: same hue, lighter.
+  // Self-consumed is a share of the production: same hue, lighter. Tooltip only.
   const selfConsumedColor = echarts.color.modifyAlpha(palette.production, 0.45);
   const flows = [
-    { name: labels.produced, color: palette.production, values: splits.map((s) => s.produced) },
-    { name: labels.consumed, color: palette.consumption, values: splits.map((s) => s.consumed) },
     {
-      name: labels.selfConsumed,
-      color: selfConsumedColor,
-      values: splits.map((s) => s.selfConsumed),
+      name: labels.produced,
+      color: palette.production,
+      values: splits.map((s) => s.produced),
+      radius: [0, 0, 0, 0],
     },
-    { name: labels.imported, color: palette.import, values: splits.map((s) => s.imported) },
-    { name: labels.exported, color: palette.export, values: splits.map((s) => s.exported) },
+    {
+      name: labels.imported,
+      color: palette.import,
+      values: splits.map((s) => s.imported),
+      radius: [3, 3, 0, 0],
+    },
+    {
+      name: labels.consumed,
+      color: palette.consumption,
+      values: splits.map((s) => -s.consumed),
+      radius: [0, 0, 0, 0],
+    },
+    {
+      name: labels.exported,
+      color: palette.export,
+      values: splits.map((s) => -s.exported),
+      radius: [0, 0, 3, 3],
+    },
   ];
 
   return {
@@ -80,7 +98,7 @@ export const buildEnergyChartOptions = (
       axisLabel: {
         fontSize: 11,
         color: palette.text,
-        formatter: (value: number) => formatAxisValue(value, scale, language),
+        formatter: (value: number) => formatAxisValue(Math.abs(value), scale, language),
       },
     },
     tooltip: {
@@ -110,9 +128,9 @@ export const buildEnergyChartOptions = (
       name: f.name,
       type: 'bar',
       data: f.values,
-      itemStyle: { color: f.color, borderRadius: [3, 3, 0, 0] },
-      barGap: '10%',
-      barCategoryGap: '25%',
+      stack: 'energy',
+      itemStyle: { color: f.color, borderRadius: f.radius },
+      barCategoryGap: '30%',
     })),
   };
 };
