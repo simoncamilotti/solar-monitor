@@ -1,9 +1,9 @@
 import { format } from 'date-fns';
 import type { FunctionComponent } from 'react';
-import DatePicker from 'react-datepicker';
 
 import { useDateLocale } from '../../../i18n/date-locale.js';
 
+import { MonthGrid } from './month-grid.js';
 import { PickerDropdown } from './picker-dropdown.js';
 
 type MonthPickerProps = {
@@ -30,20 +30,14 @@ export const MonthPicker: FunctionComponent<MonthPickerProps> = ({
   return (
     <PickerDropdown label={format(current, 'MMMM yyyy', { locale })}>
       {({ close }) => (
-        <DatePicker
-          calendarClassName="helios-calendar"
-          selected={current}
-          onChange={(date: Date | null) => {
-            onChange(date ? format(date, 'yyyy-MM') : null);
-            if (date) {
-              close();
-            }
+        <MonthGrid
+          selected={{ year: inputYear, month: inputMonth }}
+          min={min}
+          max={max}
+          onSelect={(year, month) => {
+            onChange(format(new Date(year, month, 1), 'yyyy-MM'));
+            close();
           }}
-          inline
-          showMonthYearPicker
-          locale={locale}
-          minDate={min}
-          maxDate={max}
         />
       )}
     </PickerDropdown>

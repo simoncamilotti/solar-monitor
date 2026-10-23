@@ -39,6 +39,10 @@ export const en: Translations = {
     '10': 'November',
     '11': 'December',
   },
+  picker: {
+    previousYear: 'Previous year',
+    nextYear: 'Next year',
+  },
   history: {
     title: 'History',
     description: 'Explore and filter all your production data',

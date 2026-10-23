@@ -9,6 +9,8 @@ type VisualPage = {
   waitFor: string;
   /** Stored in `localStorage` before the page loads, to open it on a given state. */
   storage?: Record<string, unknown>;
+  /** Name of a picker button to open before the screenshot. */
+  openPicker?: string;
 };
 
 const pages: VisualPage[] = [
@@ -30,6 +32,20 @@ const pages: VisualPage[] = [
         ],
       },
     },
+  },
+  {
+    name: 'compare-day-picker',
+    path: '/compare',
+    waitFor: 'main',
+    storage: {
+      'comparison-filters': {
+        granularity: 'days',
+        metric: 'kwhProduced',
+        chartType: 'bar',
+        periods: [{ date: '2024-06-21' }],
+      },
+    },
+    openPicker: 'Ajouter',
   },
   { name: 'history', path: '/history', waitFor: 'main' },
   {
@@ -57,6 +73,13 @@ async function seedStorage(page: Page, storage: VisualPage['storage']) {
   }
 }
 
+async function openPicker(page: Page, name: VisualPage['openPicker']) {
+  if (name) {
+    await page.getByRole('button', { name, exact: true }).click();
+    await page.locator('[data-slot="calendar"]').waitFor({ state: 'visible' });
+  }
+}
+
 async function switchToLightTheme(page: Page) {
   const themeButton = page.locator('aside button').filter({ hasText: /mode/i });
   await themeButton.click();
@@ -71,12 +94,13 @@ test.describe('Visual regression', () => {
     await signIn(uniqueUser());
   });
 
-  for (const { name, path, waitFor, storage } of pages) {
+  for (const { name, path, waitFor, storage, openPicker: picker } of pages) {
     test(`${name} - dark theme`, async ({ page }) => {
       await page.clock.setFixedTime(new Date('2024-07-01T12:00:00Z'));
       await seedStorage(page, storage);
       await page.goto(path);
       await waitForPageReady(page, waitFor);
+      await openPicker(page, picker);
       await expect(page).toHaveScreenshot(`${name}-dark.png`, {
         fullPage: true,
         animations: 'disabled',
@@ -90,6 +114,7 @@ test.describe('Visual regression', () => {
       await page.goto(path);
       await waitForPageReady(page, waitFor);
       await switchToLightTheme(page);
+      await openPicker(page, picker);
       await expect(page).toHaveScreenshot(`${name}-light.png`, {
         fullPage: true,
         animations: 'disabled',
