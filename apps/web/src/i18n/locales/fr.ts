@@ -89,7 +89,7 @@ export const fr = {
       titleByYear: 'Énergie par année',
       titleByMonth: 'Énergie par mois',
       titleByDay: 'Énergie par jour',
-      description: "Au-dessus de l'axe, ce que la maison consomme ; en dessous, ce qu'elle revend",
+      description: "Cliquez sur une grandeur de la légende pour l'afficher ou la masquer",
       produced: 'Produit',
       consumed: 'Consommé',
       selfConsumed: 'Autoconsommé',

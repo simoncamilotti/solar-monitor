@@ -4,7 +4,6 @@ import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Chart } from '../../charts/components/chart.js';
-import { getEnergyColors, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import type { DashboardViewMode } from '../dashboard.type.js';
 
 type DashboardChartProps = {
@@ -24,13 +23,6 @@ export const DashboardChart: FunctionComponent<DashboardChartProps> = ({
   viewMode,
 }) => {
   const { t } = useTranslation();
-  const colors = getEnergyColors(useDisplayedTheme());
-
-  const legend = [
-    { label: t('home.chart.selfConsumed'), color: colors.production },
-    { label: t('home.chart.imported'), color: colors.import },
-    { label: t('home.chart.exported'), color: colors.export },
-  ];
 
   return (
     <motion.section
@@ -47,18 +39,6 @@ export const DashboardChart: FunctionComponent<DashboardChartProps> = ({
           </h3>
           <p className="text-xs text-muted-foreground">{t('home.chart.description')}</p>
         </div>
-        <ul className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-          {legend.map((item) => (
-            <li key={item.label} className="flex items-center gap-1.5">
-              <span
-                className="w-2.5 h-2.5 rounded-xs"
-                style={{ backgroundColor: item.color }}
-                aria-hidden="true"
-              />
-              {item.label}
-            </li>
-          ))}
-        </ul>
       </div>
 
       <div className="flex-1 min-h-[300px]">

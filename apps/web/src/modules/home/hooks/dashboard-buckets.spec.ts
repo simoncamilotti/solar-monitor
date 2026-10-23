@@ -75,7 +75,7 @@ describe('getKpiSparklines', () => {
 
 describe('buildEnergyChartOptions', () => {
   const palette = {
-    production: 'P',
+    production: '#f59e0b',
     consumption: 'C',
     import: 'I',
     export: 'E',
@@ -92,17 +92,36 @@ describe('buildEnergyChartOptions', () => {
     imported: 'imported',
   };
 
-  it('should stack self-consumed and imported above the axis, exported below', () => {
+  it('should draw the five flows as separate, positive series', () => {
     const buckets = getDashboardBuckets(DATA, filters({}), monthLabel);
     const options = buildEnergyChartOptions(buckets, palette, labels);
-    const series = options.series as Array<{ name: string; stack: string; data: number[] }>;
+    const series = options.series as Array<{ name: string; stack?: string; data: number[] }>;
 
-    expect(series.map((s) => s.name)).toEqual(['self', 'imported', 'exported']);
-    expect(new Set(series.map((s) => s.stack)).size).toBe(1);
-    // January: produced 10, exported 4 → 6 self-consumed, 14 imported.
-    expect(series[0]!.data).toEqual([6, 6]);
-    expect(series[1]!.data).toEqual([14, 2]);
-    expect(series[2]!.data).toEqual([-4, -6]);
+    expect(series.map((s) => s.name)).toEqual([
+      'produced',
+      'consumed',
+      'self',
+      'imported',
+      'exported',
+    ]);
+    expect(series.every((s) => s.stack === undefined)).toBe(true);
+    // January: produced 10, consumed 20, exported 4 → 6 self-consumed, 14 imported.
+    expect(series.map((s) => s.data[0])).toEqual([10, 20, 6, 14, 4]);
+    expect(series.map((s) => s.data[1])).toEqual([12, 8, 6, 2, 6]);
+  });
+
+  it('should list every series in a clickable legend', () => {
+    const buckets = getDashboardBuckets(DATA, filters({}), monthLabel);
+    const options = buildEnergyChartOptions(buckets, palette, labels);
+    const legend = options.legend as { data: Array<{ name: string }> };
+
+    expect(legend.data.map((d) => d.name)).toEqual([
+      'produced',
+      'consumed',
+      'self',
+      'imported',
+      'exported',
+    ]);
   });
 
   it('should list the five values of a bucket in the tooltip', () => {

@@ -91,7 +91,7 @@ export const en: Translations = {
       titleByYear: 'Energy per year',
       titleByMonth: 'Energy per month',
       titleByDay: 'Energy per day',
-      description: 'Above the axis, what the house uses; below, what it sells',
+      description: 'Click a flow in the legend to show or hide it',
       produced: 'Produced',
       consumed: 'Consumed',
       selfConsumed: 'Self-consumed',
