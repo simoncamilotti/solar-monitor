@@ -24,6 +24,8 @@ jobs:
     if: github.event.head_commit.message != 'Initial commit'
     uses: simoncamilotti/shared-workflows/.github/workflows/nx-ci.yml@v1
     with:
+      # Keep in sync with .nvmrc.
+      node_version: '24.22.1'
       nx_targets: lint typecheck test build
       affected: true
       knip: true
@@ -34,6 +36,7 @@ jobs:
     if: github.event.head_commit.message != 'Initial commit'
     uses: simoncamilotti/shared-workflows/.github/workflows/nx-e2e.yml@v1
     with:
+      node_version: '24.22.1'
       affected: true
       browsers_command: pnpm --filter @repo/web-e2e exec playwright install chromium
     secrets: inherit
