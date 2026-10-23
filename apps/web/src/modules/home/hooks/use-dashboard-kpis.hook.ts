@@ -1,17 +1,9 @@
-import {
-  differenceInCalendarDays,
-  isAfter,
-  isBefore,
-  parse,
-  parseISO,
-  subDays,
-  subMonths,
-} from 'date-fns';
+import { differenceInCalendarDays, format, parseISO, subDays, subMonths } from 'date-fns';
 import { useMemo } from 'react';
 
 import type { LifetimeDay } from '@repo/contracts';
 
-import { filterByMonth, filterByYear } from '../../shared/data/data-filters.js';
+import { filterByMonth, filterByRange, filterByYear } from '../../shared/data/data-filters.js';
 import { aggregateEntries } from '../../shared/metrics/metric-computation.js';
 import type { DashboardFilterState } from '../dashboard.type.js';
 
@@ -39,12 +31,7 @@ const filterCurrentPeriod = (data: LifetimeDay[], filters: DashboardFilterState)
       if (!customStartDate || !customEndDate) {
         return [];
       }
-
-      const startDate = parse(customStartDate, 'yyyy-MM-dd', new Date());
-      const endDate = parse(customEndDate, 'yyyy-MM-dd', new Date());
-      return data.filter(
-        (d) => isAfter(parseISO(d.date), startDate) && isBefore(parseISO(d.date), endDate),
-      );
+      return filterByRange(data, customStartDate, customEndDate);
     }
   }
 };
@@ -54,8 +41,9 @@ const filterPreviousPeriod = (
   filters: DashboardFilterState,
 ): LifetimeDay[] => {
   switch (filters.viewMode) {
+    // The whole history has no period before it.
     case 'full':
-      return data;
+      return [];
     case 'yearly':
       return filterByYear(data, filters.selectedYear - 1);
     case 'monthly': {
@@ -72,9 +60,7 @@ const filterPreviousPeriod = (
       const rangeDays = differenceInCalendarDays(end, start) + 1;
       const prevEnd = subDays(start, 1);
       const prevStart = subDays(prevEnd, rangeDays - 1);
-      return data.filter(
-        (d) => isAfter(parseISO(d.date), prevStart) && isBefore(parseISO(d.date), prevEnd),
-      );
+      return filterByRange(data, format(prevStart, 'yyyy-MM-dd'), format(prevEnd, 'yyyy-MM-dd'));
     }
   }
 };

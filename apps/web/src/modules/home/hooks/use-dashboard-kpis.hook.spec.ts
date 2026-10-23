@@ -25,7 +25,7 @@ const baseFilters: DashboardFilterState = {
 };
 
 describe('useDashboardKpis', () => {
-  it('should report zero deltas in full mode, since current and previous periods are the same data', () => {
+  it('should report no delta in full mode, since the whole history has no previous period', () => {
     const data = [
       entry('2025-01-01', { kwhProduced: 10 }),
       entry('2026-01-01', { kwhProduced: 20 }),
@@ -36,7 +36,10 @@ describe('useDashboardKpis', () => {
     );
 
     expect(result.current.production).toBe(30);
-    expect(result.current.productionDelta).toBe(0);
+    expect(result.current.productionDelta).toBeNull();
+    expect(result.current.consumptionDelta).toBeNull();
+    expect(result.current.autonomyDelta).toBeNull();
+    expect(result.current.selfConsumptionDelta).toBeNull();
   });
 
   it('should compare a year against the previous year', () => {
@@ -98,13 +101,13 @@ describe('useDashboardKpis', () => {
     expect(result.current.productionDelta).toBeCloseTo(50, 5);
   });
 
-  // The comparison window is exclusive on both ends (`isAfter`/`isBefore`): an entry dated exactly
-  // on the boundary is not counted.
-  it('should exclude entries dated exactly on the custom range boundaries', () => {
+  it('should include entries dated exactly on the custom range boundaries', () => {
     const data = [
-      entry('2026-01-01T00:00:00.000Z'),
-      entry('2026-01-15T00:00:00.000Z'),
-      entry('2026-01-31T00:00:00.000Z'),
+      entry('2025-12-31'),
+      entry('2026-01-01'),
+      entry('2026-01-15'),
+      entry('2026-01-31'),
+      entry('2026-02-01'),
     ];
 
     const { result } = renderHook(() =>
@@ -116,8 +119,57 @@ describe('useDashboardKpis', () => {
       }),
     );
 
-    // Only the entry strictly between the two boundaries survives the filter.
-    expect(result.current.production).toBe(10);
+    expect(result.current.production).toBe(30);
+  });
+
+  it('should count a one-day custom range', () => {
+    const data = [entry('2026-03-01', { kwhProduced: 12 }), entry('2026-03-02')];
+
+    const { result } = renderHook(() =>
+      useDashboardKpis(data, {
+        ...baseFilters,
+        viewMode: 'custom',
+        customStartDate: '2026-03-01',
+        customEndDate: '2026-03-01',
+      }),
+    );
+
+    expect(result.current.production).toBe(12);
+  });
+
+  it('should compare a custom range against the previous range of the same length, bounds included', () => {
+    const data = [
+      entry('2026-01-21', { kwhProduced: 100 }), // outside both ranges
+      entry('2026-01-22', { kwhProduced: 5 }), // first day of the previous range
+      entry('2026-01-31', { kwhProduced: 5 }), // last day of the previous range
+      entry('2026-02-01', { kwhProduced: 15 }),
+      entry('2026-02-10', { kwhProduced: 15 }),
+    ];
+
+    const { result } = renderHook(() =>
+      useDashboardKpis(data, {
+        ...baseFilters,
+        viewMode: 'custom',
+        customStartDate: '2026-02-01',
+        customEndDate: '2026-02-10',
+      }),
+    );
+
+    expect(result.current.production).toBe(30);
+    expect(result.current.productionDelta).toBeCloseTo(200, 5); // 30 against 10
+  });
+
+  it('should express rate deltas as a difference of points', () => {
+    const data = [
+      entry('2025-06-01', { kwhConsumed: 10, kwhImported: 5 }), // autonomy 50 %
+      entry('2026-06-01', { kwhConsumed: 10, kwhImported: 2 }), // autonomy 80 %
+    ];
+
+    const { result } = renderHook(() =>
+      useDashboardKpis(data, { ...baseFilters, viewMode: 'yearly', selectedYear: 2026 }),
+    );
+
+    expect(result.current.autonomyDelta).toBeCloseTo(30, 5);
   });
 
   it('should return an empty current period when the custom range is incomplete', () => {

@@ -1,6 +1,6 @@
 import type { LifetimeDay } from '@repo/contracts';
 
-import { filterByDay, filterByMonth, filterByYear } from './data-filters.js';
+import { filterByDay, filterByMonth, filterByRange, filterByYear } from './data-filters.js';
 
 const entry = (date: string): LifetimeDay => ({
   date,
@@ -66,5 +66,21 @@ describe('filterByDay', () => {
 
   it('should return an empty array when no entry matches the day', () => {
     expect(filterByDay(DATA, '2099-01-01')).toEqual([]);
+  });
+});
+
+describe('filterByRange', () => {
+  it('should include both bounds', () => {
+    const result = filterByRange(DATA, '2025-06-01', '2026-06-15');
+
+    expect(result.map((d) => d.date)).toEqual(['2025-06-30', '2025-06-01', '2026-06-15']);
+  });
+
+  it('should keep a single day when both bounds are equal', () => {
+    expect(filterByRange(DATA, '2026-12-31', '2026-12-31')).toHaveLength(1);
+  });
+
+  it('should return an empty array when the range holds no entry', () => {
+    expect(filterByRange(DATA, '2027-01-01', '2027-12-31')).toEqual([]);
   });
 });

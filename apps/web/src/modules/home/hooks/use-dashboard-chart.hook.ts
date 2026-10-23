@@ -1,4 +1,4 @@
-import { format, isAfter, isBefore, parse, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { fr as frLocale } from 'date-fns/locale';
 import type { EChartsOption } from 'echarts';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
@@ -9,6 +9,7 @@ import { monthKey } from '../../../i18n/keys.js';
 
 import type { LifetimeDay } from '@repo/contracts';
 
+import { filterByRange } from '../../shared/data/data-filters.js';
 import { metricColors } from '../../shared/metrics/metric-colors.js';
 import { METRICS_MAPPING } from '../components/dashboard-chart.js';
 import type { DashboardFilterState } from '../dashboard.type.js';
@@ -68,21 +69,9 @@ export const useDashboardChart = (data: LifetimeDay[], filters: DashboardFilterS
         const strStartDate = filters.customStartDate;
         const strEndDate = filters.customEndDate;
         if (strStartDate && strEndDate) {
-          const startDate = parse(strStartDate, 'yyyy-MM-dd', new Date());
-          const endDate = parse(strEndDate, 'yyyy-MM-dd', new Date());
-
-          const customData = data
-            .filter((d) => {
-              const isoDate = parseISO(d.date);
-
-              const isAfterOrEqual =
-                isAfter(isoDate, startDate) || isoDate.getTime() === startDate.getTime();
-              const isBeforeOrEqual =
-                isoDate.getTime() === endDate.getTime() || isBefore(isoDate, endDate);
-
-              return isAfterOrEqual && isBeforeOrEqual;
-            })
-            .sort((a, b) => a.date.localeCompare(b.date));
+          const customData = filterByRange(data, strStartDate, strEndDate).sort((a, b) =>
+            a.date.localeCompare(b.date),
+          );
 
           categories = customData.map((d) =>
             format(parseISO(d.date), 'd MMM', { locale: frLocale }),
