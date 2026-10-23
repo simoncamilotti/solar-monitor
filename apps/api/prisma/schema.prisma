@@ -57,3 +57,31 @@ model EnphaseLifetimeData {
   @@unique([date, enphaseTokenId])
   @@index([date])
 }
+
+/// Who sets the price of a kWh: the supplier the household buys from, or the buyer of its surplus.
+enum TariffKind {
+  purchase
+  feedIn
+}
+
+/// Price of one kWh from a given day on, until the next tariff of the same kind.
+model Tariff {
+  id            String     @id @default(uuid())
+  kind          TariffKind
+  /// Euros per kWh, exact: a float would drift once multiplied by years of kWh.
+  pricePerKwh   Decimal    @db.Decimal(8, 5)
+  /// First day the price applies, stored at midnight UTC.
+  effectiveFrom DateTime   @db.Date
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([kind, effectiveFrom])
+}
+
+/// The household's installation: a single row, like `SyncSchedule`.
+model Installation {
+  id        String   @id @default("default")
+  /// Total cost in euros, to measure the return on investment. Unknown until entered.
+  cost      Decimal? @db.Decimal(12, 2)
+  updatedAt DateTime @updatedAt
+}

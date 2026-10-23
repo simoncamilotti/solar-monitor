@@ -14,6 +14,14 @@ vi.mock('./components/sync-schedule-card.js', () => ({
   SyncScheduleCard: () => <div data-testid="sync-schedule-card" />,
 }));
 
+vi.mock('./components/tariffs-card.js', () => ({
+  TariffsCard: () => <div data-testid="tariffs-card" />,
+}));
+
+vi.mock('./components/installation-card.js', () => ({
+  InstallationCard: () => <div data-testid="installation-card" />,
+}));
+
 describe('SettingsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -36,5 +44,12 @@ describe('SettingsPage', () => {
     render(<SettingsPage />);
 
     expect(screen.getByTestId('sync-schedule-card')).toBeDefined();
+  });
+
+  it('should render the tariffs and installation cards', () => {
+    render(<SettingsPage />);
+
+    expect(screen.getByTestId('tariffs-card')).toBeDefined();
+    expect(screen.getByTestId('installation-card')).toBeDefined();
   });
 });

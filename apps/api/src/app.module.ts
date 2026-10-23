@@ -14,6 +14,7 @@ import { loggerParams } from './config/logger.js';
 import { EnphaseModule } from './modules/enphase/enphase.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 import { UsersModule } from './modules/users/users.module.js';
+import { PricingModule } from './modules/pricing/pricing.module.js';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { UsersModule } from './modules/users/users.module.js';
     HealthModule,
     UsersModule,
     EnphaseModule,
+    PricingModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: ProblemDetailsFilter },

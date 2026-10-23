@@ -18,7 +18,10 @@ export type DashboardKpis = {
   selfConsumptionDelta: number | null;
 };
 
-const filterCurrentPeriod = (data: LifetimeDay[], filters: DashboardFilterState): LifetimeDay[] => {
+export const filterCurrentPeriod = (
+  data: LifetimeDay[],
+  filters: DashboardFilterState,
+): LifetimeDay[] => {
   switch (filters.viewMode) {
     case 'full':
       return data;
@@ -36,7 +39,7 @@ const filterCurrentPeriod = (data: LifetimeDay[], filters: DashboardFilterState)
   }
 };
 
-const filterPreviousPeriod = (
+export const filterPreviousPeriod = (
   data: LifetimeDay[],
   filters: DashboardFilterState,
 ): LifetimeDay[] => {
