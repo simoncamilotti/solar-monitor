@@ -28,7 +28,7 @@ export const useComparisonChart = (
     const language = i18n.language;
     // Percentages keep their unit; energies share the unit of the largest value drawn.
     const scale: EnergyScale | null =
-      getMetricUnit(filters.metric) === '%' ? null : energyScale(series.flatMap((s) => s.values));
+      getMetricUnit(filters.metric) === '%' ? null : energyScale(series.flatMap((s) => s.values).filter((v): v is number => v !== null));
     const unit = scale?.unit ?? '%';
     const formatValue = (value: number) =>
       scale ? formatScaled(value, scale, language) : `${formatNumber(value, language)}\u00a0%`;
@@ -108,10 +108,13 @@ export const useComparisonChart = (
         formatter: (params: any) => {
           const items = Array.isArray(params) ? params : [params];
           const title = `<b>${items[0].name}</b>`;
-          const lines = items.map(
-            (p: any) =>
-              `${p.marker}${p.seriesName}<span style="float:right;margin-left:20px"><b>${formatValue(Number(p.value))}</b></span>`,
-          );
+          // A range shorter than the longest one has no value past its last day.
+          const lines = items
+            .filter((p: any) => p.value != null)
+            .map(
+              (p: any) =>
+                `${p.marker}${p.seriesName}<span style="float:right;margin-left:20px"><b>${formatValue(Number(p.value))}</b></span>`,
+            );
           return [title, ...lines].join('<br>');
         },
       },

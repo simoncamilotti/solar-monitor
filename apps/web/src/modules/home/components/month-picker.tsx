@@ -1,7 +1,8 @@
 import { format } from 'date-fns';
-import { fr as frLocale } from 'date-fns/locale';
 import type { FunctionComponent } from 'react';
 import DatePicker from 'react-datepicker';
+
+import { useDateLocale } from '../../../i18n/date-locale.js';
 
 import { PickerDropdown } from './picker-dropdown.js';
 
@@ -23,10 +24,11 @@ export const MonthPicker: FunctionComponent<MonthPickerProps> = ({
   const lastYear = availableYears.at(-1);
   const min = firstYear !== undefined ? new Date(firstYear, 0, 1) : undefined;
   const max = lastYear !== undefined ? new Date(lastYear, 11, 31) : undefined;
+  const locale = useDateLocale();
   const current = new Date(inputYear, inputMonth, 1);
 
   return (
-    <PickerDropdown label={format(current, 'MMMM yyyy', { locale: frLocale })}>
+    <PickerDropdown label={format(current, 'MMMM yyyy', { locale })}>
       {({ close }) => (
         <DatePicker
           calendarClassName="helios-calendar"
@@ -39,7 +41,7 @@ export const MonthPicker: FunctionComponent<MonthPickerProps> = ({
           }}
           inline
           showMonthYearPicker
-          locale={frLocale}
+          locale={locale}
           minDate={min}
           maxDate={max}
         />

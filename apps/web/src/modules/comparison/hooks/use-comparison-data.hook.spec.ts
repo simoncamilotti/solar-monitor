@@ -7,7 +7,11 @@ import { getPeriodColor } from '../../shared/metrics/energy-colors.js';
 import { useComparisonData } from './use-comparison-data.hook.js';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string, options?: { index?: number }) =>
+      options?.index === undefined ? key : `${key}:${options.index}`,
+    i18n: { language: 'fr' },
+  }),
 }));
 
 const entry = (date: string, kwhProduced: number): LifetimeDay => ({
@@ -218,6 +222,79 @@ describe('useComparisonData', () => {
       expect(result.current[0]!.label).toBe('2026');
       expect(result.current[1]!.label).toBe('months.5 2026');
       expect(result.current[2]!.label).toBe('2026-06-15');
+    });
+  });
+
+  describe('range periods', () => {
+    const rangeFilters: ComparisonFilterState = {
+      ...baseFilters,
+      granularity: 'ranges',
+      resolution: 'daily',
+      periods: [],
+    };
+
+    it('should include both bounds of a range', () => {
+      const data = [
+        entry('2025-07-31', 1),
+        entry('2025-08-01', 2),
+        entry('2025-08-03', 3),
+        entry('2025-08-04', 4),
+      ];
+      const filters = { ...rangeFilters, periods: [{ start: '2025-08-01', end: '2025-08-03' }] };
+
+      const { result } = renderHook(() => useComparisonData(data, filters));
+
+      expect(result.current[0]!.values).toEqual([2, 0, 3]);
+    });
+
+    it('should align ranges of different lengths on their first day', () => {
+      const data = [entry('2025-08-01', 5), entry('2024-08-01', 7), entry('2024-08-05', 9)];
+      const filters = {
+        ...rangeFilters,
+        periods: [
+          { start: '2025-08-01', end: '2025-08-03' },
+          { start: '2024-08-01', end: '2024-08-05' },
+        ],
+      };
+
+      const { result } = renderHook(() => useComparisonData(data, filters));
+
+      const categories = ['dayIndex:1', 'dayIndex:2', 'dayIndex:3', 'dayIndex:4', 'dayIndex:5'];
+      expect(result.current[0]!.categories).toEqual(categories.map((c) => `compare.ranges.${c}`));
+      expect(result.current[0]!.values).toEqual([5, 0, 0, null, null]);
+      expect(result.current[1]!.values).toEqual([7, 0, 0, 0, 9]);
+    });
+
+    it('should group a range by weeks from its first day', () => {
+      const data = [entry('2025-08-01', 1), entry('2025-08-07', 2), entry('2025-08-08', 4)];
+      const filters = {
+        ...rangeFilters,
+        resolution: 'weekly' as const,
+        periods: [{ start: '2025-08-01', end: '2025-08-10' }],
+      };
+
+      const { result } = renderHook(() => useComparisonData(data, filters));
+
+      expect(result.current[0]!.values).toEqual([3, 4]);
+      expect(result.current[0]!.categories).toEqual([
+        'compare.ranges.weekIndex:1',
+        'compare.ranges.weekIndex:2',
+      ]);
+    });
+
+    it('should label a range by its name, or by its dates', () => {
+      const filters = {
+        ...rangeFilters,
+        periods: [
+          { start: '2025-08-01', end: '2025-08-14', name: 'Vacances' },
+          { start: '2024-08-01', end: '2024-08-14' },
+        ],
+      };
+
+      const { result } = renderHook(() => useComparisonData([], filters));
+
+      expect(result.current[0]!.label).toBe('Vacances');
+      expect(result.current[1]!.label).toBe('1 – 14 août 2024');
     });
   });
 });

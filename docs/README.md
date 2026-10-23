@@ -31,6 +31,7 @@ Numérotées à partir de `001` : `specs/NNN-slug.md`.
 - [002 — Valorisation en euros](specs/002-energy-savings.md)
 - [003 — Calendrier de production](specs/003-production-calendar.md)
 - [004 — Records et faits marquants](specs/004-records.md)
+- [005 — Comparaison de plages de dates libres](specs/005-custom-comparison-ranges.md)
 
 ## Runbooks
 

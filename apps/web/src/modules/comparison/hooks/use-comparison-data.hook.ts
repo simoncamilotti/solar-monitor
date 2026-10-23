@@ -2,6 +2,7 @@ import { getISOWeek, parseISO } from 'date-fns';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useDateLocale } from '../../../i18n/date-locale.js';
 import { monthKey } from '../../../i18n/keys.js';
 
 import type { LifetimeDay } from '@repo/contracts';
@@ -12,21 +13,26 @@ import { computeMetric } from '../../shared/metrics/index.js';
 import type {
   ComparisonFilterState,
   ComparisonPeriod,
+  ComparisonResolution,
   ComparisonSeries,
 } from '../comparison.type.js';
-import { isDayPeriod, isMonthPeriod, isYearPeriod } from './use-comparison-filters.hook.js';
+import { alignRanges } from '../comparison-ranges.js';
+import { getPeriodLabel } from '../period-label.js';
+import {
+  isDayPeriod,
+  isMonthPeriod,
+  isRangePeriod,
+  isYearPeriod,
+} from './use-comparison-filters.hook.js';
 
 const daysInMonth = (year: number, month: number): number => new Date(year, month + 1, 0).getDate();
 
-const getPeriodLabel = (period: ComparisonPeriod, monthNames: (i: number) => string): string => {
-  if (isYearPeriod(period)) {
-    return `${period.year}`;
-  }
-  if (isMonthPeriod(period)) {
-    return `${monthNames(period.month)} ${period.year}`;
-  }
-  return period.date;
-};
+const RANGE_INDEX_KEYS = {
+  daily: 'compare.ranges.dayIndex',
+  weekly: 'compare.ranges.weekIndex',
+  monthly: 'compare.ranges.monthIndex',
+  quarterly: 'compare.ranges.monthIndex',
+} as const satisfies Record<ComparisonResolution, string>;
 
 export const useComparisonData = (
   data: LifetimeDay[],
@@ -37,13 +43,28 @@ export const useComparisonData = (
   // Memoized so the `useMemo` below actually memoizes: an inline arrow here would be a fresh
   // reference on every render, which was defeating the memoization entirely.
   const monthName = useCallback((i: number) => t(monthKey(i)), [t]);
+  const locale = useDateLocale();
 
   return useMemo(() => {
     if (filters.periods.length === 0) return [];
 
+    if (filters.granularity === 'ranges') {
+      const ranges = filters.periods.filter(isRangePeriod);
+      const { length, values } = alignRanges(data, ranges, filters.metric, filters.resolution);
+      const categories = Array.from({ length }, (_, i) =>
+        t(RANGE_INDEX_KEYS[filters.resolution], { index: i + 1 }),
+      );
+      return ranges.map((period, index) => ({
+        label: getPeriodLabel(period, monthName, locale),
+        color: getPeriodColor(index, theme),
+        categories,
+        values: values[index] ?? [],
+      }));
+    }
+
     return filters.periods.map((period: ComparisonPeriod, index): ComparisonSeries => {
       const color = getPeriodColor(index, theme);
-      const label = getPeriodLabel(period, monthName);
+      const label = getPeriodLabel(period, monthName, locale);
 
       if (isDayPeriod(period)) {
         const entries = filterByDay(data, period.date);
@@ -143,5 +164,5 @@ export const useComparisonData = (
 
       return { label, color, categories: [], values: [] };
     });
-  }, [data, filters, monthName, theme]);
+  }, [data, filters, monthName, locale, t, theme]);
 };

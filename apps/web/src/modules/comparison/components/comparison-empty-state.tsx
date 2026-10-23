@@ -3,13 +3,14 @@ import { GitCompare } from 'lucide-react';
 import { type FunctionComponent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useDateLocale } from '../../../i18n/date-locale.js';
 import { monthKey } from '../../../i18n/keys.js';
 
 import type { LifetimeDay } from '@repo/contracts';
 
 import type { ComparisonGranularity, ComparisonPeriod } from '../comparison.type.js';
 import { getComparisonPresets, MAX_COMPARISON_PERIODS } from '../comparison-presets.js';
-import { getPeriodChipLabel } from './comparison-period-list.js';
+import { getPeriodLabel } from '../period-label.js';
 
 type ComparisonEmptyStateProps = {
   data: LifetimeDay[];
@@ -24,6 +25,7 @@ export const ComparisonEmptyState: FunctionComponent<ComparisonEmptyStateProps> 
   const { t } = useTranslation();
   const presets = useMemo(() => getComparisonPresets(data), [data]);
   const monthName = (i: number) => t(monthKey(i));
+  const locale = useDateLocale();
 
   return (
     <motion.section
@@ -57,7 +59,7 @@ export const ComparisonEmptyState: FunctionComponent<ComparisonEmptyStateProps> 
                 <span className="text-sm font-semibold">{t(`compare.presets.${preset.id}`)}</span>
                 <span className="text-xs text-muted-foreground">
                   {periods
-                    ? periods.map((p) => getPeriodChipLabel(p, monthName)).join(' · ')
+                    ? periods.map((p) => getPeriodLabel(p, monthName, locale)).join(' · ')
                     : t('compare.presets.notEnoughHistory')}
                 </span>
               </button>

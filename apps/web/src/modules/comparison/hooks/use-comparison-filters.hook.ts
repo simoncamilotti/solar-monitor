@@ -13,25 +13,29 @@ import type {
   ComparisonResolution,
   DayPeriod,
   MonthPeriod,
+  RangePeriod,
   YearPeriod,
 } from '../comparison.type.js';
 import { MAX_COMPARISON_PERIODS } from '../comparison-presets.js';
+import { getRangeResolutions } from '../comparison-ranges.js';
 
 const STORAGE_KEY = 'comparison-filters';
 
-const VALID_GRANULARITIES: ComparisonGranularity[] = ['years', 'months', 'days'];
+const VALID_GRANULARITIES: ComparisonGranularity[] = ['years', 'months', 'days', 'ranges'];
 const VALID_CHART_TYPES: ComparisonChartType[] = ['bar', 'line'];
 
 const RESOLUTIONS_BY_GRANULARITY: Record<ComparisonGranularity, ComparisonResolution[]> = {
   years: ['monthly', 'quarterly', 'daily'],
   months: ['daily', 'weekly'],
   days: [],
+  ranges: ['daily', 'weekly', 'monthly'],
 };
 
 const DEFAULT_RESOLUTION: Record<ComparisonGranularity, ComparisonResolution> = {
   years: 'monthly',
   months: 'daily',
   days: 'daily',
+  ranges: 'daily',
 };
 
 const readFromStorage = (): Partial<ComparisonFilterState> | null => {
@@ -44,11 +48,28 @@ const readFromStorage = (): Partial<ComparisonFilterState> | null => {
 };
 
 export const isYearPeriod = (p: ComparisonPeriod): p is YearPeriod =>
-  'year' in p && !('month' in p) && !('date' in p);
+  'year' in p && !('month' in p);
 
 export const isMonthPeriod = (p: ComparisonPeriod): p is MonthPeriod => 'year' in p && 'month' in p;
 
 export const isDayPeriod = (p: ComparisonPeriod): p is DayPeriod => 'date' in p;
+
+export const isRangePeriod = (p: ComparisonPeriod): p is RangePeriod => 'start' in p && 'end' in p;
+
+/** The groupings a comparison offers: for ranges, they depend on how long the ranges last. */
+const getAvailableResolutions = (
+  granularity: ComparisonGranularity,
+  periods: ComparisonPeriod[],
+): ComparisonResolution[] =>
+  granularity === 'ranges'
+    ? getRangeResolutions(periods.filter(isRangePeriod))
+    : RESOLUTIONS_BY_GRANULARITY[granularity];
+
+/** The chosen grouping, or the default one when the periods no longer allow it. */
+const getEffectiveResolution = (filters: ComparisonFilterState): ComparisonResolution =>
+  getAvailableResolutions(filters.granularity, filters.periods).includes(filters.resolution)
+    ? filters.resolution
+    : DEFAULT_RESOLUTION[filters.granularity];
 
 const periodsEqual = (a: ComparisonPeriod, b: ComparisonPeriod): boolean => {
   if (isYearPeriod(a) && isYearPeriod(b)) {
@@ -59,6 +80,9 @@ const periodsEqual = (a: ComparisonPeriod, b: ComparisonPeriod): boolean => {
   }
   if (isDayPeriod(a) && isDayPeriod(b)) {
     return a.date === b.date;
+  }
+  if (isRangePeriod(a) && isRangePeriod(b)) {
+    return a.start === b.start && a.end === b.end;
   }
   return false;
 };
@@ -118,7 +142,7 @@ export const useComparisonFilters = (data: LifetimeDay[]) => {
   // Already `yyyy-MM-dd`: no need to round-trip through a `Date`.
   const availableDays = useMemo(() => data.map((d) => d.date).sort(), [data]);
 
-  const availableResolutions = RESOLUTIONS_BY_GRANULARITY[filters.granularity];
+  const availableResolutions = getAvailableResolutions(filters.granularity, filters.periods);
 
   const setGranularity = useCallback((granularity: ComparisonGranularity) => {
     setFilters((prev) => ({
@@ -169,8 +193,14 @@ export const useComparisonFilters = (data: LifetimeDay[]) => {
     setFilters((prev) => ({ ...prev, chartType }));
   }, []);
 
+  // Adding a short range can rule out the chosen grouping: fall back without forgetting it.
+  const effectiveFilters = useMemo(
+    () => ({ ...filters, resolution: getEffectiveResolution(filters) }),
+    [filters],
+  );
+
   return {
-    filters,
+    filters: effectiveFilters,
     availableYears,
     availableMonths,
     availableDays,
