@@ -3,7 +3,8 @@
 Suivi de la production et de la consommation solaires d'un foyer : chaque jour, l'API récupère
 les données de l'installation depuis l'[API Enphase v4](https://developer-v4.enphase.com) ;
 l'application web les présente en tableau de bord avec les records de l'installation,
-comparaison de périodes (années, mois, jours ou plages de dates libres), historique exportable
+comparaison de périodes (années, mois, jours ou plages de dates libres, à enregistrer pour les
+réutiliser), historique exportable
 et calendrier de production, et les valorise en euros à partir des tarifs d'achat et de rachat
 du foyer.
 

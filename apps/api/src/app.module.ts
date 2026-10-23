@@ -15,6 +15,7 @@ import { EnphaseModule } from './modules/enphase/enphase.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { PricingModule } from './modules/pricing/pricing.module.js';
+import { DateRangesModule } from './modules/date-ranges/date-ranges.module.js';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { PricingModule } from './modules/pricing/pricing.module.js';
     UsersModule,
     EnphaseModule,
     PricingModule,
+    DateRangesModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: ProblemDetailsFilter },
