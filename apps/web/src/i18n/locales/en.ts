@@ -54,6 +54,19 @@ export const en: Translations = {
       exported: 'Exportation (kWh)',
       gridDependency: 'Dependency (%)',
     },
+    views: {
+      label: 'View',
+      table: 'Table',
+      calendar: 'Calendar',
+    },
+    calendar: {
+      title: 'Production calendar',
+      hint: 'One square per day. Click a day to open it in the dashboard.',
+      metric: 'Displayed metric',
+      less: 'Less',
+      more: 'More',
+      missing: 'Missing day',
+    },
   },
   home: {
     title: 'Dashboard',

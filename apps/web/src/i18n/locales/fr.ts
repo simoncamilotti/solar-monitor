@@ -52,6 +52,19 @@ export const fr = {
       exported: 'Export (kWh)',
       gridDependency: 'Dépendence (%)',
     },
+    views: {
+      label: 'Affichage',
+      table: 'Tableau',
+      calendar: 'Calendrier',
+    },
+    calendar: {
+      title: 'Calendrier de production',
+      hint: "Une case par jour. Cliquez sur un jour pour l'ouvrir dans le tableau de bord.",
+      metric: 'Grandeur affichée',
+      less: 'Moins',
+      more: 'Plus',
+      missing: 'Jour manquant',
+    },
   },
   home: {
     title: 'Tableau de bord',

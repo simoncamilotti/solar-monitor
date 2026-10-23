@@ -19,6 +19,19 @@ const readFromStorage = (): Partial<DashboardFilterState> | null => {
   }
 };
 
+/** Makes the dashboard open on a single day, `yyyy-MM-dd`, the next time it is shown. */
+export const presetDashboardDay = (date: string) => {
+  try {
+    const stored = readFromStorage() ?? {};
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ ...stored, viewMode: 'custom', customStartDate: date, customEndDate: date }),
+    );
+  } catch {
+    // Without storage, the dashboard opens on its default period.
+  }
+};
+
 const buildInitialState = (data: LifetimeDay[]): DashboardFilterState => {
   const stored = readFromStorage();
 

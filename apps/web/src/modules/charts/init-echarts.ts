@@ -1,5 +1,6 @@
-import { BarChart, LineChart } from 'echarts/charts';
+import { BarChart, HeatmapChart, LineChart } from 'echarts/charts';
 import {
+  CalendarComponent,
   DataZoomInsideComponent,
   GridComponent,
   LegendComponent,
@@ -22,6 +23,8 @@ echarts.use([
   MarkAreaComponent,
   BarChart,
   LineChart,
+  HeatmapChart,
+  CalendarComponent,
   SVGRenderer,
   DataZoomInsideComponent,
 ]);
