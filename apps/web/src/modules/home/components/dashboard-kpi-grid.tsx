@@ -2,6 +2,7 @@ import { RefreshCw, ShieldCheck, SolarPanel, Zap } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { energyParts, formatNumber } from '../../shared/format/index.js';
 import { getEnergyColors, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import type { KpiSparklines } from '../hooks/dashboard-buckets.js';
 import type { DashboardKpis } from '../hooks/use-dashboard-kpis.hook.js';
@@ -16,15 +17,17 @@ export const DashboardKPIGrid: FunctionComponent<DashboardKPIGridProps> = ({
   kpis,
   sparklines,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const colors = getEnergyColors(useDisplayedTheme());
+  const consumption = energyParts(kpis.consumption, i18n.language);
+  const production = energyParts(kpis.production, i18n.language);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       <KPICard
         title={t('home.kpi.consumption')}
-        value={kpis.consumption.toFixed(1)}
-        unit="kWh"
+        value={consumption.value}
+        unit={consumption.unit}
         delta={kpis.consumptionDelta}
         icon={Zap}
         color={colors.consumption}
@@ -33,8 +36,8 @@ export const DashboardKPIGrid: FunctionComponent<DashboardKPIGridProps> = ({
       />
       <KPICard
         title={t('home.kpi.production')}
-        value={kpis.production.toFixed(1)}
-        unit="kWh"
+        value={production.value}
+        unit={production.unit}
         delta={kpis.productionDelta}
         icon={SolarPanel}
         color={colors.production}
@@ -43,7 +46,7 @@ export const DashboardKPIGrid: FunctionComponent<DashboardKPIGridProps> = ({
       />
       <KPICard
         title={t('home.kpi.autonomy')}
-        value={kpis.autonomy.toFixed(1)}
+        value={formatNumber(kpis.autonomy, i18n.language)}
         unit="%"
         delta={kpis.autonomyDelta}
         deltaUnit="points"
@@ -54,7 +57,7 @@ export const DashboardKPIGrid: FunctionComponent<DashboardKPIGridProps> = ({
       />
       <KPICard
         title={t('home.kpi.selfConsumption')}
-        value={kpis.selfConsumption.toFixed(1)}
+        value={formatNumber(kpis.selfConsumption, i18n.language)}
         unit="%"
         delta={kpis.selfConsumptionDelta}
         deltaUnit="points"

@@ -84,7 +84,7 @@ describe('SavingsSection', () => {
     expect(screen.getByText(/^0,40\s€$/)).toBeDefined();
     expect(screen.getByText(/^1,90\s€$/)).toBeDefined();
     // Savings grew from 1.20 € to 1.50 €.
-    expect(screen.getByText('25.0%')).toBeDefined();
+    expect(screen.getByText(/^25,0\s%$/)).toBeDefined();
     expect(screen.queryByText('Retour sur investissement')).toBeNull();
   });
 

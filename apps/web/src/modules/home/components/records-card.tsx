@@ -6,6 +6,7 @@ import { CalendarDays, Flame, ShieldCheck, SolarPanel, Sun, Trophy } from 'lucid
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatEnergy, formatPercent } from '../../shared/format/index.js';
 import type { Records, Streak } from '../../shared/metrics/index.js';
 
 type RecordsCardProps = {
@@ -55,7 +56,7 @@ export const RecordsCard: FunctionComponent<RecordsCardProps> = ({
     {
       key: 'bestDay',
       label: t('home.records.bestDay'),
-      value: `${bestDay.value.toFixed(1)} kWh`,
+      value: formatEnergy(bestDay.value, i18n.language),
       detail: formatDay(bestDay.date),
       icon: Sun,
       onSelect: () => onSelectRange(bestDay.date, bestDay.date),
@@ -63,7 +64,7 @@ export const RecordsCard: FunctionComponent<RecordsCardProps> = ({
     {
       key: 'bestMonth',
       label: t('home.records.bestMonth'),
-      value: `${bestMonth.value.toFixed(1)} kWh`,
+      value: formatEnergy(bestMonth.value, i18n.language),
       detail: formatMonth(bestMonth.month),
       icon: CalendarDays,
       onSelect: () => onSelectMonth(bestMonth.month),
@@ -79,7 +80,7 @@ export const RecordsCard: FunctionComponent<RecordsCardProps> = ({
           {
             key: 'mostAutonomousMonth',
             label: t('home.records.mostAutonomousMonth'),
-            value: `${mostAutonomousMonth.value.toFixed(1)} %`,
+            value: formatPercent(mostAutonomousMonth.value, i18n.language),
             detail: formatMonth(mostAutonomousMonth.month),
             icon: ShieldCheck,
             onSelect: () => onSelectMonth(mostAutonomousMonth.month),
@@ -89,7 +90,7 @@ export const RecordsCard: FunctionComponent<RecordsCardProps> = ({
     {
       key: 'totalProduction',
       label: t('home.records.totalProduction'),
-      value: `${records.totalProduction.value.toFixed(1)} kWh`,
+      value: formatEnergy(records.totalProduction.value, i18n.language),
       detail: t('home.records.since', { date: formatDay(records.totalProduction.since) }),
       icon: SolarPanel,
       onSelect: onSelectAll,

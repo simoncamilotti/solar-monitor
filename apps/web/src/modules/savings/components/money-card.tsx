@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatPercent } from '../../shared/format/index.js';
 import { formatEuros } from '../format-currency.js';
 
 type MoneyCardProps = {
@@ -43,7 +44,7 @@ export const MoneyCard: FunctionComponent<MoneyCardProps> = ({
               }`}
             >
               {isPositive ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-              <span className="tabular-nums">{Math.abs(delta).toFixed(1)}%</span>
+              <span className="tabular-nums">{formatPercent(Math.abs(delta), i18n.language)}</span>
             </div>
             <span className="text-xs text-muted-foreground">{t('home.kpi.vsPrevious')}</span>
           </>

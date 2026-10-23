@@ -94,7 +94,7 @@ describe('buildEnergyChartOptions', () => {
 
   it('should draw the five flows as separate, positive series', () => {
     const buckets = getDashboardBuckets(DATA, filters({}), monthLabel);
-    const options = buildEnergyChartOptions(buckets, palette, labels);
+    const options = buildEnergyChartOptions(buckets, palette, labels, 'en');
     const series = options.series as Array<{ name: string; stack?: string; data: number[] }>;
 
     expect(series.map((s) => s.name)).toEqual([
@@ -112,7 +112,7 @@ describe('buildEnergyChartOptions', () => {
 
   it('should list every series in a clickable legend', () => {
     const buckets = getDashboardBuckets(DATA, filters({}), monthLabel);
-    const options = buildEnergyChartOptions(buckets, palette, labels);
+    const options = buildEnergyChartOptions(buckets, palette, labels, 'en');
     const legend = options.legend as { data: Array<{ name: string }> };
 
     expect(legend.data.map((d) => d.name)).toEqual([
@@ -126,13 +126,13 @@ describe('buildEnergyChartOptions', () => {
 
   it('should list the five values of a bucket in the tooltip', () => {
     const buckets = getDashboardBuckets(DATA, filters({}), monthLabel);
-    const options = buildEnergyChartOptions(buckets, palette, labels);
+    const options = buildEnergyChartOptions(buckets, palette, labels, 'en');
     const tooltip = options.tooltip as { formatter: (p: unknown) => string };
 
     const html = tooltip.formatter([{ dataIndex: 0 }]);
 
     expect(html).toContain('M0 2025');
-    for (const text of ['produced', 'consumed', 'self', 'exported', 'imported', '14.0 kWh']) {
+    for (const text of ['produced', 'consumed', 'self', 'exported', 'imported', '14.0\u00a0kWh']) {
       expect(html).toContain(text);
     }
   });

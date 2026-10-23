@@ -4,6 +4,7 @@ import { format, isAfter, parse, parseISO } from 'date-fns';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatNumber } from '../../shared/format/index.js';
 import { DEFAULT_GRID_OPTIONS } from '../../ui/constants/ag-grid-default-options.js';
 
 export const useHistoryGrid = () => {
@@ -83,7 +84,7 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: (p) => p.value?.toFixed(2),
+        valueFormatter: (p) => (p.value == null ? '' : formatNumber(p.value, i18n.language, 2)),
       },
       {
         field: 'kwhConsumed',
@@ -93,7 +94,7 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: (p) => p.value?.toFixed(2),
+        valueFormatter: (p) => (p.value == null ? '' : formatNumber(p.value, i18n.language, 2)),
       },
       {
         field: 'kwhImported',
@@ -103,7 +104,7 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: (p) => p.value?.toFixed(2),
+        valueFormatter: (p) => (p.value == null ? '' : formatNumber(p.value, i18n.language, 2)),
       },
       {
         field: 'kwhExported',
@@ -113,7 +114,7 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: (p) => p.value?.toFixed(2),
+        valueFormatter: (p) => (p.value == null ? '' : formatNumber(p.value, i18n.language, 2)),
       },
       {
         field: 'gridDependency',
@@ -123,7 +124,8 @@ export const useHistoryGrid = () => {
         sortable: true,
         flex: 1,
         cellStyle: { fontFamily: "'SF Mono', 'Fira Code', monospace" },
-        valueFormatter: (p) => p.value?.toFixed(2) + ' %',
+        valueFormatter: (p) =>
+          p.value == null ? '' : `${formatNumber(p.value, i18n.language, 2)}\u00a0%`,
       },
     ],
     [i18n.language, t],

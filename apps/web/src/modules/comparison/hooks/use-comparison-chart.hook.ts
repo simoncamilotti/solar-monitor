@@ -2,6 +2,13 @@ import type { EChartsOption } from 'echarts';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import {
+  energyScale,
+  type EnergyScale,
+  formatAxisValue,
+  formatNumber,
+  formatScaled,
+} from '../../shared/format/index.js';
 import { getChartColors, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import { getMetricUnit } from '../../shared/metrics/index.js';
 import type { ComparisonFilterState, ComparisonSeries } from '../comparison.type.js';
@@ -10,7 +17,7 @@ export const useComparisonChart = (
   series: ComparisonSeries[],
   filters: ComparisonFilterState,
 ): EChartsOption | undefined => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useDisplayedTheme();
 
   return useMemo(() => {
@@ -18,7 +25,13 @@ export const useComparisonChart = (
       return undefined;
     }
 
-    const unit = getMetricUnit(filters.metric);
+    const language = i18n.language;
+    // Percentages keep their unit; energies share the unit of the largest value drawn.
+    const scale: EnergyScale | null =
+      getMetricUnit(filters.metric) === '%' ? null : energyScale(series.flatMap((s) => s.values));
+    const unit = scale?.unit ?? '%';
+    const formatValue = (value: number) =>
+      scale ? formatScaled(value, scale, language) : `${formatNumber(value, language)}\u00a0%`;
     const metricLabel = t(`compare.metrics.${filters.metric}`);
     const isLine = filters.chartType === 'line';
     const isDays = filters.granularity === 'days';
@@ -30,7 +43,12 @@ export const useComparisonChart = (
     const valueAxis = {
       type: 'value' as const,
       splitLine: { lineStyle: { type: 'dashed' as const, color: chrome.grid } },
-      axisLabel: { fontSize: 11, color: chrome.text, formatter: `{value} ${unit}` },
+      axisLabel: {
+        fontSize: 11,
+        color: chrome.text,
+        formatter: (value: number) =>
+          `${scale ? formatAxisValue(value, scale, language) : formatNumber(value, language, 0)} ${unit}`,
+      },
     };
     const tooltipStyle = {
       backgroundColor: chrome.tooltip,
@@ -53,8 +71,7 @@ export const useComparisonChart = (
           axisPointer: { type: 'shadow' },
           formatter: (params: any) => {
             const p = Array.isArray(params) ? params[0] : params;
-            const value = Number(p.value).toFixed(1);
-            return `<b>${metricLabel}</b><br>${p.marker}${p.name}<span style="float:right;margin-left:20px"><b>${value} ${unit}</b></span>`;
+            return `<b>${metricLabel}</b><br>${p.marker}${p.name}<span style="float:right;margin-left:20px"><b>${formatValue(Number(p.value))}</b></span>`;
           },
         },
         series: [
@@ -93,7 +110,7 @@ export const useComparisonChart = (
           const title = `<b>${items[0].name}</b>`;
           const lines = items.map(
             (p: any) =>
-              `${p.marker}${p.seriesName}<span style="float:right;margin-left:20px"><b>${Number(p.value).toFixed(1)} ${unit}</b></span>`,
+              `${p.marker}${p.seriesName}<span style="float:right;margin-left:20px"><b>${formatValue(Number(p.value))}</b></span>`,
           );
           return [title, ...lines].join('<br>');
         },
@@ -109,5 +126,5 @@ export const useComparisonChart = (
         ...(isLine ? { smooth: true, symbol: 'circle', symbolSize: 4 } : {}),
       })),
     };
-  }, [series, filters, t, theme]);
+  }, [series, filters, t, i18n.language, theme]);
 };
