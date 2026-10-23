@@ -91,7 +91,7 @@ export const en: Translations = {
       titleByYear: 'Energy per year',
       titleByMonth: 'Energy per month',
       titleByDay: 'Energy per day',
-      description: 'Click a flow in the legend to show or hide it',
+      description: 'Where the energy came from, above the axis, and where it went, below',
       produced: 'Produced',
       consumed: 'Consumed',
       selfConsumed: 'Self-consumed',

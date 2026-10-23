@@ -92,22 +92,16 @@ describe('buildEnergyChartOptions', () => {
     imported: 'imported',
   };
 
-  it('should draw the five flows as separate, positive series', () => {
+  it('should stack the sources above the axis and the uses below', () => {
     const buckets = getDashboardBuckets(DATA, filters({}), monthLabel);
     const options = buildEnergyChartOptions(buckets, palette, labels, 'en');
     const series = options.series as Array<{ name: string; stack?: string; data: number[] }>;
 
-    expect(series.map((s) => s.name)).toEqual([
-      'produced',
-      'consumed',
-      'self',
-      'imported',
-      'exported',
-    ]);
-    expect(series.every((s) => s.stack === undefined)).toBe(true);
-    // January: produced 10, consumed 20, exported 4 → 6 self-consumed, 14 imported.
-    expect(series.map((s) => s.data[0])).toEqual([10, 20, 6, 14, 4]);
-    expect(series.map((s) => s.data[1])).toEqual([12, 8, 6, 2, 6]);
+    expect(series.map((s) => s.name)).toEqual(['produced', 'imported', 'consumed', 'exported']);
+    expect(series.every((s) => s.stack === 'energy')).toBe(true);
+    // January: produced 10, consumed 20, exported 4 → 14 imported; 10 + 14 = 20 + 4.
+    expect(series.map((s) => s.data[0])).toEqual([10, 14, -20, -4]);
+    expect(series.map((s) => s.data[1])).toEqual([12, 2, -8, -6]);
   });
 
   it('should list every series in a clickable legend', () => {
@@ -117,11 +111,18 @@ describe('buildEnergyChartOptions', () => {
 
     expect(legend.data.map((d) => d.name)).toEqual([
       'produced',
-      'consumed',
-      'self',
       'imported',
+      'consumed',
       'exported',
     ]);
+  });
+
+  it('should label the axis with positive values on both sides', () => {
+    const buckets = getDashboardBuckets(DATA, filters({}), monthLabel);
+    const options = buildEnergyChartOptions(buckets, palette, labels, 'en');
+    const yAxis = options.yAxis as { axisLabel: { formatter: (v: number) => string } };
+
+    expect(yAxis.axisLabel.formatter(-20)).toBe('20');
   });
 
   it('should list the five values of a bucket in the tooltip', () => {
