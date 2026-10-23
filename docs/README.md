@@ -28,6 +28,7 @@ S'écarter d'un choix du starter se consigne dans un ADR.
 Numérotées à partir de `001` : `specs/NNN-slug.md`.
 
 - [001 — Synchronisation Enphase](specs/001-enphase-sync.md)
+- [002 — Valorisation en euros](specs/002-energy-savings.md)
 - [004 — Records et faits marquants](specs/004-records.md)
 
 ## Runbooks

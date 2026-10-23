@@ -3,8 +3,10 @@ import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '../layout/components/page-header.js';
+import { InstallationCard } from './components/installation-card.js';
 import { SyncScheduleCard } from './components/sync-schedule-card.js';
 import { SyncStatusCard } from './components/sync-status-card.js';
+import { TariffsCard } from './components/tariffs-card.js';
 
 export const SettingsPage: FunctionComponent = () => {
   const { t } = useTranslation();
@@ -20,6 +22,8 @@ export const SettingsPage: FunctionComponent = () => {
       <div className="space-y-8">
         <SyncStatusCard />
         <SyncScheduleCard />
+        <TariffsCard />
+        <InstallationCard />
       </div>
     </div>
   );

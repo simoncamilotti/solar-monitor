@@ -62,6 +62,7 @@ usages à adapter.
 | Erreurs         | Problem Details (`application/problem+json`), y compris les erreurs de validation                               |
 | Base de données | Prisma (`prisma/schema.prisma`), migrations versionnées dans `prisma/migrations/`                               |
 | Enphase         | OAuth2, jetons chiffrés (AES-256-GCM), synchronisation quotidienne ([spec](specs/001-enphase-sync.md))          |
+| Tarifs          | Tarifs d'achat et de rachat datés, coût de l'installation, en `DECIMAL` ([spec](specs/002-energy-savings.md))   |
 | Tâches          | `@nestjs/schedule` dans le processus : **une seule réplique**                                                   |
 | Logs            | pino, JSON en production, lisibles en développement                                                             |
 | Traces          | OpenTelemetry, actif si `OTEL_EXPORTER_OTLP_ENDPOINT` est défini                                                |

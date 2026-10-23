@@ -6,6 +6,7 @@ import { computeRecords } from '../../shared/metrics/index.js';
 import { useDashboardChart } from '../hooks/use-dashboard-chart.hook.js';
 import { useDashboardFilters } from '../hooks/use-dashboard-filters.hook.js';
 import { useDashboardKpis } from '../hooks/use-dashboard-kpis.hook.js';
+import { SavingsSection } from '../../savings/components/savings-section.js';
 import { DashboardChart } from './dashboard-chart.js';
 import { DashboardFilters } from './dashboard-filters.js';
 import { DashboardKPIGrid } from './dashboard-kpi-grid.js';
@@ -41,6 +42,7 @@ export const DashboardContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ d
         onCustomRangeChange={setCustomRange}
       />
       <DashboardKPIGrid kpis={kpis} />
+      <SavingsSection data={data} filters={filters} />
       <DashboardChart
         chartOptions={chartOptions}
         selectedMetric={filters.selectedMetric}
