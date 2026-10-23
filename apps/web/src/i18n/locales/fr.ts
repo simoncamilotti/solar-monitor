@@ -69,6 +69,7 @@ export const fr = {
       selfConsumption: 'Autoconsommation',
       points: '{{value}} pts',
       vsPrevious: 'vs période préc.',
+      noPrevious: 'Pas de période précédente',
     },
     chart: {
       production: 'Production',
@@ -108,6 +109,7 @@ export const fr = {
       months: 'Mois',
       days: 'Jours',
     },
+    resolutionLabel: 'Regroupement',
     resolution: {
       daily: 'Par jour',
       weekly: 'Par semaine',

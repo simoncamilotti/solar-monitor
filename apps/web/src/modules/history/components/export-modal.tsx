@@ -1,3 +1,10 @@
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@repo/ui/components/select';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Download, FileText, X } from 'lucide-react';
 import { type FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
@@ -68,10 +75,14 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
     gridDependency: t('export.metrics.gridDependency'),
   };
 
-  const months = Array.from({ length: 12 }, (_, i) => ({
-    value: String(i),
-    label: t(monthKey(i)),
-  }));
+  const yearItems = [
+    { value: 'all', label: t('export.allYears') },
+    ...years.map((y) => ({ value: y, label: y })),
+  ];
+  const monthItems = [
+    { value: 'all', label: t('export.allMonths') },
+    ...Array.from({ length: 12 }, (_, i) => ({ value: String(i), label: t(monthKey(i)) })),
+  ];
 
   return (
     <AnimatePresence>
@@ -138,35 +149,43 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
                   <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     {t('export.year')}
                   </span>
-                  <select
+                  <Select
+                    items={yearItems}
                     value={year}
-                    onChange={(e) => setYear(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-hidden focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
+                    onValueChange={(value) => value && setYear(value)}
                   >
-                    <option value="all">{t('export.allYears')}</option>
-                    {years.map((y) => (
-                      <option key={y} value={y}>
-                        {y}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger aria-label={t('export.year')} className="mt-2 w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {yearItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     {t('export.month')}
                   </span>
-                  <select
+                  <Select
+                    items={monthItems}
                     value={month}
-                    onChange={(e) => setMonth(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-hidden focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer"
+                    onValueChange={(value) => value && setMonth(value)}
                   >
-                    <option value="all">{t('export.allMonths')}</option>
-                    {months.map((m) => (
-                      <option key={m.value} value={m.value}>
-                        {m.label}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger aria-label={t('export.month')} className="mt-2 w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {monthItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

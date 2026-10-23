@@ -1,3 +1,10 @@
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@repo/ui/components/select';
 import { motion } from 'framer-motion';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,17 +67,25 @@ export const ComparisonFilters: FunctionComponent<ComparisonFiltersProps> = ({
       </div>
 
       {availableResolutions.length > 0 && (
-        <select
+        <Select
+          items={availableResolutions.map((r) => ({
+            value: r,
+            label: t(`compare.resolution.${r}`),
+          }))}
           value={resolution}
-          onChange={(e) => onResolutionChange(e.target.value as ComparisonResolution)}
-          className="text-xs border border-border rounded-lg px-3 py-2 bg-background text-foreground transition-smooth focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+          onValueChange={(value) => value && onResolutionChange(value)}
         >
-          {availableResolutions.map((r) => (
-            <option key={r} value={r}>
-              {t(`compare.resolution.${r}`)}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger aria-label={t('compare.resolutionLabel')} className="text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {availableResolutions.map((r) => (
+              <SelectItem key={r} value={r} className="text-xs">
+                {t(`compare.resolution.${r}`)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       )}
 
       <div className="h-6 w-px bg-border hidden sm:block" />

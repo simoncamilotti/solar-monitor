@@ -71,6 +71,7 @@ export const en: Translations = {
       selfConsumption: 'Self-consumption',
       points: '{{value}} pts',
       vsPrevious: 'vs prev. period',
+      noPrevious: 'No previous period',
     },
     chart: {
       production: 'Production',
@@ -110,6 +111,7 @@ export const en: Translations = {
       months: 'Months',
       days: 'Days',
     },
+    resolutionLabel: 'Grouping',
     resolution: {
       daily: 'Daily',
       weekly: 'Weekly',

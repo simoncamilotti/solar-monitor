@@ -2,7 +2,7 @@ import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 
-import { Braces } from '../../ui/braces.js';
+import { Logo } from '../../ui/logo.js';
 
 export const SidebarLogo: FunctionComponent = () => {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ export const SidebarLogo: FunctionComponent = () => {
   return (
     <div className="p-6 flex items-center gap-3">
       <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-        <Braces />
+        <Logo />
       </div>
       <div>
         <h1 className="text-sm font-semibold text-sidebar-foreground">{username}</h1>

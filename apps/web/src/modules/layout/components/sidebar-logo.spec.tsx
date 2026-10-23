@@ -14,8 +14,8 @@ vi.mock('react-oidc-context', () => ({
   useAuth: () => mockAuth,
 }));
 
-vi.mock('../../ui/braces.js', () => ({
-  Braces: () => <svg data-testid="braces-icon" />,
+vi.mock('../../ui/logo.js', () => ({
+  Logo: () => <svg data-testid="logo-icon" />,
 }));
 
 describe('SidebarLogo', () => {
@@ -33,5 +33,11 @@ describe('SidebarLogo', () => {
     render(<SidebarLogo />);
 
     expect(screen.getByText('sidebar.title')).toBeDefined();
+  });
+
+  it('should render the application logo', () => {
+    render(<SidebarLogo />);
+
+    expect(screen.getByTestId('logo-icon')).toBeDefined();
   });
 });
