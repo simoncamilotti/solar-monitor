@@ -69,6 +69,7 @@ export const en: Translations = {
       consumption: 'Consumption',
       autonomy: 'Autonomy',
       selfConsumption: 'Self-consumption',
+      points: '{{value}} pts',
       vsPrevious: 'vs prev. period',
     },
     chart: {

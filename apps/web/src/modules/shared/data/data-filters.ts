@@ -16,3 +16,7 @@ export const filterByMonth = (data: LifetimeDay[], year: number, month: number) 
 
 export const filterByDay = (data: LifetimeDay[], dateStr: string) =>
   data.filter((d) => d.date === dateStr);
+
+/** Entries from `start` to `end`, both included. Days compare as `yyyy-MM-dd` strings. */
+export const filterByRange = (data: LifetimeDay[], start: string, end: string) =>
+  data.filter((d) => d.date >= start && d.date <= end);

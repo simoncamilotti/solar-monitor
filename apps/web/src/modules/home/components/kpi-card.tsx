@@ -9,6 +9,8 @@ type KPICardProps = {
   value: string;
   unit: string;
   delta: number | null;
+  /** A relative change of an energy, or a difference between two rates. */
+  deltaUnit?: 'percent' | 'points';
   icon: LucideIcon;
   color?: string;
   index?: number;
@@ -19,6 +21,7 @@ export const KPICard: FunctionComponent<KPICardProps> = ({
   value,
   unit,
   delta,
+  deltaUnit = 'percent',
   icon: Icon,
   color,
   index = 0,
@@ -60,7 +63,11 @@ export const KPICard: FunctionComponent<KPICardProps> = ({
               }`}
             >
               {isPositive ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-              <span className="data-text">{Math.abs(delta).toFixed(1)}%</span>
+              <span className="data-text">
+                {deltaUnit === 'points'
+                  ? t('home.kpi.points', { value: Math.abs(delta).toFixed(1) })
+                  : `${Math.abs(delta).toFixed(1)}%`}
+              </span>
             </div>
             <span className="text-xs text-muted-foreground">{t('home.kpi.vsPrevious')}</span>
           </>

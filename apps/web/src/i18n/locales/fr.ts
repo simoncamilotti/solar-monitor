@@ -67,6 +67,7 @@ export const fr = {
       consumption: 'Consommation',
       autonomy: 'Autonomie',
       selfConsumption: 'Autoconsommation',
+      points: '{{value}} pts',
       vsPrevious: 'vs période préc.',
     },
     chart: {
