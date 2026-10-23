@@ -72,7 +72,7 @@ export const KPICard: FunctionComponent<KPICardProps> = ({
             <span className="text-xs text-muted-foreground">{t('home.kpi.vsPrevious')}</span>
           </>
         ) : (
-          <span className="text-xs text-muted-foreground">--</span>
+          <span className="text-xs text-muted-foreground">{t('home.kpi.noPrevious')}</span>
         )}
       </div>
     </motion.div>

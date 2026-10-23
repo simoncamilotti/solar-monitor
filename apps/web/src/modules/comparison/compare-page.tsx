@@ -1,4 +1,4 @@
-import { Sun } from 'lucide-react';
+import { GitCompare } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +16,7 @@ export const ComparePage: FunctionComponent = () => {
       <PageHeader
         title={t('compare.title')}
         description={t('compare.description')}
-        icon={<Sun className="w-5 h-5 text-primary" />}
+        icon={<GitCompare className="w-5 h-5 text-primary" />}
       />
 
       {isPending && <ComparisonPageSkeleton />}

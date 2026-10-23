@@ -150,8 +150,8 @@
     font-weight: 700;
   }
 
+  /* Numbers keep the interface font, with fixed-width digits so columns line up. */
   .data-text {
-    font-family: 'SF Mono', 'Fira Code', monospace;
     font-variant-numeric: tabular-nums;
   }
 

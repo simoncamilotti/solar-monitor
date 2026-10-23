@@ -53,6 +53,13 @@ describe('ComparePage', () => {
     expect(screen.getByText('compare.description')).toBeDefined();
   });
 
+  it('should use the comparison icon of the navigation in the header', () => {
+    mockHistoryData.mockReturnValue({ data: undefined, isPending: true, isError: false });
+    const { container } = render(<ComparePage />);
+
+    expect(container.querySelector('.lucide-git-compare')).not.toBeNull();
+  });
+
   it('should render skeleton when loading', () => {
     mockHistoryData.mockReturnValue({ data: undefined, isPending: true, isError: false });
     render(<ComparePage />);

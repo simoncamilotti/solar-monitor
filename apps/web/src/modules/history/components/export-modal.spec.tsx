@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import type { LifetimeDay } from '@repo/contracts';
 
@@ -169,10 +169,27 @@ describe('ExportModal', () => {
     expect((footerExportButton as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it('should display available years in dropdown', () => {
+  it('should display available years in dropdown', async () => {
     render(<ExportModal {...defaultProps} />);
 
-    expect(screen.getByText('2023')).toBeDefined();
-    expect(screen.getByText('2024')).toBeDefined();
+    fireEvent.click(screen.getByRole('combobox', { name: 'export.year' }));
+
+    expect(await screen.findByRole('option', { name: '2023' })).toBeDefined();
+    expect(screen.getByRole('option', { name: '2024' })).toBeDefined();
+  });
+
+  it('should filter the export on the chosen year', async () => {
+    render(<ExportModal {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole('combobox', { name: 'export.year' }));
+    const option = await screen.findByRole('option', { name: '2024' });
+    fireEvent.pointerDown(option, { pointerType: 'mouse' });
+    fireEvent.click(option);
+
+    await waitFor(() =>
+      expect(mockGetFilteredData).toHaveBeenLastCalledWith(
+        expect.objectContaining({ year: '2024', month: 'all' }),
+      ),
+    );
   });
 });
