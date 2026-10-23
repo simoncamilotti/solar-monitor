@@ -20,7 +20,7 @@ test.describe('Home page', () => {
 
   test('should display navigation links', async ({ page }) => {
     await page.goto('/');
-    const nav = page.locator('nav');
+    const nav = page.locator('aside nav');
     await expect(nav).toBeVisible();
     await expect(nav.locator('a[href="/"]')).toBeVisible();
   });

@@ -1,139 +1,125 @@
-import { format, parseISO } from 'date-fns';
-import { fr as frLocale } from 'date-fns/locale';
 import type { EChartsOption } from 'echarts';
-import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { monthKey } from '../../../i18n/keys.js';
+import {
+  getChartColors,
+  getEnergyColors,
+  useDisplayedTheme,
+} from '../../shared/metrics/energy-colors.js';
+import { computeEnergySplit, type EnergySplit } from '../../shared/metrics/energy-split.js';
+import type { DashboardBucket } from './dashboard-buckets.js';
 
-import type { LifetimeDay } from '@repo/contracts';
+type ChartLabels = {
+  produced: string;
+  consumed: string;
+  selfConsumed: string;
+  exported: string;
+  imported: string;
+};
 
-import { filterByRange } from '../../shared/data/data-filters.js';
-import { metricColors } from '../../shared/metrics/metric-colors.js';
-import { METRICS_MAPPING } from '../components/dashboard-chart.js';
-import type { DashboardFilterState } from '../dashboard.type.js';
+type ChartPalette = ReturnType<typeof getEnergyColors> & ReturnType<typeof getChartColors>;
 
-export const useDashboardChart = (data: LifetimeDay[], filters: DashboardFilterState) => {
+const kwh = (value: number) => `${value.toFixed(1)} kWh`;
+
+const tooltipRow = (color: string, label: string, value: number) =>
+  `<div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:${color}"></span><span style="flex:1">${label}</span><b style="margin-left:16px">${kwh(value)}</b></div>`;
+
+/**
+ * Stacked bars: what the house used above the axis (self-consumed, then imported),
+ * what it sold below (exported, as negative values).
+ */
+export const buildEnergyChartOptions = (
+  buckets: DashboardBucket[],
+  palette: ChartPalette,
+  labels: ChartLabels,
+): EChartsOption => {
+  const splits: EnergySplit[] = buckets.map((b) => computeEnergySplit(b.entries));
+
+  return {
+    grid: { top: 10, left: 55, right: 20, bottom: 30, containLabel: false },
+    xAxis: {
+      type: 'category',
+      data: buckets.map((b) => b.label),
+      axisLabel: { fontSize: 11, color: palette.text },
+      axisLine: { lineStyle: { color: palette.axis } },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { type: 'dashed', color: palette.grid } },
+      axisLabel: {
+        fontSize: 11,
+        color: palette.text,
+        formatter: (value: number) => `${Math.abs(value)}`,
+      },
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      backgroundColor: palette.tooltip,
+      borderColor: palette.grid,
+      textStyle: { color: palette.text },
+      formatter: (params: unknown) => {
+        const index = (Array.isArray(params) ? params[0] : params) as { dataIndex: number };
+        const bucket = buckets[index.dataIndex];
+        const split = splits[index.dataIndex];
+        if (!bucket || !split) {
+          return '';
+        }
+        return [
+          `<b>${bucket.title}</b>`,
+          tooltipRow(palette.production, labels.produced, split.produced),
+          tooltipRow(palette.consumption, labels.consumed, split.consumed),
+          tooltipRow(palette.production, labels.selfConsumed, split.selfConsumed),
+          tooltipRow(palette.export, labels.exported, split.exported),
+          tooltipRow(palette.import, labels.imported, split.imported),
+        ].join('');
+      },
+    },
+    series: [
+      {
+        name: labels.selfConsumed,
+        type: 'bar',
+        stack: 'energy',
+        data: splits.map((s) => s.selfConsumed),
+        itemStyle: { color: palette.production },
+      },
+      {
+        name: labels.imported,
+        type: 'bar',
+        stack: 'energy',
+        data: splits.map((s) => s.imported),
+        itemStyle: { color: palette.import, borderRadius: [5, 5, 0, 0] },
+      },
+      {
+        name: labels.exported,
+        type: 'bar',
+        stack: 'energy',
+        data: splits.map((s) => -s.exported),
+        itemStyle: { color: palette.export, borderRadius: [0, 0, 5, 5] },
+      },
+    ],
+  };
+};
+
+export const useDashboardChart = (buckets: DashboardBucket[]): EChartsOption => {
   const { t } = useTranslation();
+  const theme = useDisplayedTheme();
 
-  return useMemo(() => {
-    const metricKey = filters.selectedMetric;
-    const color = metricColors[metricKey];
-
-    let categories: string[] = [];
-    let values: number[] = [];
-
-    switch (filters.viewMode) {
-      case 'full': {
-        const yearsMap = new Map<number, number>();
-        for (const d of data) {
-          const y = parseISO(d.date).getFullYear();
-          yearsMap.set(y, (yearsMap.get(y) ?? 0) + d[metricKey]);
-        }
-        const sortedYears = [...yearsMap.keys()].sort((a, b) => a - b);
-        categories = sortedYears.map((y) => `${y}`);
-        values = sortedYears.map((y) => yearsMap.get(y) ?? 0);
-        break;
-      }
-
-      case 'yearly': {
-        const yearData = data.filter(
-          (d) => parseISO(d.date).getFullYear() === filters.selectedYear,
-        );
-        const monthMap = new Map<number, number>();
-        for (const d of yearData) {
-          const m = parseISO(d.date).getMonth();
-          monthMap.set(m, (monthMap.get(m) ?? 0) + d[metricKey]);
-        }
-        const sortedMonths = [...monthMap.keys()].sort((a, b) => a - b);
-        categories = sortedMonths.map((m) => t(monthKey(m)));
-        values = sortedMonths.map((m) => monthMap.get(m) ?? 0);
-        break;
-      }
-
-      case 'monthly': {
-        const monthData = data.filter((d) => {
-          const date = parseISO(d.date);
-          return (
-            date.getFullYear() === filters.selectedYear && date.getMonth() === filters.selectedMonth
-          );
-        });
-        monthData.sort((a, b) => a.date.localeCompare(b.date));
-        categories = monthData.map((d) => String(parseISO(d.date).getDate()));
-        values = monthData.map((d) => d[metricKey]);
-        break;
-      }
-
-      case 'custom': {
-        const strStartDate = filters.customStartDate;
-        const strEndDate = filters.customEndDate;
-        if (strStartDate && strEndDate) {
-          const customData = filterByRange(data, strStartDate, strEndDate).sort((a, b) =>
-            a.date.localeCompare(b.date),
-          );
-
-          categories = customData.map((d) =>
-            format(parseISO(d.date), 'd MMM', { locale: frLocale }),
-          );
-          values = customData.map((d) => d[metricKey]);
-        }
-        break;
-      }
-    }
-
-    const chartOptions: EChartsOption = {
-      grid: { top: 10, left: 55, right: 20, bottom: 30, containLabel: false },
-      xAxis: {
-        type: 'category',
-        data: categories,
-        axisLabel: { fontSize: 11 },
-      },
-      yAxis: {
-        type: 'value',
-        splitLine: { lineStyle: { type: 'dashed', opacity: 0.3 } },
-        axisLabel: { fontSize: 11 },
-      },
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-        formatter: (params: any) => {
-          const dataParams = params[0] as CallbackDataParams;
-
-          const value = dataParams.value as number;
-          const labelKey = METRICS_MAPPING.find((m) => m.key === metricKey)?.labelKey;
-          const metricName = labelKey ? t(labelKey) : '';
-
-          const monthLabel = (monthIndex: number) => t(monthKey(monthIndex));
-
-          let name = '';
-          switch (filters.viewMode) {
-            case 'yearly':
-              name = `${dataParams.name} ${filters.selectedYear}`;
-              break;
-            case 'monthly':
-              name = `${dataParams.name} ${monthLabel(filters.selectedMonth)} ${filters.selectedYear}`;
-              break;
-            case 'custom':
-              name = dataParams.name as string;
-              break;
-          }
-
-          return `<b>${metricName}</b><br>${dataParams.marker}${name}<span style="float: right; margin-left: 20px"><b>${Number(value).toFixed(1)} kWh</b></span>`;
-        },
-      },
-      series: [
+  return useMemo(
+    () =>
+      buildEnergyChartOptions(
+        buckets,
+        { ...getEnergyColors(theme), ...getChartColors(theme) },
         {
-          type: 'bar',
-          data: values,
-          itemStyle: {
-            color,
-            borderRadius: [5, 5, 0, 0],
-          },
+          produced: t('home.chart.produced'),
+          consumed: t('home.chart.consumed'),
+          selfConsumed: t('home.chart.selfConsumed'),
+          exported: t('home.chart.exported'),
+          imported: t('home.chart.imported'),
         },
-      ],
-    };
-
-    return chartOptions;
-  }, [data, filters, t]);
+      ),
+    [buckets, theme, t],
+  );
 };

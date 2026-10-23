@@ -9,7 +9,7 @@ test.describe('History page', () => {
 
   test('should navigate to history page via sidebar', async ({ page }) => {
     await page.goto('/');
-    await page.locator('a[href="/history"]').click();
+    await page.locator('aside a[href="/history"]').click();
     await expect(page).toHaveURL(/\/history/);
   });
 

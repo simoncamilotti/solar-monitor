@@ -19,7 +19,6 @@ const baseFilters: DashboardFilterState = {
   viewMode: 'full',
   selectedYear: 2026,
   selectedMonth: 0,
-  selectedMetric: 'kwhProduced',
   customStartDate: null,
   customEndDate: null,
 };

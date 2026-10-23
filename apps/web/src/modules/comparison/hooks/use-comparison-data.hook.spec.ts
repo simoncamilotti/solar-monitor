@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import type { LifetimeDay } from '@repo/contracts';
 
 import type { ComparisonFilterState } from '../comparison.type.js';
-import { comparisonPeriodColors } from '../constants/comparison-colors.js';
+import { getPeriodColor } from '../../shared/metrics/energy-colors.js';
 import { useComparisonData } from './use-comparison-data.hook.js';
 
 vi.mock('react-i18next', () => ({
@@ -188,10 +188,8 @@ describe('useComparisonData', () => {
   });
 
   describe('multiple periods', () => {
-    it('should assign colors by cycling through the palette', () => {
-      const periods = Array.from({ length: comparisonPeriodColors.length + 2 }, (_, i) => ({
-        year: 2000 + i,
-      }));
+    it('should give each period its own color, the four flow hues first', () => {
+      const periods = Array.from({ length: 5 }, (_, i) => ({ year: 2000 + i }));
       const filters: ComparisonFilterState = {
         ...baseFilters,
         granularity: 'years',
@@ -201,11 +199,10 @@ describe('useComparisonData', () => {
 
       const { result } = renderHook(() => useComparisonData([], filters));
 
-      expect(result.current[0]!.color).toBe(comparisonPeriodColors[0]);
-      expect(result.current[comparisonPeriodColors.length]!.color).toBe(comparisonPeriodColors[0]);
-      expect(result.current[comparisonPeriodColors.length + 1]!.color).toBe(
-        comparisonPeriodColors[1],
-      );
+      const colors = result.current.map((s) => s.color);
+      expect(new Set(colors.slice(0, 4)).size).toBe(4);
+      expect(colors[0]).toBe(getPeriodColor(0, 'light'));
+      expect(colors[4]).toBe(colors[0]);
     });
 
     it('should label a year period, a month period and a day period distinctly', () => {

@@ -4,69 +4,66 @@ import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Chart } from '../../charts/components/chart.js';
-import { metricColors } from '../../shared/metrics/metric-colors.js';
-import type { Translations } from '../../../i18n/locales/fr.js';
-import type { DashboardMetricKey } from '../dashboard.type.js';
-
-type ChartLabelKey = `home.chart.${Extract<keyof Translations['home']['chart'], string>}`;
-
-export const METRICS_MAPPING: Array<{ key: DashboardMetricKey; labelKey: ChartLabelKey }> = [
-  { key: 'kwhConsumed', labelKey: 'home.chart.consumption' },
-  { key: 'kwhProduced', labelKey: 'home.chart.production' },
-  { key: 'kwhImported', labelKey: 'home.chart.import' },
-  { key: 'kwhExported', labelKey: 'home.chart.export' },
-];
+import { getEnergyColors, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
+import type { DashboardViewMode } from '../dashboard.type.js';
 
 type DashboardChartProps = {
   chartOptions: EChartsOption;
-  selectedMetric: DashboardMetricKey;
-  onMetricChange: (metric: DashboardMetricKey) => void;
+  viewMode: DashboardViewMode;
 };
+
+const TITLE_KEY = {
+  full: 'home.chart.titleByYear',
+  yearly: 'home.chart.titleByMonth',
+  monthly: 'home.chart.titleByDay',
+  custom: 'home.chart.titleByDay',
+} as const satisfies Record<DashboardViewMode, string>;
 
 export const DashboardChart: FunctionComponent<DashboardChartProps> = ({
   chartOptions,
-  selectedMetric,
-  onMetricChange,
+  viewMode,
 }) => {
   const { t } = useTranslation();
+  const colors = getEnergyColors(useDisplayedTheme());
+
+  const legend = [
+    { label: t('home.chart.selfConsumed'), color: colors.production },
+    { label: t('home.chart.imported'), color: colors.import },
+    { label: t('home.chart.exported'), color: colors.export },
+  ];
 
   return (
-    <motion.div
+    <motion.section
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      className="card-elevated p-6 flex-1 flex flex-col min-h-0"
+      className="card-elevated p-6 flex-1 flex flex-col min-h-0 min-w-0"
+      aria-labelledby="dashboard-chart-title"
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-foreground">
-          {t(
-            METRICS_MAPPING.find((m) => m.key === selectedMetric)?.labelKey ??
-              'home.chart.consumption',
-          )}
-        </h3>
-        <div className="flex flex-wrap gap-1.5">
-          {METRICS_MAPPING.map((m) => (
-            <button
-              key={m.key}
-              onClick={() => onMetricChange(m.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-smooth ${
-                selectedMetric === m.key
-                  ? 'text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
-              }`}
-              style={
-                selectedMetric === m.key ? { backgroundColor: metricColors[m.key] } : undefined
-              }
-            >
-              {t(m.labelKey)}
-            </button>
-          ))}
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div className="flex flex-col gap-1">
+          <h3 id="dashboard-chart-title" className="text-sm font-semibold text-foreground">
+            {t(TITLE_KEY[viewMode])}
+          </h3>
+          <p className="text-xs text-muted-foreground">{t('home.chart.description')}</p>
         </div>
+        <ul className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+          {legend.map((item) => (
+            <li key={item.label} className="flex items-center gap-1.5">
+              <span
+                className="w-2.5 h-2.5 rounded-xs"
+                style={{ backgroundColor: item.color }}
+                aria-hidden="true"
+              />
+              {item.label}
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div className="flex-1 min-h-[300px]">
         <Chart option={chartOptions} height="300px" />
       </div>
-    </motion.div>
+    </motion.section>
   );
 };

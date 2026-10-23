@@ -42,7 +42,6 @@ const yearly2025: DashboardFilterState = {
   viewMode: 'yearly',
   selectedYear: 2025,
   selectedMonth: 0,
-  selectedMetric: 'kwhProduced',
   customStartDate: null,
   customEndDate: null,
 };

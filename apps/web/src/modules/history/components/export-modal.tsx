@@ -112,7 +112,7 @@ export const ExportModal: FunctionComponent<ExportModalProps> = ({ open, onClose
                 id="export-dialog-title"
                 className="text-lg font-semibold text-foreground flex items-center gap-2"
               >
-                <Download className="w-5 h-5 text-primary" />
+                <Download className="w-5 h-5 text-primary-text" />
                 {t('export.title')}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">{t('export.description')}</p>

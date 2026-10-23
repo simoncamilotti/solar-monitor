@@ -33,7 +33,6 @@ describe('useDashboardFilters', () => {
     expect(result.current.filters.viewMode).toBe('yearly');
     expect(result.current.filters.selectedYear).toBe(2026);
     expect(result.current.filters.selectedMonth).toBe(5); // June, the latest month in 2026
-    expect(result.current.filters.selectedMetric).toBe('kwhConsumed');
   });
 
   it('should default customStartDate/customEndDate to the first and last entries', () => {
@@ -58,7 +57,6 @@ describe('useDashboardFilters', () => {
         viewMode: 'monthly',
         selectedYear: 2025,
         selectedMonth: 10,
-        selectedMetric: 'kwhProduced',
       }),
     );
 
@@ -67,7 +65,6 @@ describe('useDashboardFilters', () => {
     expect(result.current.filters.viewMode).toBe('monthly');
     expect(result.current.filters.selectedYear).toBe(2025);
     expect(result.current.filters.selectedMonth).toBe(10);
-    expect(result.current.filters.selectedMetric).toBe('kwhProduced');
   });
 
   it('should ignore an invalid viewMode from localStorage and fall back to yearly', () => {
@@ -93,14 +90,6 @@ describe('useDashboardFilters', () => {
 
     // December (11) has no data in 2025 — November (10) is the latest month with data
     expect(result.current.filters.selectedMonth).toBe(10);
-  });
-
-  it('should ignore an invalid selectedMetric from localStorage and fall back to kwhConsumed', () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ selectedMetric: 'notAMetric' }));
-
-    const { result } = renderHook(() => useDashboardFilters(DATA));
-
-    expect(result.current.filters.selectedMetric).toBe('kwhConsumed');
   });
 
   it('should ignore malformed JSON in localStorage rather than throw', () => {
@@ -144,11 +133,11 @@ describe('useDashboardFilters', () => {
     const { result } = renderHook(() => useDashboardFilters(DATA));
 
     act(() => {
-      result.current.setMetric('kwhImported');
+      result.current.setViewMode('monthly');
     });
 
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}');
-    expect(stored.selectedMetric).toBe('kwhImported');
+    expect(stored.viewMode).toBe('monthly');
   });
 
   it('should reset the selected month to a valid one when changing year', () => {

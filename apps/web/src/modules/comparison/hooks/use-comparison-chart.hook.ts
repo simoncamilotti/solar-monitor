@@ -2,6 +2,7 @@ import type { EChartsOption } from 'echarts';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { getChartColors, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import { getMetricUnit } from '../../shared/metrics/index.js';
 import type { ComparisonFilterState, ComparisonSeries } from '../comparison.type.js';
 
@@ -10,6 +11,7 @@ export const useComparisonChart = (
   filters: ComparisonFilterState,
 ): EChartsOption | undefined => {
   const { t } = useTranslation();
+  const theme = useDisplayedTheme();
 
   return useMemo(() => {
     if (series.length === 0) {
@@ -20,6 +22,21 @@ export const useComparisonChart = (
     const metricLabel = t(`compare.metrics.${filters.metric}`);
     const isLine = filters.chartType === 'line';
     const isDays = filters.granularity === 'days';
+    const chrome = getChartColors(theme);
+    const axis = {
+      axisLabel: { fontSize: 11, color: chrome.text },
+      axisLine: { lineStyle: { color: chrome.axis } },
+    };
+    const valueAxis = {
+      type: 'value' as const,
+      splitLine: { lineStyle: { type: 'dashed' as const, color: chrome.grid } },
+      axisLabel: { fontSize: 11, color: chrome.text, formatter: `{value} ${unit}` },
+    };
+    const tooltipStyle = {
+      backgroundColor: chrome.tooltip,
+      borderColor: chrome.grid,
+      textStyle: { color: chrome.text },
+    };
 
     if (isDays) {
       const categories = series.map((s) => s.label);
@@ -28,17 +45,10 @@ export const useComparisonChart = (
 
       return {
         grid: { top: 10, left: 55, right: 20, bottom: 30, containLabel: false },
-        xAxis: {
-          type: 'category',
-          data: categories,
-          axisLabel: { fontSize: 11 },
-        },
-        yAxis: {
-          type: 'value',
-          splitLine: { lineStyle: { type: 'dashed', opacity: 0.3 } },
-          axisLabel: { fontSize: 11, formatter: `{value} ${unit}` },
-        },
+        xAxis: { type: 'category', data: categories, ...axis },
+        yAxis: valueAxis,
         tooltip: {
+          ...tooltipStyle,
           trigger: 'axis',
           axisPointer: { type: 'shadow' },
           formatter: (params: any) => {
@@ -70,19 +80,12 @@ export const useComparisonChart = (
           name: s.label,
           itemStyle: { color: s.color },
         })),
-        textStyle: { fontSize: 11 },
+        textStyle: { fontSize: 11, color: chrome.text },
       },
-      xAxis: {
-        type: 'category',
-        data: categories,
-        axisLabel: { fontSize: 11 },
-      },
-      yAxis: {
-        type: 'value',
-        splitLine: { lineStyle: { type: 'dashed', opacity: 0.3 } },
-        axisLabel: { fontSize: 11, formatter: `{value} ${unit}` },
-      },
+      xAxis: { type: 'category', data: categories, ...axis },
+      yAxis: valueAxis,
       tooltip: {
+        ...tooltipStyle,
         trigger: 'axis',
         axisPointer: { type: isLine ? 'line' : 'shadow' },
         formatter: (params: any) => {
@@ -106,5 +109,5 @@ export const useComparisonChart = (
         ...(isLine ? { smooth: true, symbol: 'circle', symbolSize: 4 } : {}),
       })),
     };
-  }, [series, filters, t]);
+  }, [series, filters, t, theme]);
 };

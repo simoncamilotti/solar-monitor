@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import { monthKey } from '../../../i18n/keys.js';
 
+import { getPeriodColor, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import type { ComparisonGranularity, ComparisonPeriod } from '../comparison.type.js';
-import { comparisonPeriodColors } from '../constants/comparison-colors.js';
+import { MAX_COMPARISON_PERIODS } from '../comparison-presets.js';
 import { isDayPeriod, isMonthPeriod, isYearPeriod } from '../hooks/use-comparison-filters.hook.js';
 import { PeriodPicker } from './period-picker.js';
 
@@ -17,7 +18,10 @@ type ComparisonPeriodListProps = {
   onRemove: (period: ComparisonPeriod) => void;
 };
 
-const getPeriodChipLabel = (period: ComparisonPeriod, monthName: (i: number) => string): string => {
+export const getPeriodChipLabel = (
+  period: ComparisonPeriod,
+  monthName: (i: number) => string,
+): string => {
   if (isYearPeriod(period)) {
     return `${period.year}`;
   }
@@ -38,29 +42,31 @@ export const ComparisonPeriodList: FunctionComponent<ComparisonPeriodListProps> 
   onRemove,
 }) => {
   const { t } = useTranslation();
+  const theme = useDisplayedTheme();
   const monthName = (i: number) => t(monthKey(i));
+  const isFull = periods.length >= MAX_COMPARISON_PERIODS;
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       {periods.map((period, index) => {
-        const color = comparisonPeriodColors[index % comparisonPeriodColors.length];
         const label = getPeriodChipLabel(period, monthName);
 
         return (
           <span
             key={label}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border"
-            style={{
-              backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
-              borderColor: `color-mix(in srgb, ${color} 30%, transparent)`,
-              color,
-            }}
+            className="inline-flex items-center gap-2 pl-3 pr-1.5 py-1 rounded-full text-xs font-medium border border-border bg-background"
           >
+            <span
+              className="w-2.5 h-2.5 rounded-xs"
+              style={{ backgroundColor: getPeriodColor(index, theme) }}
+              aria-hidden="true"
+            />
             {label}
             <button
               type="button"
               onClick={() => onRemove(period)}
-              className="hover:opacity-70 transition-smooth"
+              aria-label={t('compare.periods.remove', { period: label })}
+              className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-smooth"
             >
               <X className="w-3 h-3" />
             </button>
@@ -68,11 +74,16 @@ export const ComparisonPeriodList: FunctionComponent<ComparisonPeriodListProps> 
         );
       })}
 
-      <PeriodPicker granularity={granularity} availableYears={availableYears} onAdd={onAdd} />
-
-      {periods.length < 2 && (
-        <span className="text-xs text-muted-foreground">{t('compare.periods.empty')}</span>
+      {!isFull && (
+        <PeriodPicker granularity={granularity} availableYears={availableYears} onAdd={onAdd} />
       )}
+
+      <span className="text-xs text-muted-foreground">
+        {t('compare.periods.selected', {
+          selected: periods.length,
+          max: MAX_COMPARISON_PERIODS,
+        })}
+      </span>
     </div>
   );
 };

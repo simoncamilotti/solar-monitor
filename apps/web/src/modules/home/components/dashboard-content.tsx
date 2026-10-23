@@ -2,7 +2,10 @@ import { type FunctionComponent, useMemo } from 'react';
 
 import type { LifetimeDay } from '@repo/contracts';
 
+import { computeEnergySplit } from '../../shared/metrics/energy-split.js';
 import { computeRecords } from '../../shared/metrics/index.js';
+import { getKpiSparklines } from '../hooks/dashboard-buckets.js';
+import { useDashboardBuckets } from '../hooks/use-dashboard-buckets.hook.js';
 import { useDashboardChart } from '../hooks/use-dashboard-chart.hook.js';
 import { useDashboardFilters } from '../hooks/use-dashboard-filters.hook.js';
 import { useDashboardKpis } from '../hooks/use-dashboard-kpis.hook.js';
@@ -11,6 +14,7 @@ import { DashboardChart } from './dashboard-chart.js';
 import { DashboardFilters } from './dashboard-filters.js';
 import { DashboardKPIGrid } from './dashboard-kpi-grid.js';
 import { RecordsCard } from './records-card.js';
+import { SunShareCard } from './sun-share-card.js';
 
 export const DashboardContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ data }) => {
   const {
@@ -21,12 +25,14 @@ export const DashboardContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ d
     setViewMode,
     setYear,
     setMonth,
-    setMetric,
     setCustomRange,
   } = useDashboardFilters(data);
 
   const kpis = useDashboardKpis(data, filters);
-  const chartOptions = useDashboardChart(data, filters);
+  const buckets = useDashboardBuckets(data, filters);
+  const chartOptions = useDashboardChart(buckets);
+  const sparklines = useMemo(() => getKpiSparklines(buckets), [buckets]);
+  const split = useMemo(() => computeEnergySplit(buckets.flatMap((b) => b.entries)), [buckets]);
   const records = useMemo(() => computeRecords(data), [data]);
 
   return (
@@ -41,13 +47,12 @@ export const DashboardContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ d
         onMonthChange={setMonth}
         onCustomRangeChange={setCustomRange}
       />
-      <DashboardKPIGrid kpis={kpis} />
+      <DashboardKPIGrid kpis={kpis} sparklines={sparklines} />
       <SavingsSection data={data} filters={filters} />
-      <DashboardChart
-        chartOptions={chartOptions}
-        selectedMetric={filters.selectedMetric}
-        onMetricChange={setMetric}
-      />
+      <div className="flex flex-col lg:flex-row gap-4">
+        <DashboardChart chartOptions={chartOptions} viewMode={filters.viewMode} />
+        <SunShareCard split={split} />
+      </div>
       {records && (
         <RecordsCard
           records={records}

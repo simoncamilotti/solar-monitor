@@ -14,6 +14,7 @@ export const en: Translations = {
       compare: 'Comparison',
       settings: 'Settings',
       logout: 'Logout',
+      label: 'Main navigation',
     },
   },
   language: {
@@ -74,10 +75,25 @@ export const en: Translations = {
       noPrevious: 'No previous period',
     },
     chart: {
+      titleByYear: 'Energy per year',
+      titleByMonth: 'Energy per month',
+      titleByDay: 'Energy per day',
+      description: 'Above the axis, what the house uses; below, what it sells',
+      produced: 'Produced',
+      consumed: 'Consumed',
+      selfConsumed: 'Self-consumed',
+      exported: 'Exported',
+      imported: 'Imported',
+    },
+    sunShare: {
+      title: 'Where the sun goes',
       production: 'Production',
       consumption: 'Consumption',
-      import: 'Import',
-      export: 'Export',
+      usedOnSite: 'used on site',
+      exported: 'sold to the grid',
+      fromSun: 'covered by the sun',
+      imported: 'bought from the grid',
+      empty: 'No data over the period.',
     },
     records: {
       title: 'Records',
@@ -152,6 +168,21 @@ export const en: Translations = {
     periods: {
       empty: 'No period selected',
       add: 'Add',
+      remove: 'Remove {{period}}',
+      selected: '{{selected}} of {{max}}',
+    },
+    empty: {
+      title: 'What do you want to compare?',
+      description: 'Start from a common comparison, or build your own.',
+      custom:
+        'For a custom comparison, pick years, months or days, then add up to {{max}} periods with “Add”.',
+    },
+    presets: {
+      thisYearVsLastYear: 'This year vs last year',
+      thisMonthVsLastYear: 'This month vs the same month last year',
+      bestAndWorstYear: 'Best and worst year',
+      recentYears: 'Recent years',
+      notEnoughHistory: 'Not enough history yet',
     },
     error: 'An error occurred while loading data.',
     chartType: {
