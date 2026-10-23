@@ -37,6 +37,10 @@ export const fr = {
     '10': 'Novembre',
     '11': 'Décembre',
   },
+  picker: {
+    previousYear: 'Année précédente',
+    nextYear: 'Année suivante',
+  },
   history: {
     title: 'Historique',
     description: "Explorez et filtrez l'ensemble de vos données de production",

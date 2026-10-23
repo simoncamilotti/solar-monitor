@@ -1,8 +1,7 @@
-import { format } from 'date-fns';
 import type { FunctionComponent } from 'react';
-import DatePicker from 'react-datepicker';
 
 import { PickerDropdown } from './picker-dropdown.js';
+import { YearGrid } from './year-grid.js';
 
 type YearPickerProps = {
   inputYear: number;
@@ -14,33 +13,17 @@ export const YearPicker: FunctionComponent<YearPickerProps> = ({
   inputYear,
   availableYears,
   onChange,
-}) => {
-  const firstYear = availableYears?.[0];
-  const lastYear = availableYears?.at(-1);
-  const min = firstYear !== undefined ? new Date(firstYear, 0, 1) : undefined;
-  const max = lastYear !== undefined ? new Date(lastYear, 0, 1) : undefined;
-  const current = new Date(inputYear, 0, 1);
-
-  return (
-    <PickerDropdown label={format(current, 'yyyy')}>
-      {({ close }) => (
-        <DatePicker
-          calendarClassName="helios-calendar"
-          selected={current}
-          onChange={(date: Date | null) => {
-            onChange(date ? Number(format(date, 'yyyy')) : null);
-            if (date) {
-              close();
-            }
-          }}
-          dateFormat="yyyy"
-          showYearPicker
-          inline
-          yearItemNumber={availableYears?.length}
-          minDate={min}
-          maxDate={max}
-        />
-      )}
-    </PickerDropdown>
-  );
-};
+}) => (
+  <PickerDropdown label={String(inputYear)}>
+    {({ close }) => (
+      <YearGrid
+        years={availableYears ?? [inputYear]}
+        selected={inputYear}
+        onSelect={(year) => {
+          onChange(year);
+          close();
+        }}
+      />
+    )}
+  </PickerDropdown>
+);

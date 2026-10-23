@@ -1,7 +1,6 @@
-import 'react-datepicker/dist/react-datepicker.css';
-
+import { Popover, PopoverContent, PopoverTrigger } from '@repo/ui/components/popover';
 import { Calendar } from 'lucide-react';
-import { type FunctionComponent, type ReactNode, useEffect, useRef, useState } from 'react';
+import { type FunctionComponent, type ReactNode, useState } from 'react';
 
 type PickerDropdownProps = {
   label: string;
@@ -9,37 +8,21 @@ type PickerDropdownProps = {
 };
 
 const triggerClasses =
-  'flex items-center gap-2 text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground hover:bg-muted transition-smooth focus:outline-hidden focus:ring-2 focus:ring-primary/20';
+  'flex items-center gap-2 text-sm border border-border rounded-lg px-3 py-2 bg-background text-foreground hover:bg-muted aria-expanded:bg-muted transition-smooth focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/20';
 
+/** A button that opens a picker in a popover; Escape and a click outside close it. */
 export const PickerDropdown: FunctionComponent<PickerDropdownProps> = ({ label, children }) => {
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open]);
 
   return (
-    <div ref={containerRef} className="relative">
-      <button type="button" onClick={() => setOpen((prev) => !prev)} className={triggerClasses}>
-        <Calendar className="w-4 h-4 text-muted-foreground" />
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger className={triggerClasses}>
+        <Calendar className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
         <span>{label}</span>
-      </button>
-
-      {open && (
-        <div className="absolute top-full left-0 mt-2 z-50">
-          {children({ close: () => setOpen(false) })}
-        </div>
-      )}
-    </div>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-auto p-2">
+        {children({ close: () => setOpen(false) })}
+      </PopoverContent>
+    </Popover>
   );
 };

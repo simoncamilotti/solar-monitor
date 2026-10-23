@@ -1,11 +1,14 @@
+import { Calendar } from '@repo/ui/components/calendar';
 import { format } from 'date-fns';
 import type { FunctionComponent } from 'react';
-import DatePicker from 'react-datepicker';
 import { useTranslation } from 'react-i18next';
 
 import { useDateLocale } from '../../../i18n/date-locale.js';
 
+import { calendarBounds, initialMonth } from '../../home/components/date-bounds.js';
+import { MonthGrid } from '../../home/components/month-grid.js';
 import { PickerDropdown } from '../../home/components/picker-dropdown.js';
+import { YearGrid } from '../../home/components/year-grid.js';
 import type { ComparisonGranularity, ComparisonPeriod } from '../comparison.type.js';
 import { RangePeriodForm } from './range-period-form.js';
 
@@ -42,20 +45,12 @@ export const PeriodPicker: FunctionComponent<PeriodPickerProps> = ({
     return (
       <PickerDropdown label={label}>
         {({ close }) => (
-          <DatePicker
-            calendarClassName="helios-calendar"
-            onChange={(date: Date | null) => {
-              if (date) {
-                onAdd({ year: Number(format(date, 'yyyy')) });
-                close();
-              }
+          <YearGrid
+            years={availableYears}
+            onSelect={(year) => {
+              onAdd({ year });
+              close();
             }}
-            dateFormat="yyyy"
-            showYearPicker
-            inline
-            yearItemNumber={availableYears.length}
-            minDate={minDate}
-            maxDate={maxDate}
           />
         )}
       </PickerDropdown>
@@ -66,41 +61,36 @@ export const PeriodPicker: FunctionComponent<PeriodPickerProps> = ({
     return (
       <PickerDropdown label={label}>
         {({ close }) => (
-          <DatePicker
-            calendarClassName="helios-calendar"
-            onChange={(date: Date | null) => {
-              if (date) {
-                onAdd({ year: date.getFullYear(), month: date.getMonth() });
-                close();
-              }
+          <MonthGrid
+            min={minDate}
+            max={maxDate}
+            onSelect={(year, month) => {
+              onAdd({ year, month });
+              close();
             }}
-            inline
-            showMonthYearPicker
-            locale={locale}
-            minDate={minDate}
-            maxDate={maxDate}
           />
         )}
       </PickerDropdown>
     );
   }
 
+  const bounds = calendarBounds(minDate, maxDate);
+
   return (
     <PickerDropdown label={label}>
       {({ close }) => (
-        <DatePicker
-          calendarClassName="helios-calendar"
-          onChange={(date: Date | null) => {
+        <Calendar
+          mode="single"
+          locale={locale}
+          captionLayout="dropdown"
+          defaultMonth={initialMonth(minDate, maxDate)}
+          {...bounds}
+          onSelect={(date) => {
             if (date) {
-              const dateStr = format(date, 'yyyy-MM-dd');
-              onAdd({ date: dateStr });
+              onAdd({ date: format(date, 'yyyy-MM-dd') });
               close();
             }
           }}
-          inline
-          locale={locale}
-          minDate={minDate}
-          maxDate={maxDate}
         />
       )}
     </PickerDropdown>
