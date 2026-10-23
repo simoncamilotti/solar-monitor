@@ -4,6 +4,8 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatNumber, formatPercent } from '../../shared/format/index.js';
+
 type KPICardProps = {
   title: string;
   value: string;
@@ -63,7 +65,7 @@ export const KPICard: FunctionComponent<KPICardProps> = ({
   sparkline,
   index = 0,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isPositive = delta !== null && delta >= 0;
 
   return (
@@ -107,8 +109,8 @@ export const KPICard: FunctionComponent<KPICardProps> = ({
               {isPositive ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
               <span className="data-text">
                 {deltaUnit === 'points'
-                  ? t('home.kpi.points', { value: Math.abs(delta).toFixed(1) })
-                  : `${Math.abs(delta).toFixed(1)}%`}
+                  ? t('home.kpi.points', { value: formatNumber(Math.abs(delta), i18n.language) })
+                  : formatPercent(Math.abs(delta), i18n.language)}
               </span>
             </div>
             <span className="text-xs text-muted-foreground">{t('home.kpi.vsPrevious')}</span>

@@ -4,6 +4,12 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
+  type EnergyScale,
+  energyScale,
+  formatAxisValue,
+  formatScaled,
+} from '../../shared/format/index.js';
+import {
   getChartColors,
   getEnergyColors,
   useDisplayedTheme,
@@ -21,10 +27,8 @@ type ChartLabels = {
 
 type ChartPalette = ReturnType<typeof getEnergyColors> & ReturnType<typeof getChartColors>;
 
-const kwh = (value: number) => `${value.toFixed(1)} kWh`;
-
-const tooltipRow = (color: string, label: string, value: number) =>
-  `<div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:${color}"></span><span style="flex:1">${label}</span><b style="margin-left:16px">${kwh(value)}</b></div>`;
+const tooltipRow = (color: string, label: string, value: string) =>
+  `<div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:${color}"></span><span style="flex:1">${label}</span><b style="margin-left:16px">${value}</b></div>`;
 
 /**
  * Grouped bars, one series per flow, so none hides another. The legend toggles each series and
@@ -34,8 +38,11 @@ export const buildEnergyChartOptions = (
   buckets: DashboardBucket[],
   palette: ChartPalette,
   labels: ChartLabels,
+  language: string,
 ): EChartsOption => {
   const splits: EnergySplit[] = buckets.map((b) => computeEnergySplit(b.entries));
+  const scale: EnergyScale = energyScale(splits.flatMap((s) => [s.produced, s.consumed]));
+  const energy = (kwh: number) => formatScaled(kwh, scale, language);
   // Self-consumed is a share of the production: same hue, lighter.
   const selfConsumedColor = echarts.color.modifyAlpha(palette.production, 0.45);
   const flows = [
@@ -67,8 +74,14 @@ export const buildEnergyChartOptions = (
     },
     yAxis: {
       type: 'value',
+      name: scale.unit,
+      nameTextStyle: { fontSize: 11, color: palette.text, align: 'right' },
       splitLine: { lineStyle: { type: 'dashed', color: palette.grid } },
-      axisLabel: { fontSize: 11, color: palette.text },
+      axisLabel: {
+        fontSize: 11,
+        color: palette.text,
+        formatter: (value: number) => formatAxisValue(value, scale, language),
+      },
     },
     tooltip: {
       trigger: 'axis',
@@ -85,11 +98,11 @@ export const buildEnergyChartOptions = (
         }
         return [
           `<b>${bucket.title}</b>`,
-          tooltipRow(palette.production, labels.produced, split.produced),
-          tooltipRow(palette.consumption, labels.consumed, split.consumed),
-          tooltipRow(selfConsumedColor, labels.selfConsumed, split.selfConsumed),
-          tooltipRow(palette.export, labels.exported, split.exported),
-          tooltipRow(palette.import, labels.imported, split.imported),
+          tooltipRow(palette.production, labels.produced, energy(split.produced)),
+          tooltipRow(palette.consumption, labels.consumed, energy(split.consumed)),
+          tooltipRow(selfConsumedColor, labels.selfConsumed, energy(split.selfConsumed)),
+          tooltipRow(palette.export, labels.exported, energy(split.exported)),
+          tooltipRow(palette.import, labels.imported, energy(split.imported)),
         ].join('');
       },
     },
@@ -105,7 +118,7 @@ export const buildEnergyChartOptions = (
 };
 
 export const useDashboardChart = (buckets: DashboardBucket[]): EChartsOption => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useDisplayedTheme();
 
   return useMemo(
@@ -120,7 +133,8 @@ export const useDashboardChart = (buckets: DashboardBucket[]): EChartsOption => 
           exported: t('home.chart.exported'),
           imported: t('home.chart.imported'),
         },
+        i18n.language,
       ),
-    [buckets, theme, t],
+    [buckets, theme, t, i18n.language],
   );
 };

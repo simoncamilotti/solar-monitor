@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatEnergy } from '../../shared/format/index.js';
 import { getEnergyColors, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import { computeSunShare, type EnergySplit } from '../../shared/metrics/energy-split.js';
 
@@ -24,13 +25,16 @@ const ShareBar: FunctionComponent<ShareBarProps> = ({
   shareColor,
   restColor,
 }) => {
+  const { i18n } = useTranslation();
   const rounded = Math.round(share);
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-sm font-semibold">{title}</span>
-        <span className="text-sm text-muted-foreground data-text">{total.toFixed(1)} kWh</span>
+        <span className="text-sm text-muted-foreground data-text">
+          {formatEnergy(total, i18n.language)}
+        </span>
       </div>
       <div className="flex h-3 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
         <div style={{ width: `${share}%`, backgroundColor: shareColor }} />

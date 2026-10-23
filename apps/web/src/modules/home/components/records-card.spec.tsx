@@ -23,13 +23,15 @@ describe('RecordsCard', () => {
     renderCard();
 
     expect(screen.getByText('Meilleur jour')).toBeDefined();
-    expect(screen.getByText('21.4 kWh')).toBeDefined();
+    expect(screen.getByText(/^21,4\skWh$/)).toBeDefined();
     expect(screen.getByText('21 juin 2024')).toBeDefined();
     expect(screen.getByText('juillet 2024')).toBeDefined();
     expect(screen.getByText('3 jours')).toBeDefined();
     expect(screen.getByText('1 juil. 2024 → 3 juil. 2024')).toBeDefined();
     expect(screen.getByText('1 jour')).toBeDefined();
-    expect(screen.getByText('92.5 %')).toBeDefined();
+    expect(screen.getByText(/^92,5\s%$/)).toBeDefined();
+    // 3 490 kWh in all, shown in MWh.
+    expect(screen.getByText(/^3,49\sMWh$/)).toBeDefined();
     expect(screen.getByText('depuis le 1 janv. 2024')).toBeDefined();
   });
 

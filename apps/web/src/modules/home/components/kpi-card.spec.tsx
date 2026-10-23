@@ -8,7 +8,7 @@ describe('KPICard', () => {
   it('should show an energy delta as a percentage', () => {
     render(<KPICard title="Production" value="10.0" unit="kWh" delta={-12.5} icon={Zap} />);
 
-    expect(screen.getByText('12.5%')).toBeDefined();
+    expect(screen.getByText(/^12,5\s%$/)).toBeDefined();
   });
 
   it('should show a rate delta in points', () => {
@@ -16,7 +16,7 @@ describe('KPICard', () => {
       <KPICard title="Autonomie" value="80.0" unit="%" delta={3} deltaUnit="points" icon={Zap} />,
     );
 
-    expect(screen.getByText('3.0 pts')).toBeDefined();
+    expect(screen.getByText('3,0 pts')).toBeDefined();
   });
 
   it('should explain that there is no previous period when the delta is missing', () => {

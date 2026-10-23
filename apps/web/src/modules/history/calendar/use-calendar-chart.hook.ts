@@ -4,6 +4,7 @@ import type { EChartsOption } from 'echarts';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatEnergy, formatPercent } from '../../shared/format/index.js';
 import { getChartColors, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import { levelColor } from './calendar-colors.js';
 import type { CalendarMetric, CalendarYear } from './calendar-data.js';
@@ -24,8 +25,6 @@ export const useCalendarChart = (
   const locale = i18n.language === 'en' ? enUS : fr;
 
   return useMemo(() => {
-    const unit = metric === 'autonomy' ? '%' : 'kWh';
-
     // 2023-01-01 is a Sunday: ECharts lists the day names from Sunday.
     const dayNames = Array.from({ length: 7 }, (_, i) =>
       format(addDays(parseISO('2023-01-01'), i), 'EEEEE', { locale }),
@@ -61,7 +60,7 @@ export const useCalendarChart = (
           const day = format(parseISO(date), 'EEEE d MMMM yyyy', { locale });
           return item.kind === 'missing'
             ? `${day}<br/>${t('history.calendar.missing')}`
-            : `${day}<br/><b>${value.toLocaleString(i18n.language, { maximumFractionDigits: 1 })} ${unit}</b>`;
+            : `${day}<br/><b>${metric === 'autonomy' ? formatPercent(value, i18n.language) : formatEnergy(value, i18n.language)}</b>`;
         },
       },
       calendar: {
