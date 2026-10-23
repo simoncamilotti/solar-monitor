@@ -10,6 +10,14 @@ vi.mock('./app-sidebar.js', () => ({
   AppSidebar: () => <aside data-testid="app-sidebar" />,
 }));
 
+vi.mock('./mobile-header.js', () => ({
+  MobileHeader: () => <header data-testid="mobile-header" />,
+}));
+
+vi.mock('./mobile-nav.js', () => ({
+  MobileNav: () => <nav data-testid="mobile-nav" />,
+}));
+
 describe('Layout', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -19,6 +27,13 @@ describe('Layout', () => {
     render(<Layout />);
 
     expect(screen.getByTestId('app-sidebar')).toBeDefined();
+  });
+
+  it('should render the mobile header and bottom navigation', () => {
+    render(<Layout />);
+
+    expect(screen.getByTestId('mobile-header')).toBeDefined();
+    expect(screen.getByTestId('mobile-nav')).toBeDefined();
   });
 
   it('should render the outlet', () => {
