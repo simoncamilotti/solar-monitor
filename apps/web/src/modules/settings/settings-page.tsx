@@ -16,7 +16,7 @@ export const SettingsPage: FunctionComponent = () => {
       <PageHeader
         title={t('settings.title')}
         description={t('settings.description')}
-        icon={<Settings className="w-5 h-5 text-primary" />}
+        icon={<Settings className="w-5 h-5 text-primary-text" />}
       />
 
       <div className="space-y-8">

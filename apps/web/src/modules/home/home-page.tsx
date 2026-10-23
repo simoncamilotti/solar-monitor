@@ -16,7 +16,7 @@ export const HomePage: FunctionComponent = () => {
       <PageHeader
         title={t('home.title')}
         description={t('home.description')}
-        icon={<Sun className="w-5 h-5 text-primary" />}
+        icon={<Sun className="w-5 h-5 text-primary-text" />}
       />
 
       {isPending && <HomePageSkeleton />}

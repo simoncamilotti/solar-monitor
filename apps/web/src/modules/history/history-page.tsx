@@ -20,7 +20,7 @@ export const HistoryPage: FunctionComponent = () => {
       <PageHeader
         title={t('history.title')}
         description={t('history.description')}
-        icon={<Calendar className="w-5 h-5 text-primary" />}
+        icon={<Calendar className="w-5 h-5 text-primary-text" />}
         action={{
           label: t('export.export'),
           icon: <Download className="w-4 h-4" />,

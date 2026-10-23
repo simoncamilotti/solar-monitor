@@ -105,7 +105,7 @@ export const RecordsCard: FunctionComponent<RecordsCardProps> = ({
       aria-labelledby="records-title"
     >
       <div className="flex items-center gap-2 mb-4">
-        <Trophy className="w-4 h-4 text-primary" aria-hidden="true" />
+        <Trophy className="w-4 h-4 text-primary-text" aria-hidden="true" />
         <h3 id="records-title" className="text-sm font-semibold text-foreground">
           {t('home.records.title')}
         </h3>

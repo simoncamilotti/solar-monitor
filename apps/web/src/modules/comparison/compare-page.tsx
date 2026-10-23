@@ -16,7 +16,7 @@ export const ComparePage: FunctionComponent = () => {
       <PageHeader
         title={t('compare.title')}
         description={t('compare.description')}
-        icon={<GitCompare className="w-5 h-5 text-primary" />}
+        icon={<GitCompare className="w-5 h-5 text-primary-text" />}
       />
 
       {isPending && <ComparisonPageSkeleton />}
