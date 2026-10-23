@@ -7,6 +7,11 @@ const pages = [
   { name: 'dashboard', path: '/', waitFor: 'main' },
   { name: 'compare', path: '/compare', waitFor: 'main' },
   { name: 'history', path: '/history', waitFor: 'main' },
+  {
+    name: 'history-calendar',
+    path: '/history?view=calendar',
+    waitFor: 'section[aria-labelledby="calendar-title"] .echarts-for-react svg',
+  },
   { name: 'settings', path: '/settings', waitFor: 'input[type="time"]' },
 ] as const;
 

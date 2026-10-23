@@ -26,6 +26,10 @@ vi.mock('./components/export-modal.js', () => ({
     ) : null,
 }));
 
+vi.mock('./calendar/production-calendar.js', () => ({
+  ProductionCalendar: () => <div data-testid="production-calendar" />,
+}));
+
 vi.mock('./components/grid-skeleton.js', () => ({
   GridSkeleton: () => <div data-testid="grid-skeleton" />,
 }));
@@ -129,5 +133,26 @@ describe('HistoryPage', () => {
 
     fireEvent.click(screen.getByText('close'));
     expect(screen.queryByTestId('export-modal')).toBeNull();
+  });
+
+  it('should show the calendar instead of the grid in the calendar view', () => {
+    mockHistoryData.mockReturnValue({ data: mockData, isPending: false, isError: false });
+    render(<HistoryPage view="calendar" />);
+
+    expect(screen.getByTestId('production-calendar')).toBeDefined();
+    expect(screen.queryByTestId('history-grid')).toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'history.views.calendar', pressed: true }),
+    ).toBeDefined();
+  });
+
+  it('should ask for the other view', () => {
+    const onViewChange = vi.fn();
+    mockHistoryData.mockReturnValue({ data: mockData, isPending: false, isError: false });
+    render(<HistoryPage onViewChange={onViewChange} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'history.views.calendar' }));
+
+    expect(onViewChange).toHaveBeenCalledWith('calendar');
   });
 });
