@@ -170,6 +170,7 @@ export const en: Translations = {
       years: 'Years',
       months: 'Months',
       days: 'Days',
+      ranges: 'Ranges',
     },
     resolutionLabel: 'Grouping',
     resolution: {
@@ -188,7 +189,7 @@ export const en: Translations = {
       title: 'What do you want to compare?',
       description: 'Start from a common comparison, or build your own.',
       custom:
-        'For a custom comparison, pick years, months or days, then add up to {{max}} periods with “Add”.',
+        'For a custom comparison, pick years, months, days or date ranges, then add up to {{max}} periods with “Add”.',
     },
     presets: {
       thisYearVsLastYear: 'This year vs last year',
@@ -196,6 +197,24 @@ export const en: Translations = {
       bestAndWorstYear: 'Best and worst year',
       recentYears: 'Recent years',
       notEnoughHistory: 'Not enough history yet',
+    },
+    ranges: {
+      pick: 'Pick dates',
+      name: 'Name (optional)',
+      previousYear: 'Same dates, previous year',
+      justBefore: 'Period just before',
+      dayIndex: 'D{{index}}',
+      weekIndex: 'W{{index}}',
+      monthIndex: 'M{{index}}',
+    },
+    summary: {
+      title: 'Summary · {{metric}}',
+      period: 'Period',
+      total: 'Total',
+      dailyAverage: 'Daily average',
+      bestDay: 'Best day',
+      change: 'Change from the first',
+      points: 'pts',
     },
     error: 'An error occurred while loading data.',
     chartType: {

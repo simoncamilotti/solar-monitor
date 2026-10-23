@@ -8,11 +8,13 @@ import { useComparisonFilters } from '../hooks/use-comparison-filters.hook.js';
 import { ComparisonChart } from './comparison-chart.js';
 import { ComparisonEmptyState } from './comparison-empty-state.js';
 import { ComparisonFilters } from './comparison-filters.js';
+import { ComparisonSummaryTable } from './comparison-summary-table.js';
 
 export const ComparisonContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ data }) => {
   const {
     filters,
     availableYears,
+    availableDays,
     availableResolutions,
     setGranularity,
     addPeriod,
@@ -33,6 +35,7 @@ export const ComparisonContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ 
         resolution={filters.resolution}
         periods={filters.periods}
         availableYears={availableYears}
+        availableDays={availableDays}
         availableResolutions={availableResolutions}
         onGranularityChange={setGranularity}
         onResolutionChange={setResolution}
@@ -42,13 +45,16 @@ export const ComparisonContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ 
       {filters.periods.length === 0 ? (
         <ComparisonEmptyState data={data} onApplyPreset={applyPreset} />
       ) : (
-        <ComparisonChart
-          chartOptions={chartOptions}
-          selectedMetric={filters.metric}
-          chartType={filters.chartType}
-          onMetricChange={setMetric}
-          onChartTypeChange={setChartType}
-        />
+        <>
+          <ComparisonChart
+            chartOptions={chartOptions}
+            selectedMetric={filters.metric}
+            chartType={filters.chartType}
+            onMetricChange={setMetric}
+            onChartTypeChange={setChartType}
+          />
+          <ComparisonSummaryTable data={data} filters={filters} series={series} />
+        </>
       )}
     </div>
   );

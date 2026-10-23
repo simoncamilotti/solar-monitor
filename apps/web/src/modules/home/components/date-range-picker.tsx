@@ -1,7 +1,9 @@
 import { format, parseISO } from 'date-fns';
-import { fr as frLocale } from 'date-fns/locale';
+import type { Locale } from 'date-fns/locale';
 import type { FunctionComponent } from 'react';
 import DatePicker from 'react-datepicker';
+
+import { useDateLocale } from '../../../i18n/date-locale.js';
 
 import { PickerDropdown } from './picker-dropdown.js';
 
@@ -11,19 +13,21 @@ type DateRangePickerProps = {
   minDate: Date | null;
   maxDate: Date | null;
   onChange: (startDate: string | null, endDate: string | null) => void;
+  /** Shown while no date is chosen. */
+  placeholder?: string;
 };
 
 const toDate = (dateStr: string | null): Date | null => (dateStr ? parseISO(dateStr) : null);
 const toIso = (date: Date): string => format(date, 'yyyy-MM-dd');
 
-const formatLabel = (from: Date | null, to: Date | null): string => {
+const formatLabel = (from: Date | null, to: Date | null, locale: Locale, placeholder: string) => {
   if (from && to) {
-    return `${format(from, 'd MMM yyyy', { locale: frLocale })} — ${format(to, 'd MMM yyyy', { locale: frLocale })}`;
+    return `${format(from, 'd MMM yyyy', { locale })} — ${format(to, 'd MMM yyyy', { locale })}`;
   }
   if (from) {
-    return `${format(from, 'd MMM yyyy', { locale: frLocale })} — ...`;
+    return `${format(from, 'd MMM yyyy', { locale })} — ...`;
   }
-  return '—';
+  return placeholder;
 };
 
 export const DateRangePicker: FunctionComponent<DateRangePickerProps> = ({
@@ -32,12 +36,14 @@ export const DateRangePicker: FunctionComponent<DateRangePickerProps> = ({
   minDate,
   maxDate,
   onChange,
+  placeholder = '—',
 }) => {
+  const locale = useDateLocale();
   const from = toDate(startDate);
   const to = toDate(endDate);
 
   return (
-    <PickerDropdown label={formatLabel(from, to)}>
+    <PickerDropdown label={formatLabel(from, to, locale, placeholder)}>
       {({ close }) => (
         <DatePicker
           calendarClassName="helios-calendar"
@@ -52,7 +58,7 @@ export const DateRangePicker: FunctionComponent<DateRangePickerProps> = ({
           selectsRange
           inline
           monthsShown={1}
-          locale={frLocale}
+          locale={locale}
           minDate={minDate ?? undefined}
           maxDate={maxDate ?? undefined}
         />

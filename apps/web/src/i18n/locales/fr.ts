@@ -170,6 +170,7 @@ export const fr = {
       years: 'Années',
       months: 'Mois',
       days: 'Jours',
+      ranges: 'Plages',
     },
     resolutionLabel: 'Regroupement',
     resolution: {
@@ -188,7 +189,7 @@ export const fr = {
       title: 'Que voulez-vous comparer ?',
       description: "Partez d'une comparaison courante, ou composez la vôtre.",
       custom:
-        "Pour une comparaison personnalisée, choisissez années, mois ou jours, puis ajoutez jusqu'à {{max}} périodes avec « Ajouter ».",
+        "Pour une comparaison personnalisée, choisissez années, mois, jours ou plages de dates, puis ajoutez jusqu'à {{max}} périodes avec « Ajouter ».",
     },
     presets: {
       thisYearVsLastYear: "Cette année vs l'an dernier",
@@ -196,6 +197,24 @@ export const fr = {
       bestAndWorstYear: 'Meilleure et moins bonne année',
       recentYears: 'Les dernières années',
       notEnoughHistory: "Pas encore assez d'historique",
+    },
+    ranges: {
+      pick: 'Choisir les dates',
+      name: 'Nom (facultatif)',
+      previousYear: 'Mêmes dates, année précédente',
+      justBefore: 'Période juste avant',
+      dayIndex: 'J{{index}}',
+      weekIndex: 'S{{index}}',
+      monthIndex: 'M{{index}}',
+    },
+    summary: {
+      title: 'Synthèse · {{metric}}',
+      period: 'Période',
+      total: 'Total',
+      dailyAverage: 'Moyenne par jour',
+      bestDay: 'Meilleur jour',
+      change: 'Écart avec la première',
+      points: 'pts',
     },
     error: 'Une erreur est survenue lors du chargement des données.',
     chartType: {

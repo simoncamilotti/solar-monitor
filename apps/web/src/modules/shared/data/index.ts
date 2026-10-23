@@ -1,1 +1,1 @@
-export { filterByDay, filterByMonth, filterByYear } from './data-filters.js';
+export { filterByDay, filterByMonth, filterByRange, filterByYear } from './data-filters.js';

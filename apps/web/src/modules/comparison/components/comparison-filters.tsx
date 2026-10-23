@@ -21,6 +21,7 @@ type ComparisonFiltersProps = {
   resolution: ComparisonResolution;
   periods: ComparisonPeriod[];
   availableYears: number[];
+  availableDays: string[];
   availableResolutions: ComparisonResolution[];
   onGranularityChange: (g: ComparisonGranularity) => void;
   onResolutionChange: (r: ComparisonResolution) => void;
@@ -28,13 +29,14 @@ type ComparisonFiltersProps = {
   onRemovePeriod: (p: ComparisonPeriod) => void;
 };
 
-const GRANULARITIES: ComparisonGranularity[] = ['years', 'months', 'days'];
+const GRANULARITIES: ComparisonGranularity[] = ['years', 'months', 'days', 'ranges'];
 
 export const ComparisonFilters: FunctionComponent<ComparisonFiltersProps> = ({
   granularity,
   resolution,
   periods,
   availableYears,
+  availableDays,
   availableResolutions,
   onGranularityChange,
   onResolutionChange,
@@ -54,6 +56,8 @@ export const ComparisonFilters: FunctionComponent<ComparisonFiltersProps> = ({
         {GRANULARITIES.map((g) => (
           <button
             key={g}
+            type="button"
+            aria-pressed={granularity === g}
             onClick={() => onGranularityChange(g)}
             className={`text-xs py-1.5 px-3 rounded-md transition-smooth font-medium ${
               granularity === g
@@ -94,6 +98,7 @@ export const ComparisonFilters: FunctionComponent<ComparisonFiltersProps> = ({
         periods={periods}
         granularity={granularity}
         availableYears={availableYears}
+        availableDays={availableDays}
         onAdd={onAddPeriod}
         onRemove={onRemovePeriod}
       />
