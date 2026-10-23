@@ -15,6 +15,7 @@ import type {
   MonthPeriod,
   YearPeriod,
 } from '../comparison.type.js';
+import { MAX_COMPARISON_PERIODS } from '../comparison-presets.js';
 
 const STORAGE_KEY = 'comparison-filters';
 
@@ -82,7 +83,10 @@ const buildInitialState = (): ComparisonFilterState => {
       ? stored.resolution
       : DEFAULT_RESOLUTION[granularity];
 
-  const periods = stored?.periods && Array.isArray(stored.periods) ? stored.periods : [];
+  const periods =
+    stored?.periods && Array.isArray(stored.periods)
+      ? stored.periods.slice(0, MAX_COMPARISON_PERIODS)
+      : [];
 
   return { granularity, periods, metric, resolution, chartType };
 };
@@ -128,10 +132,23 @@ export const useComparisonFilters = (data: LifetimeDay[]) => {
   const addPeriod = useCallback((period: ComparisonPeriod) => {
     setFilters((prev) => {
       const exists = prev.periods.some((p) => periodsEqual(p, period));
-      if (exists) return prev;
+      if (exists || prev.periods.length >= MAX_COMPARISON_PERIODS) return prev;
       return { ...prev, periods: [...prev.periods, period] };
     });
   }, []);
+
+  /** Replaces the comparison with a ready-made one. */
+  const applyPreset = useCallback(
+    (granularity: ComparisonGranularity, periods: ComparisonPeriod[]) => {
+      setFilters((prev) => ({
+        ...prev,
+        granularity,
+        periods: periods.slice(0, MAX_COMPARISON_PERIODS),
+        resolution: DEFAULT_RESOLUTION[granularity],
+      }));
+    },
+    [],
+  );
 
   const removePeriod = useCallback((period: ComparisonPeriod) => {
     setFilters((prev) => ({
@@ -160,6 +177,7 @@ export const useComparisonFilters = (data: LifetimeDay[]) => {
     availableResolutions,
     setGranularity,
     addPeriod,
+    applyPreset,
     removePeriod,
     setMetric,
     setResolution,

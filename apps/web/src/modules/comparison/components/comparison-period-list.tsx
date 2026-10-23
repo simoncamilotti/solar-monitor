@@ -6,6 +6,7 @@ import { monthKey } from '../../../i18n/keys.js';
 
 import { getPeriodColor, useDisplayedTheme } from '../../shared/metrics/energy-colors.js';
 import type { ComparisonGranularity, ComparisonPeriod } from '../comparison.type.js';
+import { MAX_COMPARISON_PERIODS } from '../comparison-presets.js';
 import { isDayPeriod, isMonthPeriod, isYearPeriod } from '../hooks/use-comparison-filters.hook.js';
 import { PeriodPicker } from './period-picker.js';
 
@@ -17,7 +18,10 @@ type ComparisonPeriodListProps = {
   onRemove: (period: ComparisonPeriod) => void;
 };
 
-const getPeriodChipLabel = (period: ComparisonPeriod, monthName: (i: number) => string): string => {
+export const getPeriodChipLabel = (
+  period: ComparisonPeriod,
+  monthName: (i: number) => string,
+): string => {
   if (isYearPeriod(period)) {
     return `${period.year}`;
   }
@@ -40,6 +44,7 @@ export const ComparisonPeriodList: FunctionComponent<ComparisonPeriodListProps> 
   const { t } = useTranslation();
   const theme = useDisplayedTheme();
   const monthName = (i: number) => t(monthKey(i));
+  const isFull = periods.length >= MAX_COMPARISON_PERIODS;
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -69,11 +74,16 @@ export const ComparisonPeriodList: FunctionComponent<ComparisonPeriodListProps> 
         );
       })}
 
-      <PeriodPicker granularity={granularity} availableYears={availableYears} onAdd={onAdd} />
-
-      {periods.length < 2 && (
-        <span className="text-xs text-muted-foreground">{t('compare.periods.empty')}</span>
+      {!isFull && (
+        <PeriodPicker granularity={granularity} availableYears={availableYears} onAdd={onAdd} />
       )}
+
+      <span className="text-xs text-muted-foreground">
+        {t('compare.periods.selected', {
+          selected: periods.length,
+          max: MAX_COMPARISON_PERIODS,
+        })}
+      </span>
     </div>
   );
 };

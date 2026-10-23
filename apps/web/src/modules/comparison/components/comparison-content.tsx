@@ -6,6 +6,7 @@ import { useComparisonChart } from '../hooks/use-comparison-chart.hook.js';
 import { useComparisonData } from '../hooks/use-comparison-data.hook.js';
 import { useComparisonFilters } from '../hooks/use-comparison-filters.hook.js';
 import { ComparisonChart } from './comparison-chart.js';
+import { ComparisonEmptyState } from './comparison-empty-state.js';
 import { ComparisonFilters } from './comparison-filters.js';
 
 export const ComparisonContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ data }) => {
@@ -15,6 +16,7 @@ export const ComparisonContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ 
     availableResolutions,
     setGranularity,
     addPeriod,
+    applyPreset,
     removePeriod,
     setMetric,
     setResolution,
@@ -37,13 +39,17 @@ export const ComparisonContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ 
         onAddPeriod={addPeriod}
         onRemovePeriod={removePeriod}
       />
-      <ComparisonChart
-        chartOptions={chartOptions}
-        selectedMetric={filters.metric}
-        chartType={filters.chartType}
-        onMetricChange={setMetric}
-        onChartTypeChange={setChartType}
-      />
+      {filters.periods.length === 0 ? (
+        <ComparisonEmptyState data={data} onApplyPreset={applyPreset} />
+      ) : (
+        <ComparisonChart
+          chartOptions={chartOptions}
+          selectedMetric={filters.metric}
+          chartType={filters.chartType}
+          onMetricChange={setMetric}
+          onChartTypeChange={setChartType}
+        />
+      )}
     </div>
   );
 };
