@@ -61,6 +61,8 @@ en vigueur ce jour-là.
 - **L'énergie importée** n'est pas valorisée : elle est payée avec ou sans panneaux, elle ne dit
   rien de ce que rapporte l'installation.
 - **Plusieurs devises** : l'euro seulement.
+- **La période de facturation de la revente** (estimation de ce que le foyer va toucher) :
+  [spec 007](007-surplus-resale-estimate.md).
 
 ## Notes techniques
 
