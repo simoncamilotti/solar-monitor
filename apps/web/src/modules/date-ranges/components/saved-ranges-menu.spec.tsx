@@ -128,6 +128,30 @@ describe('SavedRangesMenu', () => {
     await waitFor(() => expect(sent).toEqual({ name: 'Vacances' }));
   });
 
+  it('should not submit the form around the menu when renaming', async () => {
+    const outerSubmit = vi.fn((event: { preventDefault: () => void }) => event.preventDefault());
+    server.use(
+      getDateRangesFindAllMockHandler([summer]),
+      getDateRangesUpdateMockHandler({ ...summer, name: 'Vacances' }),
+    );
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <form onSubmit={outerSubmit}>
+          <SavedRangesMenu onApply={vi.fn()} />
+        </form>
+      </QueryClientProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Plages enregistrées' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Renommer « Été 2024 »' }));
+    fireEvent.change(screen.getByLabelText('Nom de la plage'), { target: { value: 'Vacances' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Valider le nom' }));
+
+    await waitFor(() => expect(screen.queryByLabelText('Nom de la plage')).toBeNull());
+    expect(outerSubmit).not.toHaveBeenCalled();
+  });
+
   it('should delete a saved range', async () => {
     const deleted = vi.fn();
     server.use(

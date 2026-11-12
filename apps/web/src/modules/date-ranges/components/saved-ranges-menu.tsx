@@ -117,6 +117,8 @@ const SavedRangeItem: FunctionComponent<{ range: DateRange; onApply: () => void 
 
   const rename = (event: FormEvent) => {
     event.preventDefault();
+    // The popover is a portal: without this, React bubbles the submit to a form around the menu.
+    event.stopPropagation();
     const trimmed = name.trim();
     if (!trimmed || trimmed === range.name) {
       setEditing(false);
