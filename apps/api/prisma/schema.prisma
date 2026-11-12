@@ -85,3 +85,14 @@ model Installation {
   cost      Decimal? @db.Decimal(12, 2)
   updatedAt DateTime @updatedAt
 }
+
+/// A named range of days, both bounds included, saved to compare or display it again.
+model DateRange {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  /// First and last day of the range, stored at midnight UTC.
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

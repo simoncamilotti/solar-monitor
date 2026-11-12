@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SavedRangesMenu } from '../../date-ranges/components/saved-ranges-menu.js';
 import type { DashboardFilterState, DashboardViewMode, DateRange } from '../dashboard.type.js';
 import { DateRangePicker } from './date-range-picker.js';
 import { MonthPicker } from './month-picker.js';
@@ -90,6 +91,12 @@ export const DashboardFilters: FunctionComponent<DashboardFiltersProps> = ({
           minDate={dateRange.min ? parseISO(dateRange.min) : null}
           maxDate={dateRange.max ? parseISO(dateRange.max) : null}
           onChange={onCustomRangeChange}
+        />
+      )}
+      {showCustom && (
+        <SavedRangesMenu
+          current={{ startDate: filters.customStartDate, endDate: filters.customEndDate }}
+          onApply={(range) => onCustomRangeChange(range.startDate, range.endDate)}
         />
       )}
     </motion.div>
