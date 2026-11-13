@@ -1,4 +1,4 @@
-import { installationSchema, tariffCreateSchema } from './pricing.js';
+import { billingSchema, installationSchema, tariffCreateSchema } from './pricing.js';
 
 describe('tariffCreateSchema', () => {
   const valid = { kind: 'purchase', pricePerKwh: 0.2516, effectiveFrom: '2025-02-01' };
@@ -34,5 +34,18 @@ describe('installationSchema', () => {
   it('should reject a negative cost or fractions of a cent', () => {
     expect(installationSchema.safeParse({ cost: -1 }).success).toBe(false);
     expect(installationSchema.safeParse({ cost: 10.001 }).success).toBe(false);
+  });
+});
+
+describe('billingSchema', () => {
+  it('should accept a day or no day', () => {
+    expect(billingSchema.safeParse({ startDate: '2023-03-03' }).success).toBe(true);
+    expect(billingSchema.safeParse({ startDate: null }).success).toBe(true);
+  });
+
+  it('should reject a day that does not exist or a missing field', () => {
+    expect(billingSchema.safeParse({ startDate: '2023-02-30' }).success).toBe(false);
+    expect(billingSchema.safeParse({ startDate: '03/03/2023' }).success).toBe(false);
+    expect(billingSchema.safeParse({}).success).toBe(false);
   });
 });

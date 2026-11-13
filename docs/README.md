@@ -33,6 +33,7 @@ Numérotées à partir de `001` : `specs/NNN-slug.md`.
 - [004 — Records et faits marquants](specs/004-records.md)
 - [005 — Comparaison de plages de dates libres](specs/005-custom-comparison-ranges.md)
 - [006 — Plages de dates enregistrées](specs/006-saved-date-ranges.md)
+- [007 — Revente du surplus par période de facturation](specs/007-surplus-resale-estimate.md)
 
 ## Runbooks
 

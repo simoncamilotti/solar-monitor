@@ -1,11 +1,12 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import type { Installation, Tariff, TariffCreate } from '@repo/contracts';
+import type { Billing, Installation, Tariff, TariffCreate } from '@repo/contracts';
 import { PrismaService } from '../../common/database/prisma.service.js';
 import { Prisma, type Tariff as TariffRow } from '../../generated/prisma/client.js';
 
 const INSTALLATION_ID = 'default';
 
 const toDay = (date: Date): string => date.toISOString().slice(0, 10);
+const fromDay = (day: string): Date => new Date(`${day}T00:00:00.000Z`);
 
 const toTariff = (row: TariffRow): Tariff => ({
   id: row.id,
@@ -33,7 +34,7 @@ export class PricingService {
           kind: input.kind,
           // From the decimal text, so 0.2516 is stored as 0.2516 and not as its float approximation.
           pricePerKwh: new Prisma.Decimal(input.pricePerKwh.toString()),
-          effectiveFrom: new Date(`${input.effectiveFrom}T00:00:00.000Z`),
+          effectiveFrom: fromDay(input.effectiveFrom),
         },
       });
       return toTariff(row);
@@ -67,5 +68,21 @@ export class PricingService {
       update: { cost },
     });
     return { cost: row.cost?.toNumber() ?? null };
+  }
+
+  async getBilling(): Promise<Billing> {
+    const row = await this.prisma.installation.findUnique({ where: { id: INSTALLATION_ID } });
+    return { startDate: row?.billingStart ? toDay(row.billingStart) : null };
+  }
+
+  async updateBilling(input: Billing): Promise<Billing> {
+    const billingStart = input.startDate === null ? null : fromDay(input.startDate);
+    // Only the billing column: the installation cost keeps its value.
+    const row = await this.prisma.installation.upsert({
+      where: { id: INSTALLATION_ID },
+      create: { id: INSTALLATION_ID, billingStart },
+      update: { billingStart },
+    });
+    return { startDate: row.billingStart ? toDay(row.billingStart) : null };
   }
 }

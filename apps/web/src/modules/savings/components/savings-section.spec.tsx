@@ -1,5 +1,6 @@
 import {
   getPricingFindTariffsMockHandler,
+  getPricingGetBillingMockHandler,
   getPricingGetInstallationMockHandler,
 } from '@repo/api-client/mocks';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -56,6 +57,9 @@ const renderSection = () => {
 };
 
 describe('SavingsSection', () => {
+  // Unless a test says otherwise, no billing start is entered.
+  beforeEach(() => server.use(getPricingGetBillingMockHandler({ startDate: null })));
+
   it('should invite to enter tariffs when there is none', async () => {
     server.use(getPricingFindTariffsMockHandler([]));
 
@@ -114,5 +118,45 @@ describe('SavingsSection', () => {
     // 3.20 € gained out of 100 €.
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('3');
     expect(screen.getByText(/Rentabilité estimée en/)).toBeDefined();
+  });
+
+  it('should invite to enter the billing start when there is none', async () => {
+    server.use(
+      getPricingFindTariffsMockHandler([tariff('feedIn', 0.1, '2024-01-01')]),
+      getPricingGetInstallationMockHandler({ cost: null }),
+    );
+
+    renderSection();
+
+    expect(await screen.findByText(/Renseignez le début de votre facturation/)).toBeDefined();
+    expect(screen.getByRole('link', { name: 'Aller au paramétrage' }).getAttribute('href')).toBe(
+      '/settings',
+    );
+  });
+
+  it('should invite to enter a feed-in tariff when only the billing start is known', async () => {
+    server.use(
+      getPricingFindTariffsMockHandler([tariff('purchase', 0.2, '2024-01-01')]),
+      getPricingGetInstallationMockHandler({ cost: null }),
+      getPricingGetBillingMockHandler({ startDate: '2023-03-03' }),
+    );
+
+    renderSection();
+
+    expect(await screen.findByText(/Renseignez votre tarif de rachat/)).toBeDefined();
+    expect(screen.queryByText('Revente estimée')).toBeNull();
+  });
+
+  it('should show the resale of the billing period once both are known', async () => {
+    server.use(
+      getPricingFindTariffsMockHandler([tariff('feedIn', 0.1, '2024-01-01')]),
+      getPricingGetInstallationMockHandler({ cost: null }),
+      getPricingGetBillingMockHandler({ startDate: '2023-03-03' }),
+    );
+
+    renderSection();
+
+    expect(await screen.findByText('Revente estimée')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Période précédente' })).toBeDefined();
   });
 });
