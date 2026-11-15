@@ -74,7 +74,7 @@ Chaque modèle pose son label `type: …`.
   applique le même délai. Fixée à la main sur une version trop récente, elle bloque toute
   commande pnpm, hooks compris (`ERR_PNPM_NO_MATURE_MATCHING_VERSION`). Contournement
   ponctuel qui garde les hooks actifs : `npm_config_manage_package_manager_versions=false`.
-- Renovate propose les mises à jour le lundi matin ; correctifs et mineures sont fusionnés
+- Renovate propose les mises à jour le lundi ; correctifs et mineures sont fusionnés
   automatiquement après une CI verte, les majeures sont relues.
 
 ## Releases

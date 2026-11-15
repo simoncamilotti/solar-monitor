@@ -10,7 +10,7 @@
     "node": ">=24.22.1 <25"
   },
   "starter": {
-    "version": "1.0.2"
+    "version": "1.0.3"
   },
   "scripts": {
     "prepare": "if [ -d .git ] && [ -z \"${CI:-}\" ]; then lefthook install; fi",
