@@ -36,12 +36,11 @@ Les ADR cités sont ceux du starter :
 
 ### Écarts temporaires
 
-À retirer une fois la release suivante déployée en production (simoncamilotti/infra#98) :
+À retirer quand la condition de la dernière colonne est remplie :
 
-| Sujet                | Starter                                | solar-monitor aujourd'hui                                                                                         | Fin prévue                                                                                                     |
-| -------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Configuration du web | `/config.js` généré depuis les `WEB_*` | L'image garde un `/config.js` monté quand aucune variable `WEB_*` n'est fournie (`apps/web/docker-entrypoint.sh`) | Quand les manifestes GitOps passent les `WEB_*` : retirer le cas du fichier monté                              |
-| Migrations           | Job Kubernetes séparé (ADR 0010)       | `prisma migrate deploy` au démarrage de l'API (`apps/api/entrypoint.sh`)                                          | Quand le Job de migration existe dans le dépôt GitOps : retirer `entrypoint.sh`, reprendre le `CMD` du starter |
+| Sujet      | Starter                          | solar-monitor aujourd'hui                                                | Fin prévue                                                                                                     |
+| ---------- | -------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Migrations | Job Kubernetes séparé (ADR 0010) | `prisma migrate deploy` au démarrage de l'API (`apps/api/entrypoint.sh`) | Quand le Job de migration existe dans le dépôt GitOps : retirer `entrypoint.sh`, reprendre le `CMD` du starter |
 
 ## Conséquences
 
