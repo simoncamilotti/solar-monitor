@@ -120,7 +120,7 @@ partir d'un jeton du faux émetteur.
 
 ## Starter
 
-Projet aligné sur [monorepo-starter](https://github.com/simoncamilotti/monorepo-starter) **v1.0.2**
+Projet aligné sur [monorepo-starter](https://github.com/simoncamilotti/monorepo-starter) **v1.0.3**
 (issue #52). Les choix de socle sont justifiés dans les
-[ADR du starter](https://github.com/simoncamilotti/monorepo-starter/tree/v1.0.2/starter/adr).
+[ADR du starter](https://github.com/simoncamilotti/monorepo-starter/tree/v1.0.3/starter/adr).
 Les décisions propres au projet, dont les écarts au starter, sont dans [adr/](adr/).

@@ -58,9 +58,6 @@ a besoin, procéder en deux temps, comme pour une [migration](database-migration
    PR du projet qui la lit ;
 2. une fois la release qui la lit déployée en prod, retirer l'ancienne variable.
 
-En cours : `KEYCLOAK_*` → `OIDC_*` pour l'API, `/config.js` monté → variables `WEB_*` pour le
-web. La seconde étape attend la prochaine release (simoncamilotti/infra#98).
-
 Une nouvelle variable obligatoire suit le même ordre : la PR GitOps d'abord. Seule une valeur
 qui diffère vraiment entre les environnements va dans un patch de l'overlay (`overlays/dev`
 ou `overlays/prod`), jamais une valeur qui attend une release.
