@@ -11,7 +11,7 @@ ou pas encore : cet ADR les recense, pour qu'un report d'une version suivante du
 ([guide](../guides/update-from-starter.md)) ne les écrase pas.
 
 Les ADR cités sont ceux du starter :
-[`starter/adr/`](https://github.com/simoncamilotti/monorepo-starter/tree/v1.0.3/starter/adr).
+[`starter/adr/`](https://github.com/simoncamilotti/monorepo-starter/tree/v1.0.4/starter/adr).
 
 ## Décision
 

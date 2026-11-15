@@ -1,14 +1,15 @@
 # Local hooks stay fast: the CI is the reference (ADR 0006).
 pre-commit:
-  parallel: true
+  # In sequence, ESLint first: an `eslint --fix` run after Prettier could leave a file unformatted.
+  piped: true
   jobs:
-    - name: format
-      glob: '*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,html}'
-      run: pnpm exec prettier --write --ignore-unknown {staged_files}
-      stage_fixed: true
     - name: lint
       glob: '*.{js,jsx,ts,tsx,mjs,cjs}'
       run: pnpm exec eslint --fix --no-warn-ignored {staged_files}
+      stage_fixed: true
+    - name: format
+      glob: '*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,html}'
+      run: pnpm exec prettier --write --ignore-unknown {staged_files}
       stage_fixed: true
     - name: gitleaks
       # Optional locally, mandatory in CI.
