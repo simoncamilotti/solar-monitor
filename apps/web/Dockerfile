@@ -2,7 +2,7 @@
 # Web image (ADR 0008, ADR 0010). Build context: the repository root.
 # The same image serves every environment: /config.js is generated at startup from
 # WEB_API_URL, WEB_OIDC_AUTHORITY and WEB_OIDC_CLIENT_ID.
-ARG NODE_IMAGE=node:24.22.2-alpine@sha256:a34ab6d7f6f4813f4d0c5469d74685604b962fbdbf5793a7bc7b4998ecb867c8
+ARG NODE_IMAGE=node:24.22.3-alpine@sha256:116b800c3754b440ee0aa3ed2f20f5bf3d99a554bfd9adeea09ea8017f6e85f5
 ARG NGINX_IMAGE=nginxinc/nginx-unprivileged:1.31-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e
 
 FROM ${NODE_IMAGE} AS build
