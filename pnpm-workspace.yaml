@@ -17,9 +17,9 @@ catalog:
   '@fontsource-variable/geist': 5.3.0
   '@nestjs/axios': 12.0.2
   '@nestjs/cli': 12.0.13
-  '@nestjs/common': 12.0.3
+  '@nestjs/common': 12.5.1
   '@nestjs/config': 12.1.1
-  '@nestjs/core': 12.0.3
+  '@nestjs/core': 12.5.1
   '@nestjs/platform-express': 12.5.0
   '@nestjs/schedule': 12.0.4
   '@nestjs/swagger': 12.1.2
@@ -42,7 +42,7 @@ catalog:
   '@opentelemetry/sdk-node': 0.301.2
   '@playwright/test': 1.65.1
   '@prisma/adapter-pg': 7.10.1
-  '@prisma/client': 7.10.0
+  '@prisma/client': 7.10.1
   '@prisma/instrumentation': 7.10.1
   '@scalar/nestjs-api-reference': 1.2.37
   '@standard-schema/spec': 1.1.0
@@ -97,10 +97,10 @@ catalog:
   pino-http: 11.0.0
   pino-pretty: 13.2.0
   prettier: 3.10.1
-  prisma: 7.10.0
-  react: 19.3.0
+  prisma: 7.10.1
+  react: 19.3.1
   react-day-picker: 10.0.2
-  react-dom: 19.3.0
+  react-dom: 19.3.1
   react-i18next: 17.1.13
   react-oidc-context: 3.3.1
   reflect-metadata: 0.2.2
