@@ -8,3 +8,10 @@ export const monthKey = (index: number) =>
 export const tariffKindKey = <K extends Extract<keyof Translations['tariffs']['kinds'], string>>(
   kind: K,
 ) => `tariffs.kinds.${kind}` as const;
+
+/** Key of the source of a resale estimate: `t(resaleBasisKey('lastYear'))`. */
+export const resaleBasisKey = <
+  B extends Extract<keyof Translations['savings']['resale']['basis'], string>,
+>(
+  basis: B,
+) => `savings.resale.basis.${basis}` as const;

@@ -141,4 +141,49 @@ describe('PricingService', () => {
       expect(mockPrisma.installation.upsert.mock.lastCall?.[0].update).toEqual({ cost: null });
     });
   });
+
+  describe('billing', () => {
+    it('should report an unknown start before anything is entered', async () => {
+      mockPrisma.installation.findUnique.mockResolvedValue(null);
+
+      await expect(service.getBilling()).resolves.toEqual({ startDate: null });
+    });
+
+    it('should expose the start as yyyy-MM-dd', async () => {
+      mockPrisma.installation.findUnique.mockResolvedValue({
+        id: 'default',
+        cost: null,
+        billingStart: new Date('2023-03-03T00:00:00.000Z'),
+      });
+
+      await expect(service.getBilling()).resolves.toEqual({ startDate: '2023-03-03' });
+    });
+
+    it('should store the start at midnight UTC and leave the cost alone', async () => {
+      mockPrisma.installation.upsert.mockResolvedValue({
+        id: 'default',
+        cost: new Prisma.Decimal('9500.5'),
+        billingStart: new Date('2023-03-03T00:00:00.000Z'),
+      });
+
+      await expect(service.updateBilling({ startDate: '2023-03-03' })).resolves.toEqual({
+        startDate: '2023-03-03',
+      });
+      const args = mockPrisma.installation.upsert.mock.lastCall?.[0];
+      expect(args.create.billingStart.toISOString()).toBe('2023-03-03T00:00:00.000Z');
+      expect(args.update).toEqual({ billingStart: args.update.billingStart });
+      expect(args.update).not.toHaveProperty('cost');
+    });
+
+    it('should clear the start', async () => {
+      mockPrisma.installation.upsert.mockResolvedValue({ id: 'default', billingStart: null });
+
+      await expect(service.updateBilling({ startDate: null })).resolves.toEqual({
+        startDate: null,
+      });
+      expect(mockPrisma.installation.upsert.mock.lastCall?.[0].update).toEqual({
+        billingStart: null,
+      });
+    });
+  });
 });

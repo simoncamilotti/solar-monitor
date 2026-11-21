@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
+  type Billing,
+  billingSchema,
   type Installation,
   installationSchema,
   type Tariff,
@@ -58,5 +60,19 @@ export class PricingController {
     @Body({ schema: installationSchema }) dto: Installation,
   ): Promise<Installation> {
     return this.pricing.updateInstallation(dto);
+  }
+
+  @Get('billing')
+  @ApiOperation({ summary: 'Get the start of the yearly billing period of the surplus resale' })
+  @ResponseSchema(billingSchema)
+  getBilling(): Promise<Billing> {
+    return this.pricing.getBilling();
+  }
+
+  @Put('billing')
+  @ApiOperation({ summary: 'Update the start of the yearly billing period; null clears it' })
+  @ResponseSchema(billingSchema)
+  updateBilling(@Body({ schema: billingSchema }) dto: Billing): Promise<Billing> {
+    return this.pricing.updateBilling(dto);
   }
 }
