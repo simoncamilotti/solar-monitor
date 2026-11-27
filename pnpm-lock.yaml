@@ -354,9 +354,6 @@ catalogs:
     cn:
       specifier: 0.5.2
       version: 0.5.2
-    cron:
-      specifier: 4.4.2
-      version: 4.4.2
     date-fns:
       specifier: 4.4.0
       version: 4.4.0
@@ -504,6 +501,9 @@ catalogs:
     zod:
       specifier: 4.6.7
       version: 4.6.7
+
+overrides:
+  cron: 4.4.2
 
 importers:
 
@@ -669,7 +669,7 @@ importers:
         specifier: 'catalog:'
         version: 1.21.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
       cron:
-        specifier: 'catalog:'
+        specifier: 4.4.2
         version: 4.4.2
       decimal.js:
         specifier: 'catalog:'
@@ -5738,10 +5738,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-
-  cron@4.4.0:
-    resolution: {integrity: sha512-fkdfq+b+AHI4cKdhZlppHveI/mgz2qpiYxcm+t5E5TsxX7QrLS1VE0+7GENEk9z0EeGPcpSciGv6ez24duWhwQ==}
-    engines: {node: '>=18.x'}
 
   cron@4.4.2:
     resolution: {integrity: sha512-sXlg/D5CdX7M4q3isDCbBD3XCHXExr3yBFwfZ1xaSe/IUVd3DmsnVzeSRjLlJeohbK+j4UtdKmY9k735RMl5XQ==}
@@ -11960,7 +11956,7 @@ snapshots:
     dependencies:
       '@nestjs/common': 12.0.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0)
       '@nestjs/core': 12.0.3(@nestjs/common@12.0.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/platform-express@12.6.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      cron: 4.4.0
+      cron: 4.4.2
 
   '@nestjs/schematics@12.0.13(chokidar@5.0.0)(prettier@3.10.1)(typescript@6.0.3)':
     dependencies:
@@ -15243,11 +15239,6 @@ snapshots:
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 6.0.3
-
-  cron@4.4.0:
-    dependencies:
-      '@types/luxon': 3.7.5
-      luxon: 3.7.2
 
   cron@4.4.2:
     dependencies:

@@ -130,3 +130,7 @@ allowBuilds:
   prisma: true
   protobufjs: false
   unrs-resolver: false
+
+# The API builds its own CronJob for SchedulerRegistry: one cron copy, or the types diverge.
+overrides:
+  cron: 'catalog:'
