@@ -1,8 +1,10 @@
 import {
   getPricingFindTariffsQueryKey,
+  getPricingGetBillingQueryKey,
   getPricingGetInstallationQueryKey,
   usePricingCreateTariff,
   usePricingDeleteTariff,
+  usePricingUpdateBilling,
   usePricingUpdateInstallation,
 } from '@repo/api-client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -25,4 +27,9 @@ export const useDeleteTariffMutation = () =>
 export const useUpdateInstallationMutation = () =>
   usePricingUpdateInstallation({
     mutation: { onSuccess: useInvalidate(getPricingGetInstallationQueryKey()) },
+  });
+
+export const useUpdateBillingMutation = () =>
+  usePricingUpdateBilling({
+    mutation: { onSuccess: useInvalidate(getPricingGetBillingQueryKey()) },
   });

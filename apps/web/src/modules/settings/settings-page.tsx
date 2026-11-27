@@ -3,6 +3,7 @@ import type { FunctionComponent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '../layout/components/page-header.js';
+import { BillingCard } from './components/billing-card.js';
 import { InstallationCard } from './components/installation-card.js';
 import { SyncScheduleCard } from './components/sync-schedule-card.js';
 import { SyncStatusCard } from './components/sync-status-card.js';
@@ -24,6 +25,7 @@ export const SettingsPage: FunctionComponent = () => {
         <SyncScheduleCard />
         <TariffsCard />
         <InstallationCard />
+        <BillingCard />
       </div>
     </div>
   );
