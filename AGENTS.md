@@ -87,7 +87,8 @@ OIDC ; pas de données par utilisateur ni de rôles. N'en introduire que sur dem
 - Configuration d'exécution dans `/config.js` (`src/config/config.ts`), pas de `import.meta.env`.
 - Tests de composants avec les mocks MSW générés, jamais contre la vraie API.
 - Un paquet CommonJS importé par défaut peut arriver en objet dans le build Vite (erreur React
-  #130) : `echarts-for-react` est importé depuis son build ESM (`echarts-for-react/esm/core.js`).
+  #130) : `echarts-for-react` est importé par `echarts-for-react/lib/core.js`, que la condition
+  `module` de ses `exports` résout vers le build ESM ; `esm/core.js` n'est plus exporté.
 - `apps/web/nginx.conf` n'a pas de règle `/api` : en production, le routage dépend d'une règle
   d'Ingress du dépôt GitOps.
 
