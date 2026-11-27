@@ -6,7 +6,7 @@ l'application web les présente en tableau de bord avec les records de l'install
 comparaison de périodes (années, mois, jours ou plages de dates libres, à enregistrer pour les
 réutiliser), historique exportable
 et calendrier de production, et les valorise en euros à partir des tarifs d'achat et de rachat
-du foyer.
+du foyer, avec une estimation de la revente du surplus sur la période de facturation.
 
 Monorepo Nx : une API NestJS, une application web React et leurs bibliothèques partagées, sur
 le socle de [monorepo-starter](https://github.com/simoncamilotti/monorepo-starter) v1.0.2.
