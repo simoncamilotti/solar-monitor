@@ -8,6 +8,8 @@ const mockPricing = {
   deleteTariff: vi.fn(),
   getInstallation: vi.fn(),
   updateInstallation: vi.fn(),
+  getBilling: vi.fn(),
+  updateBilling: vi.fn(),
 };
 
 const tariff = {
@@ -56,5 +58,16 @@ describe('PricingController', () => {
 
     await expect(controller.getInstallation()).resolves.toEqual({ cost: null });
     await expect(controller.updateInstallation({ cost: 9500 })).resolves.toEqual({ cost: 9500 });
+  });
+
+  it('should get and update the billing start', async () => {
+    mockPricing.getBilling.mockResolvedValue({ startDate: null });
+    mockPricing.updateBilling.mockResolvedValue({ startDate: '2023-03-03' });
+
+    await expect(controller.getBilling()).resolves.toEqual({ startDate: null });
+    await expect(controller.updateBilling({ startDate: '2023-03-03' })).resolves.toEqual({
+      startDate: '2023-03-03',
+    });
+    expect(mockPricing.updateBilling).toHaveBeenCalledWith({ startDate: '2023-03-03' });
   });
 });
