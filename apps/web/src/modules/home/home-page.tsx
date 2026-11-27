@@ -7,7 +7,16 @@ import { DashboardContent } from './components/dashboard-content.js';
 import { HomePageSkeleton } from './components/home-page-skeleton.js';
 import { PageHeader } from '../layout/components/page-header.js';
 
-export const HomePage: FunctionComponent = () => {
+type HomePageProps = {
+  /** Start year of the billing period shown by the resale card; the current one when absent. */
+  billingYear?: number;
+  onBillingYearChange?: (year: number | undefined) => void;
+};
+
+export const HomePage: FunctionComponent<HomePageProps> = ({
+  billingYear,
+  onBillingYearChange,
+}) => {
   const { t } = useTranslation();
   const { data, isPending, isError } = useHistoryData();
 
@@ -21,7 +30,13 @@ export const HomePage: FunctionComponent = () => {
 
       {isPending && <HomePageSkeleton />}
       {isError && <p className="text-destructive text-sm">{t('home.error')}</p>}
-      {data && <DashboardContent data={data} />}
+      {data && (
+        <DashboardContent
+          data={data}
+          billingYear={billingYear}
+          onBillingYearChange={onBillingYearChange}
+        />
+      )}
     </div>
   );
 };

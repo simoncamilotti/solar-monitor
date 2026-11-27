@@ -40,3 +40,12 @@ export const installationSchema = z
   })
   .meta({ id: 'Installation' });
 export type Installation = z.infer<typeof installationSchema>;
+
+/** When the surplus resale is billed: yearly, from the contract anniversary. */
+export const billingSchema = z
+  .object({
+    /** First day of a billing year, any year: the periods follow from it. `null` while unknown. */
+    startDate: daySchema.nullable(),
+  })
+  .meta({ id: 'Billing' });
+export type Billing = z.infer<typeof billingSchema>;

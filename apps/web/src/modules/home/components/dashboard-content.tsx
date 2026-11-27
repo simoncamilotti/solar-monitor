@@ -16,7 +16,18 @@ import { DashboardKPIGrid } from './dashboard-kpi-grid.js';
 import { RecordsCard } from './records-card.js';
 import { SunShareCard } from './sun-share-card.js';
 
-export const DashboardContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ data }) => {
+type DashboardContentProps = {
+  data: LifetimeDay[];
+  /** Start year of the billing period shown by the resale card; the current one when absent. */
+  billingYear?: number;
+  onBillingYearChange?: (year: number | undefined) => void;
+};
+
+export const DashboardContent: FunctionComponent<DashboardContentProps> = ({
+  data,
+  billingYear,
+  onBillingYearChange,
+}) => {
   const {
     filters,
     availableYears,
@@ -48,7 +59,12 @@ export const DashboardContent: FunctionComponent<{ data: LifetimeDay[] }> = ({ d
         onCustomRangeChange={setCustomRange}
       />
       <DashboardKPIGrid kpis={kpis} sparklines={sparklines} />
-      <SavingsSection data={data} filters={filters} />
+      <SavingsSection
+        data={data}
+        filters={filters}
+        billingYear={billingYear}
+        onBillingYearChange={onBillingYearChange}
+      />
       <div className="flex flex-col lg:flex-row gap-4">
         <DashboardChart chartOptions={chartOptions} viewMode={filters.viewMode} />
         <SunShareCard split={split} />
